@@ -3,7 +3,7 @@
  * Filename: cb.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 22:40:29 2016 (+0100)
- * Last-Updated: Sat Dec 10 23:35:27 2016 (+0100)
+ * Last-Updated: Sun Dec 11 15:38:44 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -11,6 +11,84 @@
 #include "logger.h"
 #include "instruction.h"
 #include "memory.h"
+
+/* BITs */
+static inline int gcb_bit(struct CPU * cpu, uint8_t value, uint8_t bit) {
+    FLAG_CLEARIF(value & (1 << bit), cpu->registers.f, CPU_FLAG_Z);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
+    FLAG_SET(cpu->registers.f, CPU_FLAG_H);
+    return 2;
+}
+
+static inline int gcb_bit_hl(struct CPU * cpu, uint8_t bit) {
+    gcb_bit(cpu, read_byte(cpu, cpu->registers.hl), bit);
+    return 3;
+}
+
+int cb_bit_0_b(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.b, 0); }
+int cb_bit_0_c(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.c, 0); }
+int cb_bit_0_d(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.d, 0); }
+int cb_bit_0_e(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.e, 0); }
+int cb_bit_0_h(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.h, 0); }
+int cb_bit_0_l(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.l, 0); }
+int cb_bit_0_hl(struct CPU * cpu){ return gcb_bit_hl(cpu, 0); }
+int cb_bit_0_a(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.a, 0); }
+int cb_bit_1_b(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.b, 1); }
+int cb_bit_1_c(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.c, 1); }
+int cb_bit_1_d(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.d, 1); }
+int cb_bit_1_e(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.e, 1); }
+int cb_bit_1_h(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.h, 1); }
+int cb_bit_1_l(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.l, 1); }
+int cb_bit_1_hl(struct CPU * cpu){ return gcb_bit_hl(cpu, 1); }
+int cb_bit_1_a(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.a, 1); }
+int cb_bit_2_b(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.b, 2); }
+int cb_bit_2_c(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.c, 2); }
+int cb_bit_2_d(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.d, 2); }
+int cb_bit_2_e(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.e, 2); }
+int cb_bit_2_h(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.h, 2); }
+int cb_bit_2_l(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.l, 2); }
+int cb_bit_2_hl(struct CPU * cpu){ return gcb_bit_hl(cpu, 2); }
+int cb_bit_2_a(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.a, 2); }
+int cb_bit_3_b(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.b, 3); }
+int cb_bit_3_c(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.c, 3); }
+int cb_bit_3_d(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.d, 3); }
+int cb_bit_3_e(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.e, 3); }
+int cb_bit_3_h(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.h, 3); }
+int cb_bit_3_l(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.l, 3); }
+int cb_bit_3_hl(struct CPU * cpu){ return gcb_bit_hl(cpu, 3); }
+int cb_bit_3_a(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.a, 3); }
+int cb_bit_4_b(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.b, 4); }
+int cb_bit_4_c(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.c, 4); }
+int cb_bit_4_d(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.d, 4); }
+int cb_bit_4_e(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.e, 4); }
+int cb_bit_4_h(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.h, 4); }
+int cb_bit_4_l(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.l, 4); }
+int cb_bit_4_hl(struct CPU * cpu){ return gcb_bit_hl(cpu, 4); }
+int cb_bit_4_a(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.a, 4); }
+int cb_bit_5_b(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.b, 5); }
+int cb_bit_5_c(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.c, 5); }
+int cb_bit_5_d(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.d, 5); }
+int cb_bit_5_e(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.e, 5); }
+int cb_bit_5_h(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.h, 5); }
+int cb_bit_5_l(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.l, 5); }
+int cb_bit_5_hl(struct CPU * cpu){ return gcb_bit_hl(cpu, 5); }
+int cb_bit_5_a(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.a, 5); }
+int cb_bit_6_b(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.b, 6); }
+int cb_bit_6_c(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.c, 6); }
+int cb_bit_6_d(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.d, 6); }
+int cb_bit_6_e(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.e, 6); }
+int cb_bit_6_h(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.h, 6); }
+int cb_bit_6_l(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.l, 6); }
+int cb_bit_6_hl(struct CPU * cpu){ return gcb_bit_hl(cpu, 6); }
+int cb_bit_6_a(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.a, 6); }
+int cb_bit_7_b(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.b, 7); }
+int cb_bit_7_c(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.c, 7); }
+int cb_bit_7_d(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.d, 7); }
+int cb_bit_7_e(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.e, 7); }
+int cb_bit_7_h(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.h, 7); }
+int cb_bit_7_l(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.l, 7); }
+int cb_bit_7_hl(struct CPU * cpu){ return gcb_bit_hl(cpu, 7); }
+int cb_bit_7_a(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.a, 7); }
 
 /* RESs */
 static inline int gcb_res(struct CPU * cpu, uint8_t * value, uint8_t bit) {
@@ -154,70 +232,70 @@ static struct Instruction cb_instructions[] = {
     {"SRL L",      0, NULL},
     {"SRL (HL)",   0, NULL},
     {"SRL A",      0, NULL},
-    {"BIT 0, B",   0, NULL},  // 0x4X
-    {"BIT 0, C",   0, NULL},
-    {"BIT 0, D",   0, NULL},
-    {"BIT 0, E",   0, NULL},
-    {"BIT 0, H",   0, NULL},
-    {"BIT 0, L",   0, NULL},
-    {"BIT 0, (HL)",0, NULL},
-    {"BIT 0, A",   0, NULL},
-    {"BIT 1, B",   0, NULL},
-    {"BIT 1, C",   0, NULL},
-    {"BIT 1, D",   0, NULL},
-    {"BIT 1, E",   0, NULL},
-    {"BIT 1, H",   0, NULL},
-    {"BIT 1, L",   0, NULL},
-    {"BIT 1, (HL)",0, NULL},
-    {"BIT 1, A",   0, NULL},
-    {"BIT 2, B",   0, NULL},  // 0x5X
-    {"BIT 2, C",   0, NULL},
-    {"BIT 2, D",   0, NULL},
-    {"BIT 2, E",   0, NULL},
-    {"BIT 2, H",   0, NULL},
-    {"BIT 2, L",   0, NULL},
-    {"BIT 2, (HL)",0, NULL},
-    {"BIT 2, A",   0, NULL},
-    {"BIT 3, B",   0, NULL},
-    {"BIT 3, C",   0, NULL},
-    {"BIT 3, D",   0, NULL},
-    {"BIT 3, E",   0, NULL},
-    {"BIT 3, H",   0, NULL},
-    {"BIT 3, L",   0, NULL},
-    {"BIT 3, (HL)",0, NULL},
-    {"BIT 3, A",   0, NULL},
-    {"BIT 4, B",   0, NULL},  // 0x6X
-    {"BIT 4, C",   0, NULL},
-    {"BIT 4, D",   0, NULL},
-    {"BIT 4, E",   0, NULL},
-    {"BIT 4, H",   0, NULL},
-    {"BIT 4, L",   0, NULL},
-    {"BIT 4, (HL)",0, NULL},
-    {"BIT 4, A",   0, NULL},
-    {"BIT 5, B",   0, NULL},
-    {"BIT 5, C",   0, NULL},
-    {"BIT 5, D",   0, NULL},
-    {"BIT 5, E",   0, NULL},
-    {"BIT 5, H",   0, NULL},
-    {"BIT 5, L",   0, NULL},
-    {"BIT 5, (HL)",0, NULL},
-    {"BIT 5, A",   0, NULL},
-    {"BIT 6, B",   0, NULL},  // 0x7X
-    {"BIT 6, C",   0, NULL},
-    {"BIT 6, D",   0, NULL},
-    {"BIT 6, E",   0, NULL},
-    {"BIT 6, H",   0, NULL},
-    {"BIT 6, L",   0, NULL},
-    {"BIT 6, (HL)",0, NULL},
-    {"BIT 6, A",   0, NULL},
-    {"BIT 7, B",   0, NULL},
-    {"BIT 7, C",   0, NULL},
-    {"BIT 7, D",   0, NULL},
-    {"BIT 7, E",   0, NULL},
-    {"BIT 7, H",   0, NULL},
-    {"BIT 7, L",   0, NULL},
-    {"BIT 7, (HL)",0, NULL},
-    {"BIT 7, A",   0, NULL},
+    {"BIT 0, B",   0, cb_bit_0_b},  // 0x4X
+    {"BIT 0, C",   0, cb_bit_0_c},
+    {"BIT 0, D",   0, cb_bit_0_d},
+    {"BIT 0, E",   0, cb_bit_0_e},
+    {"BIT 0, H",   0, cb_bit_0_h},
+    {"BIT 0, L",   0, cb_bit_0_l},
+    {"BIT 0, (HL)",0, cb_bit_0_hl},
+    {"BIT 0, A",   0, cb_bit_0_a},
+    {"BIT 1, B",   0, cb_bit_1_b},
+    {"BIT 1, C",   0, cb_bit_1_c},
+    {"BIT 1, D",   0, cb_bit_1_d},
+    {"BIT 1, E",   0, cb_bit_1_e},
+    {"BIT 1, H",   0, cb_bit_1_h},
+    {"BIT 1, L",   0, cb_bit_1_l},
+    {"BIT 1, (HL)",0, cb_bit_1_hl},
+    {"BIT 1, A",   0, cb_bit_1_a},
+    {"BIT 2, B",   0, cb_bit_2_b},  // 0x5X
+    {"BIT 2, C",   0, cb_bit_2_c},
+    {"BIT 2, D",   0, cb_bit_2_d},
+    {"BIT 2, E",   0, cb_bit_2_e},
+    {"BIT 2, H",   0, cb_bit_2_h},
+    {"BIT 2, L",   0, cb_bit_2_l},
+    {"BIT 2, (HL)",0, cb_bit_2_hl},
+    {"BIT 2, A",   0, cb_bit_2_a},
+    {"BIT 3, B",   0, cb_bit_3_b},
+    {"BIT 3, C",   0, cb_bit_3_c},
+    {"BIT 3, D",   0, cb_bit_3_d},
+    {"BIT 3, E",   0, cb_bit_3_e},
+    {"BIT 3, H",   0, cb_bit_3_h},
+    {"BIT 3, L",   0, cb_bit_3_l},
+    {"BIT 3, (HL)",0, cb_bit_3_hl},
+    {"BIT 3, A",   0, cb_bit_3_a},
+    {"BIT 4, B",   0, cb_bit_4_b},  // 0x6X
+    {"BIT 4, C",   0, cb_bit_4_c},
+    {"BIT 4, D",   0, cb_bit_4_d},
+    {"BIT 4, E",   0, cb_bit_4_e},
+    {"BIT 4, H",   0, cb_bit_4_h},
+    {"BIT 4, L",   0, cb_bit_4_l},
+    {"BIT 4, (HL)",0, cb_bit_4_hl},
+    {"BIT 4, A",   0, cb_bit_4_a},
+    {"BIT 5, B",   0, cb_bit_5_b},
+    {"BIT 5, C",   0, cb_bit_5_c},
+    {"BIT 5, D",   0, cb_bit_5_d},
+    {"BIT 5, E",   0, cb_bit_5_e},
+    {"BIT 5, H",   0, cb_bit_5_h},
+    {"BIT 5, L",   0, cb_bit_5_l},
+    {"BIT 5, (HL)",0, cb_bit_5_hl},
+    {"BIT 5, A",   0, cb_bit_5_a},
+    {"BIT 6, B",   0, cb_bit_6_b},  // 0x7X
+    {"BIT 6, C",   0, cb_bit_6_c},
+    {"BIT 6, D",   0, cb_bit_6_d},
+    {"BIT 6, E",   0, cb_bit_6_e},
+    {"BIT 6, H",   0, cb_bit_6_h},
+    {"BIT 6, L",   0, cb_bit_6_l},
+    {"BIT 6, (HL)",0, cb_bit_6_hl},
+    {"BIT 6, A",   0, cb_bit_6_a},
+    {"BIT 7, B",   0, cb_bit_7_b},
+    {"BIT 7, C",   0, cb_bit_7_c},
+    {"BIT 7, D",   0, cb_bit_7_d},
+    {"BIT 7, E",   0, cb_bit_7_e},
+    {"BIT 7, H",   0, cb_bit_7_h},
+    {"BIT 7, L",   0, cb_bit_7_l},
+    {"BIT 7, (HL)",0, cb_bit_7_hl},
+    {"BIT 7, A",   0, cb_bit_7_a},
     {"RES 0, B",   0, cb_res_0_b},  // 0x8X
     {"RES 0, C",   0, cb_res_0_c},
     {"RES 0, D",   0, cb_res_0_d},

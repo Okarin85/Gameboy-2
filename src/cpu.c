@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Sat Dec 10 23:04:55 2016 (+0100)
+ * Last-Updated: Sun Dec 11 15:16:59 2016 (+0100)
  *           By: Jules <archjules>
  */
 #define _GNU_SOURCE
@@ -36,9 +36,9 @@ static inline void print_registers(struct CPU * cpu) {
 static inline uint16_t interpret_opcode(struct CPU * cpu, struct Instruction opcode, char ** str) {
     uint16_t operand;
     if (opcode.operand == 1) {
-	operand = read_byte(cpu, cpu->registers.pc + 1);
+	operand = read_byte(cpu, cpu->registers.pc);
     } else if (opcode.operand == 2) {
-	operand = read_word(cpu, cpu->registers.pc + 1);
+	operand = read_word(cpu, cpu->registers.pc);
     }
 
     cpu->registers.pc += opcode.operand;
@@ -90,8 +90,8 @@ void cpu_load_rom(struct CPU * cpu, char * filename) {
 	log_fatal("Couldn't allocate memory for ZRAM.");
 	exit(EXIT_FAILURE);
     }
-    cpu->registers.pc = 0x100;
-    cpu->registers.sp = 0xFFFE;
+    cpu->memory.bios_inplace = true;
+    
     log_info("Loaded %s (%d bytes)", filename, size);
 }
 
@@ -105,17 +105,17 @@ void cpu_destroy(struct CPU * cpu) {
 
 void cpu_next_instruction(struct CPU * cpu) {
     char * str;
-    uint8_t op = read_byte(cpu, cpu->registers.pc);
+    uint8_t op = read_byte(cpu, cpu->registers.pc++);
     uint16_t operand;
     struct Instruction instruction = instructions[op];
 
     operand = interpret_opcode(cpu, instruction, &str);
     if (instruction.function == NULL) {
-	log_warn("%#04x : Instruction not implemented ! (%#02x, %s)", cpu->registers.pc, op, str);
+	log_warn("%#04x : Instruction not implemented ! (%#02x, %s)", cpu->registers.pc - 1 - instruction.operand, op, str);
 	print_registers(cpu);
 	sleep(10);
     } else {
-	log_debug("%#04x : %s", cpu->registers.pc, str);
+	log_debug("%#04x : %s", cpu->registers.pc - 1 - instruction.operand, str);
 	switch(instruction.operand) {
 	case 0:
 	    ((int (*)(struct CPU *))instruction.function)(cpu);
@@ -130,6 +130,4 @@ void cpu_next_instruction(struct CPU * cpu) {
 	print_registers(cpu);
     }
     free(str);
-    
-    cpu->registers.pc++;
 }
