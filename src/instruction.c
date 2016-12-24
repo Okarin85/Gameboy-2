@@ -3,7 +3,7 @@
  * Filename: instruction.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 12:36:49 2016 (+0100)
- * Last-Updated: Sat Dec 24 13:12:07 2016 (+0100)
+ * Last-Updated: Sat Dec 24 14:26:58 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -559,5 +559,5 @@ int cpu_xor_n(struct CPU * cpu, uint8_t operand) { return g_xor(cpu, operand) + 
 
 /* DAA (Decimally Adjust) */
 int cpu_daa(struct CPU * cpu) {
-    
+    return 1;
 }

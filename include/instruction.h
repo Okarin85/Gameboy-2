@@ -3,7 +3,7 @@
  * Filename: instruction.h
  * Author: Jules <archjules>
  * Created: Thu Dec  8 12:54:40 2016 (+0100)
- * Last-Updated: Sat Dec 24 00:30:16 2016 (+0100)
+ * Last-Updated: Sat Dec 24 14:28:49 2016 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -301,6 +301,8 @@ int cpu_rst_28(struct CPU *);
 int cpu_rst_30(struct CPU *);
 int cpu_rst_38(struct CPU *);
 
+int cpu_daa(struct CPU *);
+
 static struct Instruction instructions[] = {
     {"NOP",             0, cpu_nop}, // 0x0X
     {"LD BC, 0x%04x",   2, cpu_ld_bc_nn},
@@ -341,7 +343,7 @@ static struct Instruction instructions[] = {
     {"INC H",           0, cpu_inc_h},
     {"DEC H",           0, cpu_dec_h},
     {"LD H, 0x%02x",    1, cpu_ld_h_n},
-    {"DAA",             0, NULL},
+    {"DAA",             0, cpu_daa},
     {"JR Z, 0x%02x",    1, cpu_jr_z},
     {"ADD HL, HL",      0, cpu_add_hl_hl},
     {"LD A, (HL+)",     0, cpu_ldi_a_hl},
