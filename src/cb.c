@@ -3,7 +3,7 @@
  * Filename: cb.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 22:40:29 2016 (+0100)
- * Last-Updated: Sun Dec 11 15:38:44 2016 (+0100)
+ * Last-Updated: Sat Dec 24 00:23:21 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -11,6 +11,63 @@
 #include "logger.h"
 #include "instruction.h"
 #include "memory.h"
+
+/* Shifts */
+static inline int gcb_sla(struct CPU * cpu, uint8_t * value) {
+    FLAG_CLEARIF((*value) & 0x7f, cpu->registers.f, CPU_FLAG_Z);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
+    FLAG_SETIF((*value) & 0x80, cpu->registers.f, CPU_FLAG_C);
+
+    (*value) <<= 1;
+    return 2;
+}
+
+int cb_sla_a(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.a); }
+int cb_sla_b(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.b); }
+int cb_sla_c(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.c); }
+int cb_sla_d(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.d); }
+int cb_sla_e(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.e); }
+int cb_sla_h(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.h); }
+int cb_sla_l(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.l); }
+
+static inline int gcb_srl(struct CPU * cpu, uint8_t * value) {
+    FLAG_CLEARIF((*value) & 0xfe, cpu->registers.f, CPU_FLAG_Z);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
+    FLAG_SETIF((*value) & 0x01, cpu->registers.f, CPU_FLAG_C);
+
+    (*value) >>= 1;
+    return 2;
+}
+
+int cb_srl_a(struct CPU * cpu) { return gcb_srl(cpu, &cpu->registers.a); }
+int cb_srl_b(struct CPU * cpu) { return gcb_srl(cpu, &cpu->registers.b); }
+int cb_srl_c(struct CPU * cpu) { return gcb_srl(cpu, &cpu->registers.c); }
+int cb_srl_d(struct CPU * cpu) { return gcb_srl(cpu, &cpu->registers.d); }
+int cb_srl_e(struct CPU * cpu) { return gcb_srl(cpu, &cpu->registers.e); }
+int cb_srl_h(struct CPU * cpu) { return gcb_srl(cpu, &cpu->registers.h); }
+int cb_srl_l(struct CPU * cpu) { return gcb_srl(cpu, &cpu->registers.l); }
+
+
+/* SWAPs */
+static inline int gcb_swap(struct CPU * cpu, uint8_t * value) {
+    FLAG_CLEARIF(*value, cpu->registers.f, CPU_FLAG_Z);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_C);
+
+    (*value) = (((*value) & 0x0F) << 4) | (((*value) & 0xF0) >> 4);
+    return 2;
+}
+
+int cb_swap_a(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.a); }
+int cb_swap_b(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.b); }
+int cb_swap_c(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.c); }
+int cb_swap_d(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.d); }
+int cb_swap_e(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.e); }
+int cb_swap_h(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.h); }
+int cb_swap_l(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.l); }
 
 /* BITs */
 static inline int gcb_bit(struct CPU * cpu, uint8_t value, uint8_t bit) {
@@ -167,15 +224,92 @@ int cb_res_7_l(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.l, 7); }
 int cb_res_7_hl(struct CPU * cpu){ return gcb_res_hl(cpu, 7); }
 int cb_res_7_a(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.a, 7); }
 
+/* SETs */
+static inline int gcb_set(struct CPU * cpu, uint8_t * value, uint8_t bit) {
+    (*value) &= ~(1 << bit);
+    return 2;
+}
+
+static inline int gcb_set_hl(struct CPU * cpu, uint8_t bit) {
+    uint8_t value = read_byte(cpu, cpu->registers.hl) & ~(1 << bit);
+    write_byte(cpu, cpu->registers.hl, value);
+    return 3;
+}
+
+int cb_set_0_b(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.b, 0); }
+int cb_set_0_c(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.c, 0); }
+int cb_set_0_d(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.d, 0); }
+int cb_set_0_e(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.e, 0); }
+int cb_set_0_h(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.h, 0); }
+int cb_set_0_l(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.l, 0); }
+int cb_set_0_hl(struct CPU * cpu){ return gcb_set_hl(cpu, 0); }
+int cb_set_0_a(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.a, 0); }
+int cb_set_1_b(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.b, 1); }
+int cb_set_1_c(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.c, 1); }
+int cb_set_1_d(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.d, 1); }
+int cb_set_1_e(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.e, 1); }
+int cb_set_1_h(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.h, 1); }
+int cb_set_1_l(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.l, 1); }
+int cb_set_1_hl(struct CPU * cpu){ return gcb_set_hl(cpu, 1); }
+int cb_set_1_a(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.a, 1); }
+int cb_set_2_b(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.b, 2); }
+int cb_set_2_c(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.c, 2); }
+int cb_set_2_d(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.d, 2); }
+int cb_set_2_e(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.e, 2); }
+int cb_set_2_h(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.h, 2); }
+int cb_set_2_l(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.l, 2); }
+int cb_set_2_hl(struct CPU * cpu){ return gcb_set_hl(cpu, 2); }
+int cb_set_2_a(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.a, 2); }
+int cb_set_3_b(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.b, 3); }
+int cb_set_3_c(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.c, 3); }
+int cb_set_3_d(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.d, 3); }
+int cb_set_3_e(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.e, 3); }
+int cb_set_3_h(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.h, 3); }
+int cb_set_3_l(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.l, 3); }
+int cb_set_3_hl(struct CPU * cpu){ return gcb_set_hl(cpu, 3); }
+int cb_set_3_a(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.a, 3); }
+int cb_set_4_b(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.b, 4); }
+int cb_set_4_c(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.c, 4); }
+int cb_set_4_d(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.d, 4); }
+int cb_set_4_e(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.e, 4); }
+int cb_set_4_h(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.h, 4); }
+int cb_set_4_l(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.l, 4); }
+int cb_set_4_hl(struct CPU * cpu){ return gcb_set_hl(cpu, 4); }
+int cb_set_4_a(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.a, 4); }
+int cb_set_5_b(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.b, 5); }
+int cb_set_5_c(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.c, 5); }
+int cb_set_5_d(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.d, 5); }
+int cb_set_5_e(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.e, 5); }
+int cb_set_5_h(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.h, 5); }
+int cb_set_5_l(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.l, 5); }
+int cb_set_5_hl(struct CPU * cpu){ return gcb_set_hl(cpu, 5); }
+int cb_set_5_a(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.a, 5); }
+int cb_set_6_b(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.b, 6); }
+int cb_set_6_c(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.c, 6); }
+int cb_set_6_d(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.d, 6); }
+int cb_set_6_e(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.e, 6); }
+int cb_set_6_h(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.h, 6); }
+int cb_set_6_l(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.l, 6); }
+int cb_set_6_hl(struct CPU * cpu){ return gcb_set_hl(cpu, 6); }
+int cb_set_6_a(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.a, 6); }
+int cb_set_7_b(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.b, 7); }
+int cb_set_7_c(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.c, 7); }
+int cb_set_7_d(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.d, 7); }
+int cb_set_7_e(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.e, 7); }
+int cb_set_7_h(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.h, 7); }
+int cb_set_7_l(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.l, 7); }
+int cb_set_7_hl(struct CPU * cpu){ return gcb_set_hl(cpu, 7); }
+int cb_set_7_a(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.a, 7); }
+
 static struct Instruction cb_instructions[] = {
-    {"RLC B",      0, NULL},  // 0x0X
-    {"RLC C",      0, NULL},
-    {"RLC D",      0, NULL},
-    {"RLC E",      0, NULL},
-    {"RLC H",      0, NULL},
-    {"RLC L",      0, NULL},
+    {"RLC B",      0, cpu_rlc_b},  // 0x0X
+    {"RLC C",      0, cpu_rlc_c},
+    {"RLC D",      0, cpu_rlc_d},
+    {"RLC E",      0, cpu_rlc_e},
+    {"RLC H",      0, cpu_rlc_h},
+    {"RLC L",      0, cpu_rlc_l},
     {"RLC (HL)",   0, NULL},
-    {"RLC A",      0, NULL},
+    {"RLC A",      0, cpu_rlc_a},
     {"RRC B",      0, NULL},
     {"RRC C",      0, NULL},
     {"RRC D",      0, NULL},
@@ -184,30 +318,30 @@ static struct Instruction cb_instructions[] = {
     {"RRC L",      0, NULL},
     {"RRC (HL)",   0, NULL},
     {"RRC A",      0, NULL},
-    {"RL B",       0, NULL},  // 0x1X
-    {"RL C",       0, NULL},
-    {"RL D",       0, NULL},
-    {"RL E",       0, NULL},
-    {"RL H",       0, NULL},
-    {"RL L",       0, NULL},
+    {"RL B",       0, cpu_rl_b},  // 0x1X
+    {"RL C",       0, cpu_rl_c},
+    {"RL D",       0, cpu_rl_d},
+    {"RL E",       0, cpu_rl_e},
+    {"RL H",       0, cpu_rl_h},
+    {"RL L",       0, cpu_rl_l},
     {"RL (HL) ",   0, NULL},
-    {"RL A",       0, NULL},
-    {"RR B",       0, NULL},
-    {"RR C",       0, NULL},
-    {"RR D",       0, NULL},
-    {"RR E",       0, NULL},
-    {"RR H",       0, NULL},
-    {"RR L",       0, NULL},
+    {"RL A",       0, cpu_rl_a},
+    {"RR B",       0, cpu_rr_b},
+    {"RR C",       0, cpu_rr_c},
+    {"RR D",       0, cpu_rr_d},
+    {"RR E",       0, cpu_rr_e},
+    {"RR H",       0, cpu_rr_h},
+    {"RR L",       0, cpu_rr_l},
     {"RR (HL) ",   0, NULL},
-    {"RR A",       0, NULL},
-    {"SLA B",      0, NULL},  // 0x2X
-    {"SLA C",      0, NULL},
-    {"SLA D",      0, NULL},
-    {"SLA E",      0, NULL},
-    {"SLA H",      0, NULL},
-    {"SLA L",      0, NULL},
+    {"RR A",       0, cpu_rr_a},
+    {"SLA B",      0, cb_sla_b},  // 0x2X
+    {"SLA C",      0, cb_sla_c},
+    {"SLA D",      0, cb_sla_d},
+    {"SLA E",      0, cb_sla_e},
+    {"SLA H",      0, cb_sla_h},
+    {"SLA L",      0, cb_sla_l},
     {"SLA (HL)",   0, NULL},
-    {"SLA A",      0, NULL},
+    {"SLA A",      0, cb_sla_a},
     {"SRA B",      0, NULL},
     {"SRA C",      0, NULL},
     {"SRA D",      0, NULL},
@@ -216,22 +350,22 @@ static struct Instruction cb_instructions[] = {
     {"SRA L",      0, NULL},
     {"SRA (HL)",   0, NULL},
     {"SRA A",      0, NULL},
-    {"SWAP B",     0, NULL},  // 0x3X
-    {"SWAP C",     0, NULL},
-    {"SWAP D",     0, NULL},
-    {"SWAP E",     0, NULL},
-    {"SWAP H",     0, NULL},
-    {"SWAP L",     0, NULL},
+    {"SWAP B",     0, cb_swap_b},  // 0x3X
+    {"SWAP C",     0, cb_swap_c},
+    {"SWAP D",     0, cb_swap_d},
+    {"SWAP E",     0, cb_swap_e},
+    {"SWAP H",     0, cb_swap_h},
+    {"SWAP L",     0, cb_swap_l},
     {"SWAP (HL)",  0, NULL},
-    {"SWAP A",     0, NULL},
-    {"SRL B",      0, NULL},
-    {"SRL C",      0, NULL},
-    {"SRL D",      0, NULL},
-    {"SRL E",      0, NULL},
-    {"SRL H",      0, NULL},
-    {"SRL L",      0, NULL},
+    {"SWAP A",     0, cb_swap_a},
+    {"SRL B",      0, cb_srl_b},
+    {"SRL C",      0, cb_srl_c},
+    {"SRL D",      0, cb_srl_d},
+    {"SRL E",      0, cb_srl_e},
+    {"SRL H",      0, cb_srl_h},
+    {"SRL L",      0, cb_srl_l},
     {"SRL (HL)",   0, NULL},
-    {"SRL A",      0, NULL},
+    {"SRL A",      0, cb_srl_a},
     {"BIT 0, B",   0, cb_bit_0_b},  // 0x4X
     {"BIT 0, C",   0, cb_bit_0_c},
     {"BIT 0, D",   0, cb_bit_0_d},
@@ -360,77 +494,77 @@ static struct Instruction cb_instructions[] = {
     {"RES 7, L",   0, cb_res_7_l},
     {"RES 7, (HL)",0, cb_res_7_hl},
     {"RES 7, A",   0, cb_res_7_a},
-    {"SET 0, B",   0, NULL},  // 0xCX
-    {"SET 0, C",   0, NULL},
-    {"SET 0, D",   0, NULL},
-    {"SET 0, E",   0, NULL},
-    {"SET 0, H",   0, NULL},
-    {"SET 0, L",   0, NULL},
-    {"SET 0, (HL)",0, NULL},
-    {"SET 0, A",   0, NULL},
-    {"SET 1, B",   0, NULL},
-    {"SET 1, C",   0, NULL},
-    {"SET 1, D",   0, NULL},
-    {"SET 1, E",   0, NULL},
-    {"SET 1, H",   0, NULL},
-    {"SET 1, L",   0, NULL},
-    {"SET 1, (HL)",0, NULL},
-    {"SET 1, A",   0, NULL},
-    {"SET 2, B",   0, NULL},  // 0xDX
-    {"SET 2, C",   0, NULL},
-    {"SET 2, D",   0, NULL},
-    {"SET 2, E",   0, NULL},
-    {"SET 2, H",   0, NULL},
-    {"SET 2, L",   0, NULL},
-    {"SET 2, (HL)",0, NULL},
-    {"SET 2, A",   0, NULL},
-    {"SET 3, B",   0, NULL},
-    {"SET 3, C",   0, NULL},
-    {"SET 3, D",   0, NULL},
-    {"SET 3, E",   0, NULL},
-    {"SET 3, H",   0, NULL},
-    {"SET 3, L",   0, NULL},
-    {"SET 3, (HL)",0, NULL},
-    {"SET 3, A",   0, NULL},
-    {"SET 4, B",   0, NULL},  // 0xEX
-    {"SET 4, C",   0, NULL},
-    {"SET 4, D",   0, NULL},
-    {"SET 4, E",   0, NULL},
-    {"SET 4, H",   0, NULL},
-    {"SET 4, L",   0, NULL},
-    {"SET 4, (HL)",0, NULL},
-    {"SET 4, A",   0, NULL},
-    {"SET 5, B",   0, NULL},
-    {"SET 5, C",   0, NULL},
-    {"SET 5, D",   0, NULL},
-    {"SET 5, E",   0, NULL},
-    {"SET 5, H",   0, NULL},
-    {"SET 5, L",   0, NULL},
-    {"SET 5, (HL)",0, NULL},
-    {"SET 5, A",   0, NULL},
-    {"SET 6, B",   0, NULL},  // 0xFX
-    {"SET 6, C",   0, NULL},
-    {"SET 6, D",   0, NULL},
-    {"SET 6, E",   0, NULL},
-    {"SET 6, H",   0, NULL},
-    {"SET 6, L",   0, NULL},
-    {"SET 6, (HL)",0, NULL},
-    {"SET 6, A",   0, NULL},
-    {"SET 7, B",   0, NULL},
-    {"SET 7, C",   0, NULL},
-    {"SET 7, D",   0, NULL},
-    {"SET 7, E",   0, NULL},
-    {"SET 7, H",   0, NULL},
-    {"SET 7, L",   0, NULL},
-    {"SET 7, (HL)",0, NULL},
-    {"SET 7, A",   0, NULL},
+    {"SET 0, B",   0, cb_set_0_b},  // 0xCX
+    {"SET 0, C",   0, cb_set_0_c},
+    {"SET 0, D",   0, cb_set_0_d},
+    {"SET 0, E",   0, cb_set_0_e},
+    {"SET 0, H",   0, cb_set_0_h},
+    {"SET 0, L",   0, cb_set_0_l},
+    {"SET 0, (HL)",0, cb_set_0_hl},
+    {"SET 0, A",   0, cb_set_0_a},
+    {"SET 1, B",   0, cb_set_1_b},
+    {"SET 1, C",   0, cb_set_1_c},
+    {"SET 1, D",   0, cb_set_1_d},
+    {"SET 1, E",   0, cb_set_1_e},
+    {"SET 1, H",   0, cb_set_1_h},
+    {"SET 1, L",   0, cb_set_1_l},
+    {"SET 1, (HL)",0, cb_set_1_hl},
+    {"SET 1, A",   0, cb_set_1_a},
+    {"SET 2, B",   0, cb_set_2_b},  // 0xDX
+    {"SET 2, C",   0, cb_set_2_c},
+    {"SET 2, D",   0, cb_set_2_d},
+    {"SET 2, E",   0, cb_set_2_e},
+    {"SET 2, H",   0, cb_set_2_h},
+    {"SET 2, L",   0, cb_set_2_l},
+    {"SET 2, (HL)",0, cb_set_2_hl},
+    {"SET 2, A",   0, cb_set_2_a},
+    {"SET 3, B",   0, cb_set_3_b},
+    {"SET 3, C",   0, cb_set_3_c},
+    {"SET 3, D",   0, cb_set_3_d},
+    {"SET 3, E",   0, cb_set_3_e},
+    {"SET 3, H",   0, cb_set_3_h},
+    {"SET 3, L",   0, cb_set_3_l},
+    {"SET 3, (HL)",0, cb_set_3_hl},
+    {"SET 3, A",   0, cb_set_3_a},
+    {"SET 4, B",   0, cb_set_4_b},  // 0xEX
+    {"SET 4, C",   0, cb_set_4_c},
+    {"SET 4, D",   0, cb_set_4_d},
+    {"SET 4, E",   0, cb_set_4_e},
+    {"SET 4, H",   0, cb_set_4_h},
+    {"SET 4, L",   0, cb_set_4_l},
+    {"SET 4, (HL)",0, cb_set_4_hl},
+    {"SET 4, A",   0, cb_set_4_a},
+    {"SET 5, B",   0, cb_set_5_b},
+    {"SET 5, C",   0, cb_set_5_c},
+    {"SET 5, D",   0, cb_set_5_d},
+    {"SET 5, E",   0, cb_set_5_e},
+    {"SET 5, H",   0, cb_set_5_h},
+    {"SET 5, L",   0, cb_set_5_l},
+    {"SET 5, (HL)",0, cb_set_5_hl},
+    {"SET 5, A",   0, cb_set_5_a},
+    {"SET 6, B",   0, cb_set_6_b},  // 0xFX
+    {"SET 6, C",   0, cb_set_6_c},
+    {"SET 6, D",   0, cb_set_6_d},
+    {"SET 6, E",   0, cb_set_6_e},
+    {"SET 6, H",   0, cb_set_6_h},
+    {"SET 6, L",   0, cb_set_6_l},
+    {"SET 6, (HL)",0, cb_set_6_hl},
+    {"SET 6, A",   0, cb_set_6_a},
+    {"SET 7, B",   0, cb_set_7_b},
+    {"SET 7, C",   0, cb_set_7_c},
+    {"SET 7, D",   0, cb_set_7_d},
+    {"SET 7, E",   0, cb_set_7_e},
+    {"SET 7, H",   0, cb_set_7_h},
+    {"SET 7, L",   0, cb_set_7_l},
+    {"SET 7, (HL)",0, cb_set_7_hl},
+    {"SET 7, A",   0, cb_set_7_a},
 };
 
 int cb_prefix(struct CPU * cpu, uint8_t operation) {
     struct Instruction instruction = cb_instructions[operation];
 
     if (instruction.function) {
-	log_debug("%s", instruction.disasm);
+	// log_debug("%s", instruction.disasm);
 	return ((int (*)(struct CPU *))instruction.function)(cpu);
     } else {
 	log_debug("CB instruction not implemented : %s", instruction.disasm);

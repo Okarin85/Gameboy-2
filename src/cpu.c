@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Sun Dec 11 15:16:59 2016 (+0100)
+ * Last-Updated: Sat Dec 24 13:23:23 2016 (+0100)
  *           By: Jules <archjules>
  */
 #define _GNU_SOURCE
@@ -31,6 +31,9 @@ static inline void print_registers(struct CPU * cpu) {
     log_debug("HL : 0x%04x", cpu->registers.hl);
     log_debug("PC : 0x%04x", cpu->registers.pc);
     log_debug("SP : 0x%04x", cpu->registers.sp);
+    log_debug("IF : 0x%02x", cpu->memory.io[0xF]);
+    log_debug("IE : 0x%02x", cpu->memory.io[0xFF]);
+    log_debug("Clock : %d ticks", cpu->clock);
 }
 
 static inline uint16_t interpret_opcode(struct CPU * cpu, struct Instruction opcode, char ** str) {
@@ -85,13 +88,15 @@ void cpu_load_rom(struct CPU * cpu, char * filename) {
 	exit(EXIT_FAILURE);
     }
 
-    cpu->memory.zram = malloc(0x80);
+    cpu->memory.zram = malloc(0xFF);
     if (cpu->memory.zram == NULL) {
 	log_fatal("Couldn't allocate memory for ZRAM.");
 	exit(EXIT_FAILURE);
     }
     cpu->memory.bios_inplace = true;
-    
+    cpu->gpu.mode = 3;
+
+    cpu->registers.pc = 0;
     log_info("Loaded %s (%d bytes)", filename, size);
 }
 
@@ -104,30 +109,46 @@ void cpu_destroy(struct CPU * cpu) {
 }
 
 void cpu_next_instruction(struct CPU * cpu) {
+    static int d = 0;
     char * str;
-    uint8_t op = read_byte(cpu, cpu->registers.pc++);
+    uint8_t op = read_byte(cpu, cpu->registers.pc++), last_pc = cpu->registers.pc;
     uint16_t operand;
     struct Instruction instruction = instructions[op];
-
+    
     operand = interpret_opcode(cpu, instruction, &str);
     if (instruction.function == NULL) {
 	log_warn("%#04x : Instruction not implemented ! (%#02x, %s)", cpu->registers.pc - 1 - instruction.operand, op, str);
 	print_registers(cpu);
 	sleep(10);
     } else {
-	log_debug("%#04x : %s", cpu->registers.pc - 1 - instruction.operand, str);
+	if ((cpu->registers.pc - 1 - instruction.operand) == 0x100) {
+	    d = 1;
+	} else if (d == 1) {
+	    // log_debug("%#04x : %s", cpu->registers.pc - 1 - instruction.operand, str);
+	    // print_registers(cpu);
+	    if ((cpu->registers.pc - 1 - instruction.operand) == 0x4325) d = 0;
+	    // usleep(100000);
+	}
+	// print_registers(cpu);
 	switch(instruction.operand) {
 	case 0:
-	    ((int (*)(struct CPU *))instruction.function)(cpu);
+	    cpu->time_last = ((int (*)(struct CPU *))instruction.function)(cpu);
 	    break;
 	case 1:
-	    ((int (*)(struct CPU *, uint8_t))instruction.function)(cpu, (uint8_t)operand);
+	    cpu->time_last = ((int (*)(struct CPU *, uint8_t))instruction.function)(cpu, (uint8_t)operand);
 	    break;
 	case 2:
-	    ((int (*)(struct CPU *, uint16_t))instruction.function)(cpu, operand);
+	    cpu->time_last = ((int (*)(struct CPU *, uint16_t))instruction.function)(cpu, operand);
 	    break;
 	}
-	print_registers(cpu);
+	cpu->clock += cpu->time_last;
+	
+	// print_registers(cpu);
     }
+
+    
+    /* if (cpu->registers.pc == 0x2be) {
+       log_debug("LOOOOOOl !!!");
+	} */
     free(str);
 }

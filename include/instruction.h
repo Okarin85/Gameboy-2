@@ -3,7 +3,7 @@
  * Filename: instruction.h
  * Author: Jules <archjules>
  * Created: Thu Dec  8 12:54:40 2016 (+0100)
- * Last-Updated: Sun Dec 11 14:21:55 2016 (+0100)
+ * Last-Updated: Sat Dec 24 00:30:16 2016 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -86,6 +86,7 @@ int cpu_ld_d_h(struct CPU *);
 int cpu_ld_d_l(struct CPU *);
 int cpu_ld_d_hl(struct CPU *);
 
+int cpu_ld_a_nn(struct CPU *, uint16_t);
 int cpu_ld_a_bc(struct CPU *);
 int cpu_ld_a_de(struct CPU *);
 int cpu_ld_bc_a(struct CPU *);
@@ -117,15 +118,77 @@ int cpu_ld_h_n(struct CPU *, uint8_t);
 int cpu_ld_l_n(struct CPU *, uint8_t);
 int cpu_ld_hl_n(struct CPU *, uint8_t);
 
+int cpu_ldm_c_a(struct CPU *);
+int cpu_ldm_a_c(struct CPU *);
+
 int cpu_ld_bc_nn(struct CPU *, uint16_t);
 int cpu_ld_de_nn(struct CPU *, uint16_t);
 int cpu_ld_hl_nn(struct CPU *, uint16_t);
 int cpu_ld_sp_nn(struct CPU *, uint16_t);
 
+int cpu_pop_bc(struct CPU *);
+int cpu_pop_de(struct CPU *);
+int cpu_pop_hl(struct CPU *);
+int cpu_pop_af(struct CPU *);
+
 int cpu_push_bc(struct CPU *);
 int cpu_push_de(struct CPU *);
 int cpu_push_hl(struct CPU *);
 int cpu_push_af(struct CPU *);
+
+int cpu_rl_a(struct CPU *);
+int cpu_rl_b(struct CPU *);
+int cpu_rl_c(struct CPU *);
+int cpu_rl_d(struct CPU *);
+int cpu_rl_e(struct CPU *);
+int cpu_rl_h(struct CPU *);
+int cpu_rl_l(struct CPU *);
+
+int cpu_rr_a(struct CPU *);
+int cpu_rr_b(struct CPU *);
+int cpu_rr_c(struct CPU *);
+int cpu_rr_d(struct CPU *);
+int cpu_rr_e(struct CPU *);
+int cpu_rr_h(struct CPU *);
+int cpu_rr_l(struct CPU *);
+
+int cpu_rlc_a(struct CPU *);
+int cpu_rlc_b(struct CPU *);
+int cpu_rlc_c(struct CPU *);
+int cpu_rlc_d(struct CPU *);
+int cpu_rlc_e(struct CPU *);
+int cpu_rlc_h(struct CPU *);
+int cpu_rlc_l(struct CPU *);
+
+int cpu_add_a(struct CPU *);
+int cpu_add_b(struct CPU *);
+int cpu_add_c(struct CPU *);
+int cpu_add_d(struct CPU *);
+int cpu_add_e(struct CPU *);
+int cpu_add_h(struct CPU *);
+int cpu_add_l(struct CPU *);
+int cpu_add_hl(struct CPU *);
+int cpu_add_n(struct CPU *, uint8_t operand);
+
+int cpu_adc_a(struct CPU *);
+int cpu_adc_b(struct CPU *);
+int cpu_adc_c(struct CPU *);
+int cpu_adc_d(struct CPU *);
+int cpu_adc_e(struct CPU *);
+int cpu_adc_h(struct CPU *);
+int cpu_adc_l(struct CPU *);
+int cpu_adc_hl(struct CPU *);
+int cpu_adc_n(struct CPU *, uint8_t);
+
+int cpu_sub_a(struct CPU *);
+int cpu_sub_b(struct CPU *);
+int cpu_sub_c(struct CPU *);
+int cpu_sub_d(struct CPU *);
+int cpu_sub_e(struct CPU *);
+int cpu_sub_h(struct CPU *);
+int cpu_sub_l(struct CPU *);
+int cpu_sub_hl(struct CPU *);
+int cpu_sub_n(struct CPU *, uint8_t);
 
 int cpu_dec_a(struct CPU *);
 int cpu_dec_b(struct CPU *);
@@ -134,6 +197,7 @@ int cpu_dec_d(struct CPU *);
 int cpu_dec_e(struct CPU *);
 int cpu_dec_h(struct CPU *);
 int cpu_dec_l(struct CPU *);
+int cpu_decm_hl(struct CPU *);
 
 int cpu_inc_a(struct CPU *);
 int cpu_inc_b(struct CPU *);
@@ -142,6 +206,7 @@ int cpu_inc_d(struct CPU *);
 int cpu_inc_e(struct CPU *);
 int cpu_inc_h(struct CPU *);
 int cpu_inc_l(struct CPU *);
+int cpu_incm_hl(struct CPU *);
 
 int cpu_cp_a(struct CPU *);
 int cpu_cp_b(struct CPU *);
@@ -153,6 +218,43 @@ int cpu_cp_l(struct CPU *);
 int cpu_cp_hl(struct CPU *);
 int cpu_cp_n(struct CPU *, uint8_t);
 
+int cpu_add_hl_bc(struct CPU *);
+int cpu_add_hl_de(struct CPU *);
+int cpu_add_hl_hl(struct CPU *);
+int cpu_add_hl_sp(struct CPU *);
+
+int cpu_dec_bc(struct CPU *);
+int cpu_dec_de(struct CPU *);
+int cpu_dec_hl(struct CPU *);
+int cpu_dec_sp(struct CPU *);
+
+int cpu_inc_bc(struct CPU *);
+int cpu_inc_de(struct CPU *);
+int cpu_inc_hl(struct CPU *);
+int cpu_inc_sp(struct CPU *);
+
+int cpu_cpl(struct CPU *);
+
+int cpu_and_b(struct CPU *); 
+int cpu_and_c(struct CPU *); 
+int cpu_and_d(struct CPU *); 
+int cpu_and_e(struct CPU *); 
+int cpu_and_h(struct CPU *); 
+int cpu_and_l(struct CPU *); 
+int cpu_and_hl(struct CPU *); 
+int cpu_and_a(struct CPU *);
+int cpu_and_n(struct CPU *, uint8_t);
+
+int cpu_or_b(struct CPU *); 
+int cpu_or_c(struct CPU *); 
+int cpu_or_d(struct CPU *); 
+int cpu_or_e(struct CPU *); 
+int cpu_or_h(struct CPU *); 
+int cpu_or_l(struct CPU *); 
+int cpu_or_hl(struct CPU *); 
+int cpu_or_a(struct CPU *);
+int cpu_or_n(struct CPU *, uint8_t);
+
 int cpu_xor_b(struct CPU *); 
 int cpu_xor_c(struct CPU *); 
 int cpu_xor_d(struct CPU *); 
@@ -161,9 +263,16 @@ int cpu_xor_h(struct CPU *);
 int cpu_xor_l(struct CPU *); 
 int cpu_xor_hl(struct CPU *); 
 int cpu_xor_a(struct CPU *);
+int cpu_xor_n(struct CPU *, uint8_t);
 
 int cpu_jp(struct CPU *, uint16_t);
 int cpu_jr(struct CPU *, uint8_t);
+int cpu_jp_hl(struct CPU *);
+
+int cpu_jp_z(struct CPU *, uint16_t);
+int cpu_jp_c(struct CPU *, uint16_t);
+int cpu_jp_nz(struct CPU *, uint16_t);
+int cpu_jp_nc(struct CPU *, uint16_t);
 
 int cpu_jr_z(struct CPU *, uint8_t);
 int cpu_jr_c(struct CPU *, uint8_t);
@@ -171,22 +280,40 @@ int cpu_jr_nz(struct CPU *, uint8_t);
 int cpu_jr_nc(struct CPU *, uint8_t);
 
 int cpu_call(struct CPU *, uint16_t);
+int cpu_call_z(struct CPU *, uint16_t);
+int cpu_call_c(struct CPU *, uint16_t);
+int cpu_call_nz(struct CPU *, uint16_t);
+int cpu_call_nc(struct CPU *, uint16_t);
 
 int cpu_ret(struct CPU *);
+int cpu_ret_z(struct CPU *);
+int cpu_ret_c(struct CPU *);
+int cpu_ret_nz(struct CPU *);
+int cpu_ret_nc(struct CPU *);
+int cpu_reti(struct CPU *);
+
+int cpu_rst_00(struct CPU *);
+int cpu_rst_08(struct CPU *);
+int cpu_rst_10(struct CPU *);
+int cpu_rst_18(struct CPU *);
+int cpu_rst_20(struct CPU *);
+int cpu_rst_28(struct CPU *);
+int cpu_rst_30(struct CPU *);
+int cpu_rst_38(struct CPU *);
 
 static struct Instruction instructions[] = {
     {"NOP",             0, cpu_nop}, // 0x0X
     {"LD BC, 0x%04x",   2, cpu_ld_bc_nn},
     {"LD (BC), A",      0, cpu_ld_bc_a},
-    {"INC BC",          0, NULL},
+    {"INC BC",          0, cpu_inc_bc},
     {"INC B",           0, cpu_inc_b},
     {"DEC B",           0, cpu_dec_b},
     {"LD B, 0x%02x",    1, cpu_ld_b_n},
-    {"RLCA",            0, NULL},
+    {"RLCA",            0, cpu_rlc_a},
     {"LD (0x%04x), SP", 2, NULL},
-    {"ADD HL, BC",      0, NULL},
+    {"ADD HL, BC",      0, cpu_add_hl_bc},
     {"LD A, (BC)",      0, cpu_ld_a_bc},
-    {"DEC BC",          0, NULL},
+    {"DEC BC",          0, cpu_dec_bc},
     {"INC C",           0, cpu_inc_c},
     {"DEC C",           0, cpu_dec_c},
     {"LD C, 0x%02x",    1, cpu_ld_c_n},
@@ -194,48 +321,48 @@ static struct Instruction instructions[] = {
     {"STOP",            0, NULL},    // 0x1X
     {"LD DE, 0x%04x",   2, cpu_ld_de_nn},
     {"LD (DE), A",      0, cpu_ld_de_a},
-    {"INC DE",          0, NULL},
+    {"INC DE",          0, cpu_inc_de},
     {"INC D",           0, cpu_inc_d},
     {"DEC D",           0, cpu_dec_d},
     {"LD D, 0x%02x",    1, cpu_ld_d_n},
-    {"RLA",             0, NULL},
+    {"RLA",             0, cpu_rl_a},
     {"JR 0x%02x",       1, cpu_jr},
-    {"ADD HL, DE",      0, NULL},
+    {"ADD HL, DE",      0, cpu_add_hl_de},
     {"LD A, (DE)",      0, cpu_ld_a_de},
-    {"DEC DE",          0, NULL},
+    {"DEC DE",          0, cpu_dec_de},
     {"INC E",           0, cpu_inc_e},
     {"DEC E",           0, cpu_dec_e},
     {"LD E, 0x%02x",    1, cpu_ld_e_n},
-    {"RRA",             0, NULL},
+    {"RRA",             0, cpu_rr_a},
     {"JR NZ, 0x%02x",   1, cpu_jr_nz},    // 0x2X
     {"LD HL, 0x%04x",   2, cpu_ld_hl_nn},
     {"LD (HL+), A",     0, cpu_ldi_hl_a},
-    {"INC HL",          0, NULL},
+    {"INC HL",          0, cpu_inc_hl},
     {"INC H",           0, cpu_inc_h},
     {"DEC H",           0, cpu_dec_h},
     {"LD H, 0x%02x",    1, cpu_ld_h_n},
     {"DAA",             0, NULL},
     {"JR Z, 0x%02x",    1, cpu_jr_z},
-    {"ADD HL, HL",      0, NULL},
+    {"ADD HL, HL",      0, cpu_add_hl_hl},
     {"LD A, (HL+)",     0, cpu_ldi_a_hl},
-    {"DEC HL",          0, NULL},
+    {"DEC HL",          0, cpu_dec_hl},
     {"INC L",           0, cpu_inc_l},
     {"DEC L",           0, cpu_dec_l},
     {"LD L, 0x%02x",    1, cpu_ld_l_n},
-    {"CPL",             0, cpu_cp_a},
+    {"CPL",             0, cpu_cpl},
     {"JR NC, 0x%02x",   1, cpu_jr_nc},    // 0x3X
     {"LD SP, 0x%04x",   2, cpu_ld_sp_nn},
     {"LD (HL-), A",     0, cpu_ldd_hl_a},
-    {"INC SP",          0, NULL},
-    {"INC (HL)",        0, NULL},
-    {"DEC (HL)",        0, NULL},
+    {"INC SP",          0, cpu_inc_sp},
+    {"INC (HL)",        0, cpu_incm_hl},
+    {"DEC (HL)",        0, cpu_decm_hl},
     {"LD (HL), 0x%02x", 1, cpu_ld_hl_n},
     {"SCF",             0, NULL},
     {"JR C, 0x%02x",    1, cpu_jr_c},
-    {"ADD HL, SP",      0, NULL},
+    {"ADD HL, SP",      0, cpu_add_hl_sp},
     {"LD A, (HL-)",     0, cpu_ldd_a_hl},
-    {"DEC SP",          0, NULL},
-    {"INC A",           0, NULL},
+    {"DEC SP",          0, cpu_dec_sp},
+    {"INC A",           0, cpu_inc_a},
     {"DEC A",           0, cpu_dec_a},
     {"LD A, 0x%02x",    1, cpu_ld_a_n},
     {"CCF",             0, NULL},
@@ -303,30 +430,30 @@ static struct Instruction instructions[] = {
     {"LD A, L",         0, cpu_ld_a_l},
     {"LD A, (HL)",      0, cpu_ld_a_hl},
     {"LD A, A",         0, cpu_ld_a_a},
-    {"ADD A, B",        0, NULL},    // 0x8X
-    {"ADD A, C",        0, NULL},
-    {"ADD A, D",        0, NULL},
-    {"ADD A, E",        0, NULL},
-    {"ADD A, H",        0, NULL},
-    {"ADD A, L",        0, NULL},
-    {"ADD A, (HL)",     0, NULL},
-    {"ADD A, A",        0, NULL},
-    {"ADC A, B",        0, NULL},
-    {"ADC A, C",        0, NULL},
-    {"ADC A, D",        0, NULL},
-    {"ADC A, E",        0, NULL},
-    {"ADC A, H",        0, NULL},
-    {"ADC A, L",        0, NULL},
-    {"ADC A, (HL)",     0, NULL},
-    {"ADC A, A",        0, NULL},
-    {"SUB A, B",        0, NULL},    // 0x9X
-    {"SUB A, C",        0, NULL},
-    {"SUB A, D",        0, NULL},
-    {"SUB A, E",        0, NULL},
-    {"SUB A, H",        0, NULL},
-    {"SUB A, L",        0, NULL},
-    {"SUB A, (HL)",     0, NULL},
-    {"SUB A, A",        0, NULL},
+    {"ADD A, B",        0, cpu_add_b},    // 0x8X
+    {"ADD A, C",        0, cpu_add_c},
+    {"ADD A, D",        0, cpu_add_d},
+    {"ADD A, E",        0, cpu_add_e},
+    {"ADD A, H",        0, cpu_add_h},
+    {"ADD A, L",        0, cpu_add_l},
+    {"ADD A, (HL)",     0, cpu_add_hl},
+    {"ADD A, A",        0, cpu_add_a},
+    {"ADC A, B",        0, cpu_adc_b},
+    {"ADC A, C",        0, cpu_adc_c},
+    {"ADC A, D",        0, cpu_adc_d},
+    {"ADC A, E",        0, cpu_adc_e},
+    {"ADC A, H",        0, cpu_adc_h},
+    {"ADC A, L",        0, cpu_adc_l},
+    {"ADC A, (HL)",     0, cpu_adc_hl},
+    {"ADC A, A",        0, cpu_adc_a},
+    {"SUB A, B",        0, cpu_sub_b},    // 0x9X
+    {"SUB A, C",        0, cpu_sub_c},
+    {"SUB A, D",        0, cpu_sub_d},
+    {"SUB A, E",        0, cpu_sub_e},
+    {"SUB A, H",        0, cpu_sub_h},
+    {"SUB A, L",        0, cpu_sub_l},
+    {"SUB A, (HL)",     0, cpu_sub_hl},
+    {"SUB A, A",        0, cpu_sub_a},
     {"SBC A, B",        0, NULL},
     {"SBC A, C",        0, NULL},
     {"SBC A, D",        0, NULL},
@@ -335,14 +462,14 @@ static struct Instruction instructions[] = {
     {"SBC A, L",        0, NULL},
     {"SBC A, (HL)",     0, NULL},
     {"SBC A, A",        0, NULL},
-    {"AND B",           0, NULL},    // 0xAX
-    {"AND C",           0, NULL},
-    {"AND D",           0, NULL},
-    {"AND E",           0, NULL},
-    {"AND H",           0, NULL},
-    {"AND L",           0, NULL},
-    {"AND (HL)",        0, NULL},
-    {"AND A",           0, NULL},
+    {"AND B",           0, cpu_and_b},    // 0xAX
+    {"AND C",           0, cpu_and_c},
+    {"AND D",           0, cpu_and_d},
+    {"AND E",           0, cpu_and_e},
+    {"AND H",           0, cpu_and_h},
+    {"AND L",           0, cpu_and_l},
+    {"AND (HL)",        0, cpu_and_hl},
+    {"AND A",           0, cpu_and_a},
     {"XOR B",           0, cpu_xor_b},
     {"XOR C",           0, cpu_xor_c},
     {"XOR D",           0, cpu_xor_d},
@@ -351,86 +478,86 @@ static struct Instruction instructions[] = {
     {"XOR L",           0, cpu_xor_l},
     {"XOR (HL)",        0, cpu_xor_hl},
     {"XOR A",           0, cpu_xor_a},
-    {"OR B",            0, NULL},    // 0xBX
-    {"OR C",            0, NULL},
-    {"OR D",            0, NULL},
-    {"OR E",            0, NULL},
-    {"OR H",            0, NULL},
-    {"OR L",            0, NULL},
-    {"OR (HL)",         0, NULL},
-    {"OR A",            0, NULL},
-    {"CP B",            0, cpu_cp_a},
-    {"CP C",            0, cpu_cp_b},
-    {"CP D",            0, cpu_cp_c},
-    {"CP E",            0, cpu_cp_d},
-    {"CP H",            0, cpu_cp_e},
-    {"CP L",            0, cpu_cp_h},
-    {"CP (HL)",         0, cpu_cp_l},
-    {"CP A",            0, cpu_cp_hl},
-    {"RET NZ",          0, NULL},    // 0xCX
-    {"POP BC",          0, NULL},
-    {"JP NZ, 0x%04x",   2, NULL},
+    {"OR B",            0, cpu_or_b},    // 0xBX
+    {"OR C",            0, cpu_or_c},
+    {"OR D",            0, cpu_or_d},
+    {"OR E",            0, cpu_or_e},
+    {"OR H",            0, cpu_or_h},
+    {"OR L",            0, cpu_or_l},
+    {"OR (HL)",         0, cpu_or_hl},
+    {"OR A",            0, cpu_or_a},
+    {"CP B",            0, cpu_cp_b},
+    {"CP C",            0, cpu_cp_c},
+    {"CP D",            0, cpu_cp_d},
+    {"CP E",            0, cpu_cp_e},
+    {"CP H",            0, cpu_cp_h},
+    {"CP L",            0, cpu_cp_l},
+    {"CP (HL)",         0, cpu_cp_hl},
+    {"CP A",            0, cpu_cp_a},
+    {"RET NZ",          0, cpu_ret_nz},    // 0xCX
+    {"POP BC",          0, cpu_pop_bc},
+    {"JP NZ, 0x%04x",   2, cpu_jp_nz},
     {"JP 0x%04x",       2, cpu_jp},
-    {"CALL NZ, 0x%04x", 2, NULL},
+    {"CALL NZ, 0x%04x", 2, cpu_call_nz},
     {"PUSH BC",         0, cpu_push_bc},
-    {"ADD A, 0x%02x",   1, NULL},
-    {"RST 0x00",        0, NULL},
-    {"RET Z",           0, NULL},
+    {"ADD A, 0x%02x",   1, cpu_add_n},
+    {"RST 0x00",        0, cpu_rst_00},
+    {"RET Z",           0, cpu_ret_z},
     {"RET",             0, cpu_ret},
-    {"JP Z, 0x%04x",    2, NULL},
+    {"JP Z, 0x%04x",    2, cpu_jp_z},
     {"CB %2X",          1, cb_prefix},
-    {"CALL Z, 0x%04x",  2, NULL},
+    {"CALL Z, 0x%04x",  2, cpu_call_z},
     {"CALL 0x%04x",     2, cpu_call},
-    {"ADC A, 0x%02x",   1, NULL},
-    {"RST 0x08",        0, NULL},
-    {"RET NC",          0, NULL},    // 0xDX
-    {"POP DE",          0, NULL},
-    {"JP NC, 0x%04x",   2, NULL},
+    {"ADC A, 0x%02x",   1, cpu_adc_n},
+    {"RST 0x08",        0, cpu_rst_08},
+    {"RET NC",          0, cpu_ret_nc},    // 0xDX
+    {"POP DE",          0, cpu_pop_de},
+    {"JP NC, 0x%04x",   2, cpu_jp_nc},
     {"NONE",            0, NULL},
-    {"CALL NC, 0x%04x", 2, NULL},
+    {"CALL NC, 0x%04x", 2, cpu_call_nc},
     {"PUSH DE",         0, cpu_push_de},
-    {"SUB A, 0x%02x",   1, NULL},
-    {"RST 0x10",        0, NULL},
-    {"RET C",           0, NULL},
-    {"RETI",            0, NULL},
-    {"JP C, 0x%04x",    2, NULL},
+    {"SUB A, 0x%02x",   1, cpu_sub_n},
+    {"RST 0x10",        0, cpu_rst_10},
+    {"RET C",           0, cpu_ret_c},
+    {"RETI",            0, cpu_reti},
+    {"JP C, 0x%04x",    2, cpu_jp_c},
     {"NONE",            0, NULL},
-    {"CALL C, 0x%04x",  2, NULL},
+    {"CALL C, 0x%04x",  2, cpu_call_c},
     {"NONE",            0, NULL},
     {"SBC A, 0x%02x",   1, NULL},
-    {"RST 0x18",        0, NULL},
+    {"RST 0x18",        0, cpu_rst_18},
     {"LDH (0x%02x), A", 1, cpu_ldh_n_a},    // 0xEX
-    {"POP HL",          0, NULL},
-    {"LD (C), A",       0, NULL},
+    {"POP HL",          0, cpu_pop_hl},
+    {"LD (C), A",       0, cpu_ldm_c_a},
     {"NONE",            0, NULL},
     {"NONE",            0, NULL},
     {"PUSH HL",         0, cpu_push_hl},
-    {"AND 0x%02x",      1, NULL},
-    {"RST 0x20",        0, NULL},
+    {"AND 0x%02x",      1, cpu_and_n},
+    {"RST 0x20",        0, cpu_rst_20},
     {"ADD SP, 0x%02x",  1, NULL},
-    {"JP (HL)",         0, NULL},
+    {"JP (HL)",         0, cpu_jp_hl},
     {"LD (0x%04x), A",  2, cpu_ld_n_a},
     {"NONE",            0, NULL},
     {"NONE",            0, NULL},
     {"NONE",            0, NULL},
-    {"XOR 0x%02x",      1, NULL},
-    {"RST 0x28",        0, NULL},
+    {"XOR 0x%02x",      1, cpu_xor_n},
+    {"RST 0x28",        0, cpu_rst_28},
     {"LDH A, (0x%02x)", 1, cpu_ldh_a_n},    // 0xFX
-    {"POP AF",          0, NULL},
-    {"LD A, (C)",       0, NULL},
+    {"POP AF",          0, cpu_pop_af},
+    {"LD A, (C)",       0, cpu_ldm_a_c},
     {"DI",              0, cpu_di},
     {"NONE",            0, NULL},
     {"PUSH AF",         0, cpu_push_af},
-    {"OR 0x%02x",       1, NULL},
-    {"RST 0x30",        0, NULL},
+    {"OR 0x%02x",       1, cpu_or_n},
+    {"RST 0x30",        0, cpu_rst_30},
     {"LD HL, SP+0x%02x",1, NULL},
     {"LD SP, HL",       0, NULL},
-    {"LD A, (0x%04x)",  2, NULL},
+    {"LD A, (0x%04x)",  2, cpu_ld_a_nn},
     {"EI",              0, cpu_ei},
     {"NONE",            0, NULL},
     {"NONE",            0, NULL},
     {"CP 0x%02x",       1, cpu_cp_n},
-    {"RST 0x38",        0, NULL},
+    {"RST 0x38",        0, cpu_rst_38},
 };
 
 #endif /* INSTRUCTION_H */
