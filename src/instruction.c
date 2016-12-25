@@ -3,7 +3,7 @@
  * Filename: instruction.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 12:36:49 2016 (+0100)
- * Last-Updated: Mon Dec 26 00:10:01 2016 (+0100)
+ * Last-Updated: Mon Dec 26 00:55:28 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -166,66 +166,49 @@ int cpu_pop_af(struct CPU * cpu) {
 }
 
 /* Rotates */
-static inline int g_rl(struct CPU * cpu, uint8_t * value) {
+int cpu_rra(struct CPU * cpu) {
     int carry = (cpu->registers.f & CPU_FLAG_C) != 0;
-    FLAG_SETIF((*value) & 0x80, cpu->registers.f, CPU_FLAG_C);
+    FLAG_SETIF(cpu->registers.a & 0x01, cpu->registers.f, CPU_FLAG_C);
     
-    (*value) = ((*value) << 1) | carry;
-    
-    FLAG_CLEARIF((*value), cpu->registers.f, CPU_FLAG_Z);
+    cpu->registers.a = (cpu->registers.a >> 1) | (cpu->registers.a << 7);
+
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
-
-    return 2;
+    
+    return 1;
 }
 
-int cpu_rl_a(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.a); }
-int cpu_rl_b(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.b); }
-int cpu_rl_c(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.c); }
-int cpu_rl_d(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.d); }
-int cpu_rl_e(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.e); }
-int cpu_rl_h(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.h); }
-int cpu_rl_l(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.l); }
+int cpu_rrca(struct CPU * cpu) {
+    cpu->registers.a = (cpu->registers.a >> 1) | (cpu->registers.a << 7);
 
-static inline int g_rr(struct CPU * cpu, uint8_t * value) {
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_Z);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
+    FLAG_SETIF(cpu->registers.a & 0x80, cpu->registers.f, CPU_FLAG_C);
+
+    return 1;
+}
+
+int cpu_rla(struct CPU * cpu) {
     int carry = (cpu->registers.f & CPU_FLAG_C) != 0;
-    FLAG_SETIF((*value) & 0x01, cpu->registers.f, CPU_FLAG_C);
+    FLAG_SETIF(cpu->registers.a & 0x80, cpu->registers.f, CPU_FLAG_C);
     
-    (*value) = ((*value) >> 1) | (carry << 7);
-    
-    FLAG_CLEARIF((*value), cpu->registers.f, CPU_FLAG_Z);
+    cpu->registers.a = (cpu->registers.a << 1) | carry;
+
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
-    
-    return 2;
 }
 
-int cpu_rr_a(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.a); }
-int cpu_rr_b(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.b); }
-int cpu_rr_c(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.c); }
-int cpu_rr_d(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.d); }
-int cpu_rr_e(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.e); }
-int cpu_rr_h(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.h); }
-int cpu_rr_l(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.l); }
-
-static inline int g_rlc(struct CPU * cpu, uint8_t * value) {
-    (*value) = ((*value) << 1) | ((*value) >> 7);
+int cpu_rlca(struct CPU * cpu) {
+    cpu->registers.a = (cpu->registers.a << 1) | (cpu->registers.a >> 7);
     
-    FLAG_CLEARIF((*value), cpu->registers.f, CPU_FLAG_Z);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
-    FLAG_SETIF((*value) & 1, cpu->registers.f, CPU_FLAG_C);
-
-    return 2;
+    FLAG_SETIF(cpu->registers.a & 0x80, cpu->registers.f, CPU_FLAG_C);
 }
-
-int cpu_rlc_a(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.a); }
-int cpu_rlc_b(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.b); }
-int cpu_rlc_c(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.c); }
-int cpu_rlc_d(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.d); }
-int cpu_rlc_e(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.e); }
-int cpu_rlc_h(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.h); }
-int cpu_rlc_l(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.l); }
 
 /* 8-bit ALU */
 static inline int g_add8(struct CPU * cpu, uint8_t reg) {

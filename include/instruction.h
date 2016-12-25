@@ -3,7 +3,7 @@
  * Filename: instruction.h
  * Author: Jules <archjules>
  * Created: Thu Dec  8 12:54:40 2016 (+0100)
- * Last-Updated: Mon Dec 26 00:11:20 2016 (+0100)
+ * Last-Updated: Mon Dec 26 00:55:16 2016 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -138,29 +138,10 @@ int cpu_push_de(struct CPU *);
 int cpu_push_hl(struct CPU *);
 int cpu_push_af(struct CPU *);
 
-int cpu_rl_a(struct CPU *);
-int cpu_rl_b(struct CPU *);
-int cpu_rl_c(struct CPU *);
-int cpu_rl_d(struct CPU *);
-int cpu_rl_e(struct CPU *);
-int cpu_rl_h(struct CPU *);
-int cpu_rl_l(struct CPU *);
-
-int cpu_rr_a(struct CPU *);
-int cpu_rr_b(struct CPU *);
-int cpu_rr_c(struct CPU *);
-int cpu_rr_d(struct CPU *);
-int cpu_rr_e(struct CPU *);
-int cpu_rr_h(struct CPU *);
-int cpu_rr_l(struct CPU *);
-
-int cpu_rlc_a(struct CPU *);
-int cpu_rlc_b(struct CPU *);
-int cpu_rlc_c(struct CPU *);
-int cpu_rlc_d(struct CPU *);
-int cpu_rlc_e(struct CPU *);
-int cpu_rlc_h(struct CPU *);
-int cpu_rlc_l(struct CPU *);
+int cpu_rra(struct CPU *);
+int cpu_rrca(struct CPU *);
+int cpu_rla(struct CPU *);
+int cpu_rlca(struct CPU *);
 
 int cpu_add_a(struct CPU *);
 int cpu_add_b(struct CPU *);
@@ -170,7 +151,7 @@ int cpu_add_e(struct CPU *);
 int cpu_add_h(struct CPU *);
 int cpu_add_l(struct CPU *);
 int cpu_add_hl(struct CPU *);
-int cpu_add_n(struct CPU *, uint8_t operand);
+int cpu_add_n(struct CPU *, uint8_t);
 
 int cpu_adc_a(struct CPU *);
 int cpu_adc_b(struct CPU *);
@@ -325,7 +306,7 @@ static struct Instruction instructions[] = {
     {"INC B",           0, cpu_inc_b},
     {"DEC B",           0, cpu_dec_b},
     {"LD B, 0x%02x",    1, cpu_ld_b_n},
-    {"RLCA",            0, cpu_rlc_a},
+    {"RLCA",            0, cpu_rlca},
     {"LD (0x%04x), SP", 2, cpu_ld_nn_sp},
     {"ADD HL, BC",      0, cpu_add_hl_bc},
     {"LD A, (BC)",      0, cpu_ld_a_bc},
@@ -333,7 +314,7 @@ static struct Instruction instructions[] = {
     {"INC C",           0, cpu_inc_c},
     {"DEC C",           0, cpu_dec_c},
     {"LD C, 0x%02x",    1, cpu_ld_c_n},
-    {"RRCA",            0, NULL},
+    {"RRCA",            0, cpu_rrca},
     {"STOP",            0, NULL},    // 0x1X
     {"LD DE, 0x%04x",   2, cpu_ld_de_nn},
     {"LD (DE), A",      0, cpu_ld_de_a},
@@ -341,7 +322,7 @@ static struct Instruction instructions[] = {
     {"INC D",           0, cpu_inc_d},
     {"DEC D",           0, cpu_dec_d},
     {"LD D, 0x%02x",    1, cpu_ld_d_n},
-    {"RLA",             0, cpu_rl_a},
+    {"RLA",             0, cpu_rla},
     {"JR 0x%02x",       1, cpu_jr},
     {"ADD HL, DE",      0, cpu_add_hl_de},
     {"LD A, (DE)",      0, cpu_ld_a_de},
@@ -349,7 +330,7 @@ static struct Instruction instructions[] = {
     {"INC E",           0, cpu_inc_e},
     {"DEC E",           0, cpu_dec_e},
     {"LD E, 0x%02x",    1, cpu_ld_e_n},
-    {"RRA",             0, cpu_rr_a},
+    {"RRA",             0, cpu_rra},
     {"JR NZ, 0x%02x",   1, cpu_jr_nz},    // 0x2X
     {"LD HL, 0x%04x",   2, cpu_ld_hl_nn},
     {"LD (HL+), A",     0, cpu_ldi_hl_a},

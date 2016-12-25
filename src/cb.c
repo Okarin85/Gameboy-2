@@ -3,7 +3,7 @@
  * Filename: cb.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 22:40:29 2016 (+0100)
- * Last-Updated: Sun Dec 25 22:58:48 2016 (+0100)
+ * Last-Updated: Mon Dec 26 00:58:54 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -31,6 +31,26 @@ int cb_sla_d(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.d); }
 int cb_sla_e(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.e); }
 int cb_sla_h(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.h); }
 int cb_sla_l(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.l); }
+
+static inline int gcb_sra(struct CPU * cpu, uint8_t * value) {
+    uint8_t old = (*value & 0x80);
+    FLAG_SETIF((*value) & 0x1, cpu->registers.f, CPU_FLAG_C);
+
+    (*value) = old | ((*value) >> 1);
+
+    FLAG_CLEARIF((*value), cpu->registers.f, CPU_FLAG_Z);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
+    return 2;
+}
+
+int cb_sra_a(struct CPU * cpu) { return gcb_sra(cpu, &cpu->registers.a); }
+int cb_sra_b(struct CPU * cpu) { return gcb_sra(cpu, &cpu->registers.b); }
+int cb_sra_c(struct CPU * cpu) { return gcb_sra(cpu, &cpu->registers.c); }
+int cb_sra_d(struct CPU * cpu) { return gcb_sra(cpu, &cpu->registers.d); }
+int cb_sra_e(struct CPU * cpu) { return gcb_sra(cpu, &cpu->registers.e); }
+int cb_sra_h(struct CPU * cpu) { return gcb_sra(cpu, &cpu->registers.h); }
+int cb_sra_l(struct CPU * cpu) { return gcb_sra(cpu, &cpu->registers.l); }
 
 static inline int gcb_srl(struct CPU * cpu, uint8_t * value) {
     FLAG_SETIF((*value) & 0x01, cpu->registers.f, CPU_FLAG_C);
@@ -302,6 +322,86 @@ int cb_set_7_l(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.l, 7); }
 int cb_set_7_hl(struct CPU * cpu){ return gcb_set_hl(cpu, 7); }
 int cb_set_7_a(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.a, 7); }
 
+/* Rotates */
+static inline int g_rr(struct CPU * cpu, uint8_t * value) {
+    int carry = (cpu->registers.f & CPU_FLAG_C) != 0;
+    FLAG_SETIF((*value) & 0x01, cpu->registers.f, CPU_FLAG_C);
+    
+    (*value) = ((*value) >> 1) | (carry << 7);
+    
+    FLAG_CLEARIF((*value), cpu->registers.f, CPU_FLAG_Z);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
+    
+    return 2;
+}
+
+int cpu_rr_a(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.a); }
+int cpu_rr_b(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.b); }
+int cpu_rr_c(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.c); }
+int cpu_rr_d(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.d); }
+int cpu_rr_e(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.e); }
+int cpu_rr_h(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.h); }
+int cpu_rr_l(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.l); }
+
+static inline int g_rrc(struct CPU * cpu, uint8_t * value) {
+    (*value) = ((*value) >> 1) | ((*value) << 7);
+
+    FLAG_CLEARIF(*value, cpu->registers.f, CPU_FLAG_Z);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
+    FLAG_SETIF((*value) & 0x80, cpu->registers.f, CPU_FLAG_C);
+
+    return 2;
+}
+
+int cpu_rrc_a(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.a); }
+int cpu_rrc_b(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.b); }
+int cpu_rrc_c(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.c); }
+int cpu_rrc_d(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.d); }
+int cpu_rrc_e(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.e); }
+int cpu_rrc_h(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.h); }
+int cpu_rrc_l(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.l); }
+
+static inline int g_rl(struct CPU * cpu, uint8_t * value) {
+    int carry = (cpu->registers.f & CPU_FLAG_C) != 0;
+    FLAG_SETIF((*value) & 0x80, cpu->registers.f, CPU_FLAG_C);
+    
+    (*value) = ((*value) << 1) | carry;
+    
+    FLAG_CLEARIF((*value), cpu->registers.f, CPU_FLAG_Z);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
+    return 2;
+}
+
+int cpu_rl_a(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.a); }
+int cpu_rl_b(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.b); }
+int cpu_rl_c(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.c); }
+int cpu_rl_d(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.d); }
+int cpu_rl_e(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.e); }
+int cpu_rl_h(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.h); }
+int cpu_rl_l(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.l); }
+
+static inline int g_rlc(struct CPU * cpu, uint8_t * value) {
+    (*value) = ((*value) << 1) | ((*value) >> 7);
+    
+    FLAG_CLEARIF((*value), cpu->registers.f, CPU_FLAG_Z);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
+    FLAG_SETIF((*value) & 1, cpu->registers.f, CPU_FLAG_C);
+
+    return 2;
+}
+
+int cpu_rlc_a(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.a); }
+int cpu_rlc_b(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.b); }
+int cpu_rlc_c(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.c); }
+int cpu_rlc_d(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.d); }
+int cpu_rlc_e(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.e); }
+int cpu_rlc_h(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.h); }
+int cpu_rlc_l(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.l); }
+
 static struct Instruction cb_instructions[] = {
     {"RLC B",      0, cpu_rlc_b},  // 0x0X
     {"RLC C",      0, cpu_rlc_c},
@@ -311,14 +411,14 @@ static struct Instruction cb_instructions[] = {
     {"RLC L",      0, cpu_rlc_l},
     {"RLC (HL)",   0, NULL},
     {"RLC A",      0, cpu_rlc_a},
-    {"RRC B",      0, NULL},
-    {"RRC C",      0, NULL},
-    {"RRC D",      0, NULL},
-    {"RRC E",      0, NULL},
-    {"RRC H",      0, NULL},
-    {"RRC L",      0, NULL},
+    {"RRC B",      0, cpu_rrc_b},
+    {"RRC C",      0, cpu_rrc_c},
+    {"RRC D",      0, cpu_rrc_d},
+    {"RRC E",      0, cpu_rrc_e},
+    {"RRC H",      0, cpu_rrc_h},
+    {"RRC L",      0, cpu_rrc_l},
     {"RRC (HL)",   0, NULL},
-    {"RRC A",      0, NULL},
+    {"RRC A",      0, cpu_rrc_a},
     {"RL B",       0, cpu_rl_b},  // 0x1X
     {"RL C",       0, cpu_rl_c},
     {"RL D",       0, cpu_rl_d},
@@ -343,14 +443,14 @@ static struct Instruction cb_instructions[] = {
     {"SLA L",      0, cb_sla_l},
     {"SLA (HL)",   0, NULL},
     {"SLA A",      0, cb_sla_a},
-    {"SRA B",      0, NULL},
-    {"SRA C",      0, NULL},
-    {"SRA D",      0, NULL},
-    {"SRA E",      0, NULL},
-    {"SRA H",      0, NULL},
-    {"SRA L",      0, NULL},
+    {"SRA B",      0, cb_sra_b},
+    {"SRA C",      0, cb_sra_c},
+    {"SRA D",      0, cb_sra_d},
+    {"SRA E",      0, cb_sra_e},
+    {"SRA H",      0, cb_sra_h},
+    {"SRA L",      0, cb_sra_l},
     {"SRA (HL)",   0, NULL},
-    {"SRA A",      0, NULL},
+    {"SRA A",      0, cb_sra_a},
     {"SWAP B",     0, cb_swap_b},  // 0x3X
     {"SWAP C",     0, cb_swap_c},
     {"SWAP D",     0, cb_swap_d},
