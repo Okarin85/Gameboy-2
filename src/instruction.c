@@ -3,7 +3,7 @@
  * Filename: instruction.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 12:36:49 2016 (+0100)
- * Last-Updated: Sun Dec 25 23:51:04 2016 (+0100)
+ * Last-Updated: Mon Dec 26 00:10:01 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -270,7 +270,7 @@ static inline int g_sub8(struct CPU * cpu, uint8_t reg) {
     FLAG_SETIF((cpu->registers.a - reg), cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_CLEARIF((((cpu->registers.a & 0xF) - (reg & 0xF)) & 0x10) == 0x10, cpu->registers.f, CPU_FLAG_H);
-    FLAG_CLEARIF(((cpu->registers.a + reg) & 0x100) == 0x100, cpu->registers.f, CPU_FLAG_C);
+    FLAG_CLEARIF(((cpu->registers.a - reg) & 0x100) == 0x100, cpu->registers.f, CPU_FLAG_C);
 
     cpu->registers.a -= reg;
     
@@ -286,6 +286,28 @@ int cpu_sub_h(struct CPU * cpu) { return g_sub8(cpu, cpu->registers.h); }
 int cpu_sub_l(struct CPU * cpu) { return g_sub8(cpu, cpu->registers.l); }
 int cpu_sub_hl(struct CPU * cpu){ return g_sub8(cpu, read_byte(cpu, cpu->registers.hl)) + 1; }
 int cpu_sub_n(struct CPU * cpu, uint8_t operand) { return g_sub8(cpu, operand) + 1; }
+
+static inline int g_sbc8(struct CPU * cpu, uint8_t reg) {
+    uint16_t v = reg + ((cpu->registers.f & CPU_FLAG_C) != 0);
+
+    FLAG_SETIF((cpu->registers.a - v), cpu->registers.f, CPU_FLAG_Z);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
+    FLAG_CLEARIF((((cpu->registers.a & 0xF) - (v & 0xF)) & 0x10) == 0x10, cpu->registers.f, CPU_FLAG_H);
+    FLAG_CLEARIF(((cpu->registers.a + v) & 0x100) == 0x100, cpu->registers.f, CPU_FLAG_C);
+
+    cpu->registers.a -= v;
+    return 1;
+}
+
+int cpu_sbc_a(struct CPU * cpu) { return g_sbc8(cpu, cpu->registers.a); }
+int cpu_sbc_b(struct CPU * cpu) { return g_sbc8(cpu, cpu->registers.b); }
+int cpu_sbc_c(struct CPU * cpu) { return g_sbc8(cpu, cpu->registers.c); }
+int cpu_sbc_d(struct CPU * cpu) { return g_sbc8(cpu, cpu->registers.d); }
+int cpu_sbc_e(struct CPU * cpu) { return g_sbc8(cpu, cpu->registers.e); }
+int cpu_sbc_h(struct CPU * cpu) { return g_sbc8(cpu, cpu->registers.h); }
+int cpu_sbc_l(struct CPU * cpu) { return g_sbc8(cpu, cpu->registers.l); }
+int cpu_sbc_hl(struct CPU * cpu){ return g_sbc8(cpu, read_byte(cpu, cpu->registers.hl)) + 1; }
+int cpu_sbc_n(struct CPU * cpu, uint8_t operand) { return g_sbc8(cpu, operand) + 1; }
 
 static inline int g_dec8_r(struct CPU * cpu, uint8_t * reg) {
     FLAG_SET(cpu->registers.f, CPU_FLAG_N);
@@ -564,6 +586,25 @@ int cpu_xor_h(struct CPU * cpu)  { return g_xor(cpu, cpu->registers.h); }
 int cpu_xor_l(struct CPU * cpu)  { return g_xor(cpu, cpu->registers.l); }
 int cpu_xor_hl(struct CPU * cpu) { return g_xor(cpu, read_byte(cpu, cpu->registers.hl)); }
 int cpu_xor_n(struct CPU * cpu, uint8_t operand) { return g_xor(cpu, operand) + 1; }
+
+/*
+ * Some "singleton" instructions.
+ */
+/* SCF (Set Carry Flag) */
+int cpu_scf(struct CPU * cpu) {
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
+    FLAG_SET(cpu->registers.f, CPU_FLAG_C);
+    return 1;
+}
+
+/* CCF (Complement Carry Flag */
+int cpu_ccf(struct CPU * cpu) {
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
+    cpu->registers.f ^= CPU_FLAG_C;
+    return 1;
+}
 
 /* DAA (Decimally Adjust) */
 int cpu_daa(struct CPU * cpu) {

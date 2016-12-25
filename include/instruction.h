@@ -3,7 +3,7 @@
  * Filename: instruction.h
  * Author: Jules <archjules>
  * Created: Thu Dec  8 12:54:40 2016 (+0100)
- * Last-Updated: Sun Dec 25 21:54:08 2016 (+0100)
+ * Last-Updated: Mon Dec 26 00:11:20 2016 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -192,6 +192,16 @@ int cpu_sub_l(struct CPU *);
 int cpu_sub_hl(struct CPU *);
 int cpu_sub_n(struct CPU *, uint8_t);
 
+int cpu_sbc_a(struct CPU *);
+int cpu_sbc_b(struct CPU *);
+int cpu_sbc_c(struct CPU *);
+int cpu_sbc_d(struct CPU *);
+int cpu_sbc_e(struct CPU *);
+int cpu_sbc_h(struct CPU *);
+int cpu_sbc_l(struct CPU *);
+int cpu_sbc_hl(struct CPU *);
+int cpu_sbc_n(struct CPU *, uint8_t);
+
 int cpu_dec_a(struct CPU *);
 int cpu_dec_b(struct CPU *);
 int cpu_dec_c(struct CPU *);
@@ -303,6 +313,8 @@ int cpu_rst_28(struct CPU *);
 int cpu_rst_30(struct CPU *);
 int cpu_rst_38(struct CPU *);
 
+int cpu_scf(struct CPU *);
+int cpu_ccf(struct CPU *);
 int cpu_daa(struct CPU *);
 
 static struct Instruction instructions[] = {
@@ -361,7 +373,7 @@ static struct Instruction instructions[] = {
     {"INC (HL)",        0, cpu_incm_hl},
     {"DEC (HL)",        0, cpu_decm_hl},
     {"LD (HL), 0x%02x", 1, cpu_ld_hl_n},
-    {"SCF",             0, NULL},
+    {"SCF",             0, cpu_scf},
     {"JR C, 0x%02x",    1, cpu_jr_c},
     {"ADD HL, SP",      0, cpu_add_hl_sp},
     {"LD A, (HL-)",     0, cpu_ldd_a_hl},
@@ -369,7 +381,7 @@ static struct Instruction instructions[] = {
     {"INC A",           0, cpu_inc_a},
     {"DEC A",           0, cpu_dec_a},
     {"LD A, 0x%02x",    1, cpu_ld_a_n},
-    {"CCF",             0, NULL},
+    {"CCF",             0, cpu_ccf},
     {"LD B, B",         0, cpu_ld_b_b},    // 0x4X
     {"LD B, C",         0, cpu_ld_b_c},
     {"LD B, D",         0, cpu_ld_b_d},
@@ -458,14 +470,14 @@ static struct Instruction instructions[] = {
     {"SUB A, L",        0, cpu_sub_l},
     {"SUB A, (HL)",     0, cpu_sub_hl},
     {"SUB A, A",        0, cpu_sub_a},
-    {"SBC A, B",        0, NULL},
-    {"SBC A, C",        0, NULL},
-    {"SBC A, D",        0, NULL},
-    {"SBC A, E",        0, NULL},
-    {"SBC A, H",        0, NULL},
-    {"SBC A, L",        0, NULL},
-    {"SBC A, (HL)",     0, NULL},
-    {"SBC A, A",        0, NULL},
+    {"SBC A, B",        0, cpu_sbc_b},
+    {"SBC A, C",        0, cpu_sbc_c},
+    {"SBC A, D",        0, cpu_sbc_d},
+    {"SBC A, E",        0, cpu_sbc_e},
+    {"SBC A, H",        0, cpu_sbc_h},
+    {"SBC A, L",        0, cpu_sbc_l},
+    {"SBC A, (HL)",     0, cpu_sbc_hl},
+    {"SBC A, A",        0, cpu_sbc_a},
     {"AND B",           0, cpu_and_b},    // 0xAX
     {"AND C",           0, cpu_and_c},
     {"AND D",           0, cpu_and_d},
