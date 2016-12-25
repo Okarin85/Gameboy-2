@@ -3,7 +3,7 @@
  * Filename: instruction.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 12:36:49 2016 (+0100)
- * Last-Updated: Sat Dec 24 14:26:58 2016 (+0100)
+ * Last-Updated: Sun Dec 25 23:51:04 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -133,6 +133,12 @@ int cpu_ld_bc_nn(struct CPU * cpu, uint16_t operand) { return g_ld16(cpu, &cpu->
 int cpu_ld_de_nn(struct CPU * cpu, uint16_t operand) { return g_ld16(cpu, &cpu->registers.de, operand); }
 int cpu_ld_hl_nn(struct CPU * cpu, uint16_t operand) { return g_ld16(cpu, &cpu->registers.hl, operand); }
 int cpu_ld_sp_nn(struct CPU * cpu, uint16_t operand) { return g_ld16(cpu, &cpu->registers.sp, operand); }
+int cpu_ld_sp_hl(struct CPU * cpu) { return g_ld16(cpu, &cpu->registers.sp, cpu->registers.hl); }
+
+int cpu_ld_nn_sp(struct CPU * cpu) {
+    write_word(cpu, cpu->registers.hl, cpu->registers.sp);
+    return 5;
+}
 
 static inline int g_push16(struct CPU * cpu, uint16_t value) {
     push_word(cpu, value);
@@ -190,7 +196,7 @@ static inline int g_rr(struct CPU * cpu, uint8_t * value) {
     FLAG_CLEARIF((*value), cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
-
+    
     return 2;
 }
 
@@ -223,12 +229,14 @@ int cpu_rlc_l(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.l); }
 
 /* 8-bit ALU */
 static inline int g_add8(struct CPU * cpu, uint8_t reg) {
-    FLAG_SETIF((cpu->registers.a + reg), cpu->registers.f, CPU_FLAG_Z);
+    uint8_t res = cpu->registers.a + reg;
+    
+    FLAG_SETIF(!res, cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_SETIF((((cpu->registers.a & 0xF) + (reg & 0xF)) & 0x10) == 0x10, cpu->registers.f, CPU_FLAG_H);
     FLAG_SETIF(((cpu->registers.a + reg) & 0x100) == 0x100, cpu->registers.f, CPU_FLAG_C);
 
-    cpu->registers.a += reg;
+    cpu->registers.a = res;
     
     return 1;
 }
@@ -559,5 +567,23 @@ int cpu_xor_n(struct CPU * cpu, uint8_t operand) { return g_xor(cpu, operand) + 
 
 /* DAA (Decimally Adjust) */
 int cpu_daa(struct CPU * cpu) {
+    uint16_t a = cpu->registers.a;
+
+    if (cpu->registers.f & CPU_FLAG_N) {
+	if (cpu->registers.f & CPU_FLAG_H) { a = (a - 0x6) & 0xFF; }
+	if (cpu->registers.f & CPU_FLAG_C) { a-= 0x60;             }
+    } else {
+	if (((a & 0xF) > 9) || (cpu->registers.f & CPU_FLAG_H)) { a += 0x06; }
+	if ((a > 0x9F)      || (cpu->registers.f & CPU_FLAG_C)) { a += 0x60; }
+    }
+
+    if ((a & 0x100) == 0x100) { FLAG_SET(cpu->registers.f, CPU_FLAG_C); }
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_Z);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
+
+    a &= 0xFF;
+    if (a == 0) { FLAG_SET(cpu->registers.f, CPU_FLAG_Z); }
+    cpu->registers.a = a;
+    
     return 1;
 }

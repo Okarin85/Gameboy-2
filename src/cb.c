@@ -3,7 +3,7 @@
  * Filename: cb.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 22:40:29 2016 (+0100)
- * Last-Updated: Sat Dec 24 00:23:21 2016 (+0100)
+ * Last-Updated: Sun Dec 25 22:58:48 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -14,12 +14,13 @@
 
 /* Shifts */
 static inline int gcb_sla(struct CPU * cpu, uint8_t * value) {
-    FLAG_CLEARIF((*value) & 0x7f, cpu->registers.f, CPU_FLAG_Z);
-    FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
-    FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
     FLAG_SETIF((*value) & 0x80, cpu->registers.f, CPU_FLAG_C);
 
     (*value) <<= 1;
+
+    FLAG_CLEARIF((*value) & 0x7f, cpu->registers.f, CPU_FLAG_Z);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
     return 2;
 }
 
@@ -32,12 +33,12 @@ int cb_sla_h(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.h); }
 int cb_sla_l(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.l); }
 
 static inline int gcb_srl(struct CPU * cpu, uint8_t * value) {
-    FLAG_CLEARIF((*value) & 0xfe, cpu->registers.f, CPU_FLAG_Z);
+    FLAG_SETIF((*value) & 0x01, cpu->registers.f, CPU_FLAG_C);
+    (*value) >>= 1;
+
+    FLAG_CLEARIF((*value), cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
-    FLAG_SETIF((*value) & 0x01, cpu->registers.f, CPU_FLAG_C);
-
-    (*value) >>= 1;
     return 2;
 }
 

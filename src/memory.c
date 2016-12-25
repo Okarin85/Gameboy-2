@@ -3,7 +3,7 @@
  * Filename: memory.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:40:29 2016 (+0100)
- * Last-Updated: Sat Dec 24 13:24:20 2016 (+0100)
+ * Last-Updated: Sun Dec 25 23:50:24 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include "logger.h"
@@ -67,9 +67,6 @@ uint8_t read_byte(struct CPU * cpu, uint16_t address) {
 }
 
 void write_byte(struct CPU * cpu, uint16_t address, uint8_t value) {
-    // log_debug("Writing byte 0x%04x (0%x)", address, value);
-    if (address == 0xff80) return;
-    
     switch (address & 0xF000) {
     case 0x0000:
     case 0x1000:

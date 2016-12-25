@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Sat Dec 24 13:23:23 2016 (+0100)
+ * Last-Updated: Sun Dec 25 23:49:33 2016 (+0100)
  *           By: Jules <archjules>
  */
 #define _GNU_SOURCE
@@ -110,7 +110,7 @@ void cpu_destroy(struct CPU * cpu) {
 
 void cpu_next_instruction(struct CPU * cpu) {
     static int d = 0;
-    char * str;
+    char * str, z[2];
     uint8_t op = read_byte(cpu, cpu->registers.pc++), last_pc = cpu->registers.pc;
     uint16_t operand;
     struct Instruction instruction = instructions[op];
@@ -121,15 +121,15 @@ void cpu_next_instruction(struct CPU * cpu) {
 	print_registers(cpu);
 	sleep(10);
     } else {
-	if ((cpu->registers.pc - 1 - instruction.operand) == 0x100) {
+	#ifdef BREAKPOINT
+	if ((cpu->registers.pc - 1 - instruction.operand) == BREAKPOINT) {
 	    d = 1;
 	} else if (d == 1) {
-	    // log_debug("%#04x : %s", cpu->registers.pc - 1 - instruction.operand, str);
-	    // print_registers(cpu);
-	    if ((cpu->registers.pc - 1 - instruction.operand) == 0x4325) d = 0;
-	    // usleep(100000);
+	    log_debug("%#04x : %s", cpu->registers.pc - 1 - instruction.operand, str);
+	    print_registers(cpu);
+	    fgets(z, 2, stdin);
 	}
-	// print_registers(cpu);
+	#endif
 	switch(instruction.operand) {
 	case 0:
 	    cpu->time_last = ((int (*)(struct CPU *))instruction.function)(cpu);
@@ -142,13 +142,6 @@ void cpu_next_instruction(struct CPU * cpu) {
 	    break;
 	}
 	cpu->clock += cpu->time_last;
-	
-	// print_registers(cpu);
     }
-
-    
-    /* if (cpu->registers.pc == 0x2be) {
-       log_debug("LOOOOOOl !!!");
-	} */
     free(str);
 }

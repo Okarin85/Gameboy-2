@@ -3,7 +3,7 @@
  * Filename: instruction.h
  * Author: Jules <archjules>
  * Created: Thu Dec  8 12:54:40 2016 (+0100)
- * Last-Updated: Sat Dec 24 14:28:49 2016 (+0100)
+ * Last-Updated: Sun Dec 25 21:54:08 2016 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -125,6 +125,8 @@ int cpu_ld_bc_nn(struct CPU *, uint16_t);
 int cpu_ld_de_nn(struct CPU *, uint16_t);
 int cpu_ld_hl_nn(struct CPU *, uint16_t);
 int cpu_ld_sp_nn(struct CPU *, uint16_t);
+int cpu_ld_sp_hl(struct CPU *);
+int cpu_ld_nn_sp(struct CPU *);
 
 int cpu_pop_bc(struct CPU *);
 int cpu_pop_de(struct CPU *);
@@ -312,7 +314,7 @@ static struct Instruction instructions[] = {
     {"DEC B",           0, cpu_dec_b},
     {"LD B, 0x%02x",    1, cpu_ld_b_n},
     {"RLCA",            0, cpu_rlc_a},
-    {"LD (0x%04x), SP", 2, NULL},
+    {"LD (0x%04x), SP", 2, cpu_ld_nn_sp},
     {"ADD HL, BC",      0, cpu_add_hl_bc},
     {"LD A, (BC)",      0, cpu_ld_a_bc},
     {"DEC BC",          0, cpu_dec_bc},
@@ -553,7 +555,7 @@ static struct Instruction instructions[] = {
     {"OR 0x%02x",       1, cpu_or_n},
     {"RST 0x30",        0, cpu_rst_30},
     {"LD HL, SP+0x%02x",1, NULL},
-    {"LD SP, HL",       0, NULL},
+    {"LD SP, HL",       0, cpu_ld_sp_hl},
     {"LD A, (0x%04x)",  2, cpu_ld_a_nn},
     {"EI",              0, cpu_ei},
     {"NONE",            0, NULL},
