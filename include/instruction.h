@@ -3,7 +3,7 @@
  * Filename: instruction.h
  * Author: Jules <archjules>
  * Created: Thu Dec  8 12:54:40 2016 (+0100)
- * Last-Updated: Mon Dec 26 00:55:16 2016 (+0100)
+ * Last-Updated: Mon Dec 26 14:30:47 2016 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -521,7 +521,7 @@ static struct Instruction instructions[] = {
     {"NONE",            0, NULL},
     {"CALL C, 0x%04x",  2, cpu_call_c},
     {"NONE",            0, NULL},
-    {"SBC A, 0x%02x",   1, NULL},
+    {"SBC A, 0x%02x",   1, cpu_sbc_n},
     {"RST 0x18",        0, cpu_rst_18},
     {"LDH (0x%02x), A", 1, cpu_ldh_n_a},    // 0xEX
     {"POP HL",          0, cpu_pop_hl},

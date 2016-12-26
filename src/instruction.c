@@ -3,7 +3,7 @@
  * Filename: instruction.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 12:36:49 2016 (+0100)
- * Last-Updated: Mon Dec 26 00:55:28 2016 (+0100)
+ * Last-Updated: Mon Dec 26 15:49:49 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -170,7 +170,7 @@ int cpu_rra(struct CPU * cpu) {
     int carry = (cpu->registers.f & CPU_FLAG_C) != 0;
     FLAG_SETIF(cpu->registers.a & 0x01, cpu->registers.f, CPU_FLAG_C);
     
-    cpu->registers.a = (cpu->registers.a >> 1) | (cpu->registers.a << 7);
+    cpu->registers.a = (cpu->registers.a >> 1) | (carry << 7);
 
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
@@ -180,12 +180,14 @@ int cpu_rra(struct CPU * cpu) {
 }
 
 int cpu_rrca(struct CPU * cpu) {
-    cpu->registers.a = (cpu->registers.a >> 1) | (cpu->registers.a << 7);
+    int c = cpu->registers.a & 0x1;
+    
+    cpu->registers.a = (cpu->registers.a >> 1) | (c << 7);
 
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
-    FLAG_SETIF(cpu->registers.a & 0x80, cpu->registers.f, CPU_FLAG_C);
+    FLAG_SETIF(c,cpu->registers.f,CPU_FLAG_C);
 
     return 1;
 }
