@@ -3,7 +3,7 @@
  * Filename: cb.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 22:40:29 2016 (+0100)
- * Last-Updated: Mon Dec 26 00:58:54 2016 (+0100)
+ * Last-Updated: Tue Dec 27 23:11:23 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -364,14 +364,15 @@ int cpu_rrc_h(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.h); }
 int cpu_rrc_l(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.l); }
 
 static inline int g_rl(struct CPU * cpu, uint8_t * value) {
-    int carry = (cpu->registers.f & CPU_FLAG_C) != 0;
-    FLAG_SETIF((*value) & 0x80, cpu->registers.f, CPU_FLAG_C);
+    uint8_t ocarry = (cpu->registers.f & CPU_FLAG_C) != 0, ncarry = (*value) & 0x80;
     
-    (*value) = ((*value) << 1) | carry;
+    (*value) = ((*value) << 1) | ocarry;
     
+    FLAG_SETIF(ncarry, cpu->registers.f, CPU_FLAG_C);
     FLAG_CLEARIF((*value), cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
+    
     return 2;
 }
 

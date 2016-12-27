@@ -3,7 +3,7 @@
  * Filename: instruction.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 12:36:49 2016 (+0100)
- * Last-Updated: Mon Dec 26 17:19:25 2016 (+0100)
+ * Last-Updated: Tue Dec 27 22:34:46 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -210,7 +210,7 @@ int cpu_rlca(struct CPU * cpu) {
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
-    FLAG_SETIF(cpu->registers.a & 0x80, cpu->registers.f, CPU_FLAG_C);
+    FLAG_SETIF(cpu->registers.a & 0x1, cpu->registers.f, CPU_FLAG_C);
 }
 
 /* 8-bit ALU */
