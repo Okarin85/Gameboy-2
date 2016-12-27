@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Tue Dec 27 17:00:15 2016 (+0100)
+ * Last-Updated: Tue Dec 27 17:15:35 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -28,6 +28,7 @@ uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
     static int last = 0x90;
     switch(port) {
     case 0x00:
+	return 0x9f;
     case 0x40:
 	return 0x83 |
 	    cpu->gpu.bg_map << 3 |
@@ -35,10 +36,16 @@ uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
     case 0x41:
 	return (cpu->memory.io[0x41] & 0xfc) |
 	    cpu->gpu.mode;
+    case 0x42:
+	return cpu->gpu.scroll_y;
+    case 0x43:
+	return cpu->gpu.scroll_x;
     case 0x44:
 	return cpu->gpu.current_line;
+    case 0x47:
+	return cpu->memory.io[0x47];
     default:
-	return cpu->memory.io[port];
+	return 1;
     }
 }
 
