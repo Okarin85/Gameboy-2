@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Fri Dec 23 19:06:28 2016 (+0100)
+ * Last-Updated: Mon Dec 26 20:18:25 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -51,6 +51,9 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
 	break;
     case 0x43:
 	cpu->gpu.scroll_x = value;
+	break;
+    case 0x45:
+	log_debug("Writing LYC : %x", value);
 	break;
     case 0x47:
 	log_debug("Writing palette : %x", value);

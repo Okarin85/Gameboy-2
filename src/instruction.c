@@ -3,7 +3,7 @@
  * Filename: instruction.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 12:36:49 2016 (+0100)
- * Last-Updated: Mon Dec 26 15:49:49 2016 (+0100)
+ * Last-Updated: Mon Dec 26 17:19:25 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -115,14 +115,15 @@ int cpu_ld_hl_l(struct CPU * cpu) { return g_ld8_memory(cpu, cpu->registers.hl, 
 
 int cpu_ld_n_a(struct CPU * cpu, uint16_t operand) { return g_ld8_memory(cpu, operand, cpu->registers.a) + 2; }
 
-int cpu_ldm_c_a(struct CPU * cpu) { return g_ld8_memory(cpu, 0xff00 + cpu->registers.c, cpu->registers.a); }
-int cpu_ldm_a_c(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.a, read_byte(cpu, 0xff00 + cpu->registers.c)) + 1; }
-
 /* 8-bit complex loads */
 int cpu_ldd_hl_a(struct CPU * cpu) { g_ld8_memory(cpu, cpu->registers.hl, cpu->registers.a); cpu->registers.hl--; return 2; }
 int cpu_ldi_hl_a(struct CPU * cpu) { g_ld8_memory(cpu, cpu->registers.hl, cpu->registers.a); cpu->registers.hl++; return 2; }
 int cpu_ldd_a_hl(struct CPU * cpu) { cpu->registers.a = read_byte(cpu, cpu->registers.hl);   cpu->registers.hl--; return 2; }
 int cpu_ldi_a_hl(struct CPU * cpu) { cpu->registers.a = read_byte(cpu, cpu->registers.hl);   cpu->registers.hl++; return 2; }
+
+
+int cpu_ldm_c_a(struct CPU * cpu) { write_byte(cpu, 0xff00 + cpu->registers.c, cpu->registers.a); return 2; }
+int cpu_ldm_a_c(struct CPU * cpu) { cpu->registers.a = read_byte(cpu, 0xff00 + cpu->registers.c); return 2; }
 int cpu_ldh_n_a(struct CPU * cpu, uint8_t operand) { write_byte(cpu, 0xFF00 + operand, cpu->registers.a); return 3; }
 int cpu_ldh_a_n(struct CPU * cpu, uint8_t operand) { cpu->registers.a = read_byte(cpu, 0xFF00 + operand); return 3; }
 
