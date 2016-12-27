@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Mon Dec 26 20:18:25 2016 (+0100)
+ * Last-Updated: Tue Dec 27 17:00:15 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -27,6 +27,14 @@ static inline uint32_t get_color(int color) {
 uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
     static int last = 0x90;
     switch(port) {
+    case 0x00:
+    case 0x40:
+	return 0x83 |
+	    cpu->gpu.bg_map << 3 |
+	    cpu->gpu.bg_tile<< 4;
+    case 0x41:
+	return (cpu->memory.io[0x41] & 0xfc) |
+	    cpu->gpu.mode;
     case 0x44:
 	return cpu->gpu.current_line;
     default:
