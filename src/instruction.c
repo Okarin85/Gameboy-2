@@ -3,7 +3,7 @@
  * Filename: instruction.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 12:36:49 2016 (+0100)
- * Last-Updated: Thu Dec 29 00:35:10 2016 (+0100)
+ * Last-Updated: Thu Dec 29 00:44:34 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -21,6 +21,19 @@
  * Nothing.
  */
 int cpu_nop(struct CPU * cpu){ return 1; }
+
+/*
+ * cpu_halt:
+ * Halts the CPU until an interrupt occurs
+ */
+int cpu_halt(struct CPU * cpu) { cpu->halted = true; return 1; }
+
+
+/*
+ * cpu_stop:
+ * At the moment, does exactly like HALT (Takes the byte following the opcode)
+ */
+int cpu_stop(struct CPU * cpu, uint8_t nothing) { cpu->halted = true; return 1; }
 
 /*
  * cpu_{ei,di}:

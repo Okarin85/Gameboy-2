@@ -3,7 +3,7 @@
  * Filename: interrupt.c
  * Author: Jules <archjules>
  * Created: Tue Dec 20 23:09:01 2016 (+0100)
- * Last-Updated: Fri Dec 23 19:02:58 2016 (+0100)
+ * Last-Updated: Thu Dec 29 00:43:19 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include "logger.h"
@@ -27,6 +27,7 @@ void treat_interruptions(struct CPU * cpu) {
 }
 
 void remove_interruption(struct CPU * cpu, uint8_t interruption) {
+    cpu->halted = false;
     cpu->memory.io[0x0F] &= ~interruption;
 }
 

@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Tue Dec 27 23:10:51 2016 (+0100)
+ * Last-Updated: Thu Dec 29 00:41:50 2016 (+0100)
  *           By: Jules <archjules>
  */
 #define _GNU_SOURCE
@@ -109,39 +109,36 @@ void cpu_destroy(struct CPU * cpu) {
 }
 
 void cpu_next_instruction(struct CPU * cpu) {
-    static int d = 0;
-    char * str, z[2];
-    uint8_t op = read_byte(cpu, cpu->registers.pc++), last_pc = cpu->registers.pc;
+    char * str;
+    uint8_t op;
     uint16_t operand;
-    struct Instruction instruction = instructions[op];
-    
-    operand = interpret_opcode(cpu, instruction, &str);
-    if (instruction.function == NULL) {
-	log_warn("%#04x : Instruction not implemented ! (%#02x, %s)", cpu->registers.pc - 1 - instruction.operand, op, str);
-	print_registers(cpu);
-	sleep(10);
+    struct Instruction instruction;
+
+    if (cpu->halted) {
+	cpu->time_last = 1;
+	cpu->clock += 1;
     } else {
-	#ifdef BREAKPOINT
-	if ((cpu->registers.pc - 1 - instruction.operand) == BREAKPOINT) {
-	    d = 1;
-	} else if (d == 1) {
-	    log_debug("%#04x : %s", cpu->registers.pc - 1 - instruction.operand, str);
+	op = read_byte(cpu, cpu->registers.pc++);
+	instruction = instructions[op];
+	operand = interpret_opcode(cpu, instruction, &str);
+	if (instruction.function == NULL) {
+	    log_warn("%#04x : Instruction not implemented ! (%#02x, %s)", cpu->registers.pc - 1 - instruction.operand, op, str);
 	    print_registers(cpu);
-	    fgets(z, 2, stdin);
+	    sleep(10);
+	} else {
+	    switch(instruction.operand) {
+	    case 0:
+		cpu->time_last = ((int (*)(struct CPU *))instruction.function)(cpu);
+		break;
+	    case 1:
+		cpu->time_last = ((int (*)(struct CPU *, uint8_t))instruction.function)(cpu, (uint8_t)operand);
+		break;
+	    case 2:
+		cpu->time_last = ((int (*)(struct CPU *, uint16_t))instruction.function)(cpu, operand);
+		break;
+	    }
+	    cpu->clock += cpu->time_last;
 	}
-	#endif
-	switch(instruction.operand) {
-	case 0:
-	    cpu->time_last = ((int (*)(struct CPU *))instruction.function)(cpu);
-	    break;
-	case 1:
-	    cpu->time_last = ((int (*)(struct CPU *, uint8_t))instruction.function)(cpu, (uint8_t)operand);
-	    break;
-	case 2:
-	    cpu->time_last = ((int (*)(struct CPU *, uint16_t))instruction.function)(cpu, operand);
-	    break;
-	}
-	cpu->clock += cpu->time_last;
+	free(str);
     }
-    free(str);
 }

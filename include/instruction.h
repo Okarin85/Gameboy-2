@@ -3,7 +3,7 @@
  * Filename: instruction.h
  * Author: Jules <archjules>
  * Created: Thu Dec  8 12:54:40 2016 (+0100)
- * Last-Updated: Wed Dec 28 12:34:35 2016 (+0100)
+ * Last-Updated: Thu Dec 29 00:44:48 2016 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -18,6 +18,8 @@ struct Instruction {
 
 int cb_prefix(struct CPU *, uint8_t);
 int cpu_nop(struct CPU *);
+int cpu_stop(struct CPU *, uint8_t);
+int cpu_halt(struct CPU *);
 int cpu_ei(struct CPU *);
 int cpu_di(struct CPU *);
 
@@ -315,7 +317,7 @@ static struct Instruction instructions[] = {
     {"DEC C",           0, cpu_dec_c},
     {"LD C, 0x%02x",    1, cpu_ld_c_n},
     {"RRCA",            0, cpu_rrca},
-    {"STOP",            0, NULL},    // 0x1X
+    {"STOP",            1, cpu_stop},    // 0x1X
     {"LD DE, 0x%04x",   2, cpu_ld_de_nn},
     {"LD (DE), A",      0, cpu_ld_de_a},
     {"INC DE",          0, cpu_inc_de},
@@ -417,7 +419,7 @@ static struct Instruction instructions[] = {
     {"LD (HL), E",      0, cpu_ld_hl_e},
     {"LD (HL), H",      0, cpu_ld_hl_h},
     {"LD (HL), L",      0, cpu_ld_hl_l},
-    {"HALT",            0, NULL},
+    {"HALT",            0, cpu_halt},
     {"LD (HL), A",      0, cpu_ld_hl_a},
     {"LD A, B",         0, cpu_ld_a_b},
     {"LD A, C",         0, cpu_ld_a_c},
