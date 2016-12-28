@@ -3,7 +3,7 @@
  * Filename: instruction.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 12:36:49 2016 (+0100)
- * Last-Updated: Wed Dec 28 18:55:06 2016 (+0100)
+ * Last-Updated: Thu Dec 29 00:35:10 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -350,7 +350,7 @@ static inline int g_sub8(struct CPU * cpu, uint8_t reg) {
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_CLEARIF((((cpu->registers.a & 0xF) - (reg & 0xF)) & 0x10) == 0x10, cpu->registers.f, CPU_FLAG_H);
     FLAG_CLEARIF(((cpu->registers.a - reg) & 0x100) == 0x100, cpu->registers.f, CPU_FLAG_C);
-$
+    
     cpu->registers.a -= reg;
     
     return 1;
