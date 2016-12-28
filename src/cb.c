@@ -3,7 +3,7 @@
  * Filename: cb.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 22:40:29 2016 (+0100)
- * Last-Updated: Wed Dec 28 11:43:12 2016 (+0100)
+ * Last-Updated: Wed Dec 28 12:16:39 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -11,8 +11,6 @@
 #include "logger.h"
 #include "instruction.h"
 #include "memory.h"
-
-/* Shifts */
 
 /*
  * cb_sla_*:

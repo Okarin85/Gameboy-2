@@ -3,7 +3,7 @@
  * Filename: instruction.h
  * Author: Jules <archjules>
  * Created: Thu Dec  8 12:54:40 2016 (+0100)
- * Last-Updated: Mon Dec 26 14:30:47 2016 (+0100)
+ * Last-Updated: Wed Dec 28 12:34:35 2016 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -118,8 +118,8 @@ int cpu_ld_h_n(struct CPU *, uint8_t);
 int cpu_ld_l_n(struct CPU *, uint8_t);
 int cpu_ld_hl_n(struct CPU *, uint8_t);
 
-int cpu_ldm_c_a(struct CPU *);
-int cpu_ldm_a_c(struct CPU *);
+int cpu_ldh_c_a(struct CPU *);
+int cpu_ldh_a_c(struct CPU *);
 
 int cpu_ld_bc_nn(struct CPU *, uint16_t);
 int cpu_ld_de_nn(struct CPU *, uint16_t);
@@ -525,7 +525,7 @@ static struct Instruction instructions[] = {
     {"RST 0x18",        0, cpu_rst_18},
     {"LDH (0x%02x), A", 1, cpu_ldh_n_a},    // 0xEX
     {"POP HL",          0, cpu_pop_hl},
-    {"LD (C), A",       0, cpu_ldm_c_a},
+    {"LD (C), A",       0, cpu_ldh_c_a},
     {"NONE",            0, NULL},
     {"NONE",            0, NULL},
     {"PUSH HL",         0, cpu_push_hl},
@@ -541,7 +541,7 @@ static struct Instruction instructions[] = {
     {"RST 0x28",        0, cpu_rst_28},
     {"LDH A, (0x%02x)", 1, cpu_ldh_a_n},    // 0xFX
     {"POP AF",          0, cpu_pop_af},
-    {"LD A, (C)",       0, cpu_ldm_a_c},
+    {"LD A, (C)",       0, cpu_ldh_a_c},
     {"DI",              0, cpu_di},
     {"NONE",            0, NULL},
     {"PUSH AF",         0, cpu_push_af},

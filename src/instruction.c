@@ -3,7 +3,7 @@
  * Filename: instruction.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 12:36:49 2016 (+0100)
- * Last-Updated: Tue Dec 27 22:34:46 2016 (+0100)
+ * Last-Updated: Wed Dec 28 18:55:06 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -16,8 +16,18 @@
  * Every instruction. Every instruction returns the number of cycles it took to complete.
  */
 
-/* NOP instruction */
+/*
+ * cpu_nop:
+ * Nothing.
+ */
 int cpu_nop(struct CPU * cpu){ return 1; }
+
+/*
+ * cpu_{ei,di}:
+ * Enables or disables the interruptions.
+ *
+ * All flags untouched
+ */
 int cpu_ei(struct CPU * cpu) { cpu->interrupts = true;  return 1; }
 int cpu_di(struct CPU * cpu) { cpu->interrupts = false; return 1; }
 
@@ -25,6 +35,12 @@ int cpu_di(struct CPU * cpu) { cpu->interrupts = false; return 1; }
 static inline int g_ld8_register(struct CPU * cpu, uint8_t * dest, uint8_t value) { (*dest) = value; return 1; }
 static inline int g_ld8_memory(struct CPU * cpu, uint16_t dest, uint8_t value) { write_byte(cpu, dest, value); return 2; }
 
+/*
+ * cpu_ld_*_*
+ * Loads *{2} into *{1}.
+ *
+ * All flags untouched.
+ */
 int cpu_ld_a_n(struct CPU * cpu, uint8_t operand) { return g_ld8_register(cpu, &cpu->registers.a, operand); }
 int cpu_ld_b_n(struct CPU * cpu, uint8_t operand) { return g_ld8_register(cpu, &cpu->registers.b, operand); }
 int cpu_ld_c_n(struct CPU * cpu, uint8_t operand) { return g_ld8_register(cpu, &cpu->registers.c, operand); }
@@ -113,21 +129,52 @@ int cpu_ld_hl_e(struct CPU * cpu) { return g_ld8_memory(cpu, cpu->registers.hl, 
 int cpu_ld_hl_h(struct CPU * cpu) { return g_ld8_memory(cpu, cpu->registers.hl, cpu->registers.h); }
 int cpu_ld_hl_l(struct CPU * cpu) { return g_ld8_memory(cpu, cpu->registers.hl, cpu->registers.l); }
 
+/*
+ * cpu_ld_n_a
+ * LD (n), a (n = 16bit constant)
+ * 
+ * All flags untouched.
+ */
 int cpu_ld_n_a(struct CPU * cpu, uint16_t operand) { return g_ld8_memory(cpu, operand, cpu->registers.a) + 2; }
 
-/* 8-bit complex loads */
+/*
+ * cpu_ld{i,d}_hl_a:
+ * Loads A into (HL), then decrements or increments HL.
+ *
+ * All flags untouched
+ */
 int cpu_ldd_hl_a(struct CPU * cpu) { g_ld8_memory(cpu, cpu->registers.hl, cpu->registers.a); cpu->registers.hl--; return 2; }
 int cpu_ldi_hl_a(struct CPU * cpu) { g_ld8_memory(cpu, cpu->registers.hl, cpu->registers.a); cpu->registers.hl++; return 2; }
+
+/*
+ * cpu_ld{i,d}_a_hl:
+ * Loads (HL) into A, then decrements or increments HL.
+ *
+ * All flags untouched
+ */
 int cpu_ldd_a_hl(struct CPU * cpu) { cpu->registers.a = read_byte(cpu, cpu->registers.hl);   cpu->registers.hl--; return 2; }
 int cpu_ldi_a_hl(struct CPU * cpu) { cpu->registers.a = read_byte(cpu, cpu->registers.hl);   cpu->registers.hl++; return 2; }
 
-
-int cpu_ldm_c_a(struct CPU * cpu) { write_byte(cpu, 0xff00 + cpu->registers.c, cpu->registers.a); return 2; }
-int cpu_ldm_a_c(struct CPU * cpu) { cpu->registers.a = read_byte(cpu, 0xff00 + cpu->registers.c); return 2; }
+/*
+ * cpu_ldh_a_*:
+ * Loads (0xFF00 + *) into A
+ *
+ * cpu_ldh_*_a:
+ * Loads A into (0xFF00 + *)
+ *
+ * All flags untouched
+ */
+int cpu_ldh_c_a(struct CPU * cpu) { write_byte(cpu, 0xff00 + cpu->registers.c, cpu->registers.a); return 2; }
+int cpu_ldh_a_c(struct CPU * cpu) { cpu->registers.a = read_byte(cpu, 0xff00 + cpu->registers.c); return 2; }
 int cpu_ldh_n_a(struct CPU * cpu, uint8_t operand) { write_byte(cpu, 0xFF00 + operand, cpu->registers.a); return 3; }
 int cpu_ldh_a_n(struct CPU * cpu, uint8_t operand) { cpu->registers.a = read_byte(cpu, 0xFF00 + operand); return 3; }
 
-/* 16-bit loads */
+/*
+ * cpu_ld_{1}_{2}:
+ * Loads {1} into {2}
+ *
+ * All flags untouched
+ */
 static inline int g_ld16(struct CPU * cpu, uint16_t * dest, uint16_t value) { (*dest) = value; return 3; }
 
 int cpu_ld_bc_nn(struct CPU * cpu, uint16_t operand) { return g_ld16(cpu, &cpu->registers.bc, operand); }
@@ -136,11 +183,21 @@ int cpu_ld_hl_nn(struct CPU * cpu, uint16_t operand) { return g_ld16(cpu, &cpu->
 int cpu_ld_sp_nn(struct CPU * cpu, uint16_t operand) { return g_ld16(cpu, &cpu->registers.sp, operand); }
 int cpu_ld_sp_hl(struct CPU * cpu) { return g_ld16(cpu, &cpu->registers.sp, cpu->registers.hl); }
 
+/*
+ * cpu_ld_nn_sp:
+ * Writes SP at (HL).
+ */
 int cpu_ld_nn_sp(struct CPU * cpu) {
     write_word(cpu, cpu->registers.hl, cpu->registers.sp);
     return 5;
 }
 
+/*
+ * cpu_push_*:
+ * Pushes * on the stack.
+ * 
+ * All flags untouched
+ */
 static inline int g_push16(struct CPU * cpu, uint16_t value) {
     push_word(cpu, value);
     return 4;
@@ -151,6 +208,12 @@ int cpu_push_de(struct CPU * cpu) { return g_push16(cpu, cpu->registers.de); }
 int cpu_push_hl(struct CPU * cpu) { return g_push16(cpu, cpu->registers.hl); }
 int cpu_push_af(struct CPU * cpu) { return g_push16(cpu, cpu->registers.af); }
 
+/*
+ * cpu_pop_*:
+ * Pop a word off the stack and store it in *
+ * 
+ * All flags untouched
+ */
 static inline int g_pop16(struct CPU * cpu, uint16_t * value) {
     (*value) = pop_word(cpu);
     return 3;
@@ -166,7 +229,11 @@ int cpu_pop_af(struct CPU * cpu) {
     return 3;
 }
 
-/* Rotates */
+/*
+ * cpu_r*:
+ * Almost like the function of the same name in CB, but faster
+ * and unsets the zero flag
+ */
 int cpu_rra(struct CPU * cpu) {
     int carry = (cpu->registers.f & CPU_FLAG_C) != 0;
     FLAG_SETIF(cpu->registers.a & 0x01, cpu->registers.f, CPU_FLAG_C);
@@ -213,7 +280,15 @@ int cpu_rlca(struct CPU * cpu) {
     FLAG_SETIF(cpu->registers.a & 0x1, cpu->registers.f, CPU_FLAG_C);
 }
 
-/* 8-bit ALU */
+/*
+ * cpu_add_*:
+ * Adds A and *, result in A
+ *
+ * Carry: Set if carry
+ * Zero:  Set if result == 0
+ * Substract: Unset
+ * Half-carry: Set if half-carry
+ */
 static inline int g_add8(struct CPU * cpu, uint8_t reg) {
     uint8_t res = cpu->registers.a + reg;
     
@@ -237,6 +312,15 @@ int cpu_add_l(struct CPU * cpu) { return g_add8(cpu, cpu->registers.l); }
 int cpu_add_hl(struct CPU * cpu){ return g_add8(cpu, read_byte(cpu, cpu->registers.hl)) + 1; }
 int cpu_add_n(struct CPU * cpu, uint8_t operand) { return g_add8(cpu, operand) + 1; }
 
+/*
+ * cpu_adc_*:
+ * Adds A, * and carry, result in A
+ *
+ * Carry: Set if carry
+ * Zero:  Set if result == 0
+ * Substract: Unset
+ * Half-carry: Set if half-carry
+ */
 static inline int g_adc8(struct CPU * cpu, uint8_t reg) {
     int carry = (cpu->registers.f & CPU_FLAG_C) >> 4;
     return g_add8(cpu, reg + carry);
@@ -252,12 +336,21 @@ int cpu_adc_l(struct CPU * cpu) { return g_adc8(cpu, cpu->registers.l); }
 int cpu_adc_hl(struct CPU * cpu){ return g_adc8(cpu, read_byte(cpu, cpu->registers.hl)) + 1; }
 int cpu_adc_n(struct CPU * cpu, uint8_t operand) { return g_adc8(cpu, operand) + 1; }
 
+/*
+ * cpu_sub_*
+ * Substracts * from A
+ * 
+ * Carry: Set if carry
+ * Zero:  Set if result == 0
+ * Substract: Set
+ * Half-carry: Set if half-carry
+ */
 static inline int g_sub8(struct CPU * cpu, uint8_t reg) {
     FLAG_SETIF((cpu->registers.a - reg), cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_CLEARIF((((cpu->registers.a & 0xF) - (reg & 0xF)) & 0x10) == 0x10, cpu->registers.f, CPU_FLAG_H);
     FLAG_CLEARIF(((cpu->registers.a - reg) & 0x100) == 0x100, cpu->registers.f, CPU_FLAG_C);
-
+$
     cpu->registers.a -= reg;
     
     return 1;
@@ -273,6 +366,15 @@ int cpu_sub_l(struct CPU * cpu) { return g_sub8(cpu, cpu->registers.l); }
 int cpu_sub_hl(struct CPU * cpu){ return g_sub8(cpu, read_byte(cpu, cpu->registers.hl)) + 1; }
 int cpu_sub_n(struct CPU * cpu, uint8_t operand) { return g_sub8(cpu, operand) + 1; }
 
+/*
+ * cpu_sbc_*
+ * Substracts (* + carry) from A
+ * 
+ * Carry: Set if carry
+ * Zero:  Set if result == 0
+ * Substract: Set
+ * Half-carry: Set if half-carry
+ */
 static inline int g_sbc8(struct CPU * cpu, uint8_t reg) {
     uint16_t v = reg + ((cpu->registers.f & CPU_FLAG_C) != 0);
 
@@ -295,6 +397,15 @@ int cpu_sbc_l(struct CPU * cpu) { return g_sbc8(cpu, cpu->registers.l); }
 int cpu_sbc_hl(struct CPU * cpu){ return g_sbc8(cpu, read_byte(cpu, cpu->registers.hl)) + 1; }
 int cpu_sbc_n(struct CPU * cpu, uint8_t operand) { return g_sbc8(cpu, operand) + 1; }
 
+/*
+ * cpu_dec_*:
+ * Decrement *
+ * 
+ * Carry: untouched
+ * Zero: set if * == 0 after operation
+ * Substract: Set
+ * Half-carry: Set if half-carry
+ */
 static inline int g_dec8_r(struct CPU * cpu, uint8_t * reg) {
     FLAG_SET(cpu->registers.f, CPU_FLAG_N);
     FLAG_CLEARIF(*reg & 0xf, cpu->registers.f, CPU_FLAG_H);
@@ -320,6 +431,15 @@ int cpu_decm_hl(struct CPU * cpu) {
     return 2;
 }
 
+/*
+ * cpu_inc_*:
+ * Increment *
+ * 
+ * Carry: untouched
+ * Zero: set if * == 0 after operation
+ * Substract: Unset
+ * Half-carry: Set if half-carry
+ */
 static inline int g_inc8_r(struct CPU * cpu, uint8_t * reg) {
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_CLEARIF((*reg & 0xf) == 0xf, cpu->registers.f, CPU_FLAG_H);
@@ -345,6 +465,15 @@ int cpu_incm_hl(struct CPU * cpu) {
     return 2;
 }
 
+/*
+ * cpu_cp_*:
+ * Compare A and *. Same as a substraction, but the result is thrown away.
+ *
+ * Carry: Set if carry (if A < *)
+ * Zero: Set if A == *
+ * Substract: Set
+ * Half-carry: Set if low nibble of A < low nibble of *
+ */
 static inline int g_cp(struct CPU * cpu, uint8_t value) {
     FLAG_SETIF(cpu->registers.a == value, cpu->registers.f, CPU_FLAG_Z);
     FLAG_SETIF((cpu->registers.a & 0xf) < (value & 0xf), cpu->registers.f, CPU_FLAG_H);
@@ -364,6 +493,10 @@ int cpu_cp_l(struct CPU * cpu) { return g_cp(cpu, cpu->registers.l); }
 int cpu_cp_hl(struct CPU * cpu) { return g_cp(cpu, read_byte(cpu, cpu->registers.hl)) + 1; }
 int cpu_cp_n(struct CPU * cpu, uint8_t operand) { return g_cp(cpu, operand) + 1; }
 
+/*
+ * cpu_cpl:
+ * Complements all bits of A
+ */
 int cpu_cpl(struct CPU * cpu) {
     cpu->registers.a = ~(cpu->registers.a);
     
@@ -373,7 +506,12 @@ int cpu_cpl(struct CPU * cpu) {
     return 1;
 }
 
-/* 16-bit ALU */
+/*
+ * cpu_dec_*:
+ * Decrement a 16-bit register
+ *
+ * All flags untouched
+ */
 static inline int g_dec16(struct CPU * cpu, uint16_t * value) {
     (*value)--;
     return 2;
@@ -384,6 +522,12 @@ int cpu_dec_de(struct CPU * cpu) { return g_dec16(cpu, &cpu->registers.de); }
 int cpu_dec_hl(struct CPU * cpu) { return g_dec16(cpu, &cpu->registers.hl); }
 int cpu_dec_sp(struct CPU * cpu) { return g_dec16(cpu, &cpu->registers.sp); }
 
+/*
+ * cpu_inc_*:
+ * Increment a 16-bit register
+ * 
+ * All flags untouched
+ */
 static inline int g_inc16(struct CPU * cpu, uint16_t * value) {
     (*value)++;
     return 2;
@@ -394,6 +538,15 @@ int cpu_inc_de(struct CPU * cpu) { return g_inc16(cpu, &cpu->registers.de); }
 int cpu_inc_hl(struct CPU * cpu) { return g_inc16(cpu, &cpu->registers.hl); }
 int cpu_inc_sp(struct CPU * cpu) { return g_inc16(cpu, &cpu->registers.sp); }
 
+/*
+ * cpu_add_hl_*:
+ * Add * to HL
+ *
+ * Carry: Set if carry
+ * Zero: Untouched
+ * Substract: Unset
+ * Half-carry: Set if carry from bit 11 to 12
+ */
 static inline int g_add_hl16(struct CPU * cpu, uint16_t value) {
     FLAG_SETIF(((cpu->registers.hl & 0x0FFF) + (value & 0x0FFF)) & 0x1000, cpu->registers.f, CPU_FLAG_H);
     FLAG_SETIF((cpu->registers.hl + value) & 0x10000, cpu->registers.f, CPU_FLAG_C);
@@ -408,13 +561,28 @@ int cpu_add_hl_de(struct CPU * cpu) { return g_add_hl16(cpu, cpu->registers.de);
 int cpu_add_hl_hl(struct CPU * cpu) { return g_add_hl16(cpu, cpu->registers.hl); }
 int cpu_add_hl_sp(struct CPU * cpu) { return g_add_hl16(cpu, cpu->registers.sp); }
 
-/*  Inconditionnal jumps */
+/*
+ * cpu_jp:
+ * Jump to a given address
+ */
 int cpu_jp(struct CPU * cpu, uint16_t operand) { cpu->registers.pc = operand; return 4; }
+
+/*
+ * cpu_jr:
+ * Jump to a relative address given a signed offset
+ */
 int cpu_jr(struct CPU * cpu, uint8_t operand)  { cpu->registers.pc+=((int8_t)operand); return 3; }
 
+/*
+ * cpu_jp_hl:
+ * Jump to the address pointed by HL
+ */
 int cpu_jp_hl(struct CPU * cpu) { cpu->registers.pc = cpu->registers.hl; return 1; }
 
-/* Conditionnal jumps */
+/*
+ * cpu_jp_*:
+ * Jump to given address if * flag is set
+ */
 static inline int g_cjp(struct CPU * cpu, uint16_t operand, uint8_t flag) {
     if (cpu->registers.f & flag) return cpu_jp(cpu, operand);
     else                         return 2;
@@ -422,6 +590,10 @@ static inline int g_cjp(struct CPU * cpu, uint16_t operand, uint8_t flag) {
 int cpu_jp_z(struct CPU * cpu, uint16_t operand) { return g_cjp(cpu, operand, CPU_FLAG_Z); }
 int cpu_jp_c(struct CPU * cpu, uint16_t operand) { return g_cjp(cpu, operand, CPU_FLAG_C); }
 
+/*
+ * cpu_jp_n*:
+ * Jump to given address if * flag is unset
+ */
 static inline int g_cnjp(struct CPU * cpu, uint16_t operand, uint8_t flag) {
     if (cpu->registers.f & flag) return 2;
     else                         return cpu_jp(cpu, operand);
@@ -429,6 +601,10 @@ static inline int g_cnjp(struct CPU * cpu, uint16_t operand, uint8_t flag) {
 int cpu_jp_nz(struct CPU * cpu, uint16_t operand) { return g_cnjp(cpu, operand, CPU_FLAG_Z); }
 int cpu_jp_nc(struct CPU * cpu, uint16_t operand) { return g_cnjp(cpu, operand, CPU_FLAG_C); }
 
+/*
+ * cpu_jr_*:
+ * Jump relative if * flag is set
+ */
 static inline int g_cjr(struct CPU * cpu, uint8_t operand, uint8_t flag) {
     if (cpu->registers.f & flag) return cpu_jr(cpu, operand);
     else                         return 2;
@@ -436,6 +612,10 @@ static inline int g_cjr(struct CPU * cpu, uint8_t operand, uint8_t flag) {
 int cpu_jr_z(struct CPU * cpu, uint8_t operand) { return g_cjr(cpu, operand, CPU_FLAG_Z); }
 int cpu_jr_c(struct CPU * cpu, uint8_t operand) { return g_cjr(cpu, operand, CPU_FLAG_C); }
 
+/*
+ * cpu_jr_n*:
+ * Jump relative if * flag is unset
+ */
 static inline int g_cnjr(struct CPU * cpu, uint8_t operand, uint8_t flag) {
     if (cpu->registers.f & flag) return 2;
     else                         return cpu_jr(cpu, operand);
@@ -443,7 +623,10 @@ static inline int g_cnjr(struct CPU * cpu, uint8_t operand, uint8_t flag) {
 int cpu_jr_nz(struct CPU * cpu, uint8_t operand) { return g_cnjr(cpu, operand, CPU_FLAG_Z); }
 int cpu_jr_nc(struct CPU * cpu, uint8_t operand) { return g_cnjr(cpu, operand, CPU_FLAG_C); }
 
-/* Calls */
+/*
+ * cpu_call:
+ * Pushes current PC on the stack, then jump to given address
+ */
 static inline int g_call(struct CPU * cpu, uint16_t address) {
     push_word(cpu, cpu->registers.pc);
     cpu->registers.pc = address;
@@ -452,6 +635,10 @@ static inline int g_call(struct CPU * cpu, uint16_t address) {
 
 int cpu_call(struct CPU * cpu, uint16_t operand) { return g_call(cpu, operand); }
 
+/*
+ * cpu_call_*:
+ * Call given address if * flag is set
+ */
 static inline int g_ccall(struct CPU * cpu, uint16_t address, uint8_t flag) {
     if (cpu->registers.f & flag) return g_call(cpu, address);
     else                         return 3;
@@ -460,6 +647,10 @@ static inline int g_ccall(struct CPU * cpu, uint16_t address, uint8_t flag) {
 int cpu_call_c(struct CPU * cpu, uint16_t operand) { return g_ccall(cpu, operand, CPU_FLAG_C); }
 int cpu_call_z(struct CPU * cpu, uint16_t operand) { return g_ccall(cpu, operand, CPU_FLAG_Z); }
 
+/*
+ * cpu_call_n*:
+ * Call given address if * flag is unset
+ */
 static inline int g_cncall(struct CPU * cpu, uint16_t address, uint8_t flag) {
     if (cpu->registers.f & flag) return 3;
     else                         return g_call(cpu, address);
@@ -468,7 +659,10 @@ static inline int g_cncall(struct CPU * cpu, uint16_t address, uint8_t flag) {
 int cpu_call_nc(struct CPU * cpu, uint16_t operand) { return g_cncall(cpu, operand, CPU_FLAG_C); }
 int cpu_call_nz(struct CPU * cpu, uint16_t operand) { return g_cncall(cpu, operand, CPU_FLAG_Z); }
 
-/* Returns */
+/*
+ * cpu_ret:
+ * Pops a word of the stack, then jump to the address pointed by it
+ */
 static inline int g_ret(struct CPU * cpu) {
     uint16_t address = pop_word(cpu);
     cpu->registers.pc = address;
@@ -477,12 +671,22 @@ static inline int g_ret(struct CPU * cpu) {
 }
 
 int cpu_ret(struct CPU * cpu) { return g_ret(cpu); }
+
+/*
+ * cpu_reti:
+ * Like cpu_ret, but enables interrupts
+ */
 int cpu_reti(struct CPU * cpu) {
     g_ret(cpu);
     cpu->interrupts = true;
 
     return 2;
 }
+
+/*
+ * cpu_ret_*:
+ * Returns if * flag is set
+ */
 static inline int g_cret(struct CPU * cpu, uint8_t flag) {
     if (cpu->registers.f & flag) { g_ret(cpu); return 5; }
     else                         { return 2; }
@@ -491,6 +695,10 @@ static inline int g_cret(struct CPU * cpu, uint8_t flag) {
 int cpu_ret_z(struct CPU * cpu) { return g_cret(cpu, CPU_FLAG_Z); }
 int cpu_ret_c(struct CPU * cpu) { return g_cret(cpu, CPU_FLAG_C); }
 
+/*
+ * cpu_ret_n*:
+ * Returns if * flag is unset
+ */
 static inline int g_cnret(struct CPU * cpu, uint8_t flag) {
     if (cpu->registers.f & flag) { return 2; }
     else                         { g_ret(cpu); return 5; }
@@ -499,8 +707,10 @@ static inline int g_cnret(struct CPU * cpu, uint8_t flag) {
 int cpu_ret_nz(struct CPU * cpu){ return g_cnret(cpu, CPU_FLAG_Z); }
 int cpu_ret_nc(struct CPU * cpu){ return g_cnret(cpu, CPU_FLAG_C); }
 
-/* Restarts */
-
+/*
+ * cpu_rst_*:
+ * Calls *
+ */
 int cpu_rst_00(struct CPU * cpu) { g_call(cpu, 0x00); return 8; }
 int cpu_rst_08(struct CPU * cpu) { g_call(cpu, 0x08); return 8; }
 int cpu_rst_10(struct CPU * cpu) { g_call(cpu, 0x10); return 8; }
@@ -510,7 +720,14 @@ int cpu_rst_28(struct CPU * cpu) { g_call(cpu, 0x28); return 8; }
 int cpu_rst_30(struct CPU * cpu) { g_call(cpu, 0x30); return 8; }
 int cpu_rst_38(struct CPU * cpu) { g_call(cpu, 0x38); return 8; }
 
-/* ANDs */
+/*
+ * Bitwise AND between A and value. Result in A.
+ *
+ * Carry: Unset
+ * Zero: Set if A == 0 after operation
+ * Substract: Unset
+ * Half-carry: Set
+ */
 static inline int g_and(struct CPU * cpu, uint8_t value) {
     cpu->registers.a &= value;
 
@@ -531,7 +748,14 @@ int cpu_and_l(struct CPU * cpu)  { return g_and(cpu, cpu->registers.l); }
 int cpu_and_hl(struct CPU * cpu) { return g_and(cpu, read_byte(cpu, cpu->registers.hl)) + 1; }
 int cpu_and_n(struct CPU * cpu, uint8_t operand) { return g_and(cpu, operand) + 1; }
 
-/* ORs */
+/*
+ * Bitwise OR between A and value. Result in A.
+ *
+ * Carry: Unset
+ * Zero: Set if A == 0 after operation
+ * Substract: Unset
+ * Half-carry: Unset
+ */
 static inline int g_or(struct CPU * cpu, uint8_t value) {
     cpu->registers.a |= value;
 
@@ -552,7 +776,14 @@ int cpu_or_l(struct CPU * cpu)  { return g_or(cpu, cpu->registers.l); }
 int cpu_or_hl(struct CPU * cpu) { return g_or(cpu, read_byte(cpu, cpu->registers.hl)); }
 int cpu_or_n(struct CPU * cpu, uint8_t operand) { return g_or(cpu, operand) + 1; }
 
-/* XORs */
+/*
+ * Bitwise XOR between A and value. Result in A.
+ *
+ * Carry: Unset
+ * Zero: Set if A == 0 after operation
+ * Substract: Unset
+ * Half-carry: Unset
+ */
 static inline int g_xor(struct CPU * cpu, uint8_t value) {
     cpu->registers.a ^= value;
 
@@ -574,9 +805,9 @@ int cpu_xor_hl(struct CPU * cpu) { return g_xor(cpu, read_byte(cpu, cpu->registe
 int cpu_xor_n(struct CPU * cpu, uint8_t operand) { return g_xor(cpu, operand) + 1; }
 
 /*
- * Some "singleton" instructions.
+ * cpu_scf:
+ * Sets carry flag
  */
-/* SCF (Set Carry Flag) */
 int cpu_scf(struct CPU * cpu) {
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
@@ -584,7 +815,9 @@ int cpu_scf(struct CPU * cpu) {
     return 1;
 }
 
-/* CCF (Complement Carry Flag */
+/* cpu_ccf:
+ * Complement Carry Flag
+ */
 int cpu_ccf(struct CPU * cpu) {
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
@@ -592,7 +825,15 @@ int cpu_ccf(struct CPU * cpu) {
     return 1;
 }
 
-/* DAA (Decimally Adjust) */
+/*
+ * cpu_daa:
+ * Decimally adjust A for BCD operations
+ * 
+ * Carry: Set if carry
+ * Zero: Unset
+ * Substract: Untouched
+ * Half-carry: Unset
+ */
 int cpu_daa(struct CPU * cpu) {
     uint16_t a = cpu->registers.a;
 
