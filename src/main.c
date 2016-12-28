@@ -3,7 +3,7 @@
  * Filename: main.c
  * Author: Jules <archjules>
  * Created: Wed Dec  7 08:48:50 2016 (+0100)
- * Last-Updated: Fri Dec 23 01:26:06 2016 (+0100)
+ * Last-Updated: Wed Dec 28 11:04:29 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -19,6 +19,11 @@
 #include "interrupt.h"
 #include "logger.h"
 
+/*
+ * main:
+ * The entry point of the program. Parses CL arguments and loops the CPU.
+ * @return: 0 in case of success.
+ */
 int main(int argc, char ** argv) {
     struct CPU cpu;
     char * rom_filename = NULL, c;

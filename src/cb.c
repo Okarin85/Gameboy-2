@@ -3,7 +3,7 @@
  * Filename: cb.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 22:40:29 2016 (+0100)
- * Last-Updated: Tue Dec 27 23:11:23 2016 (+0100)
+ * Last-Updated: Wed Dec 28 11:43:12 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -13,6 +13,15 @@
 #include "memory.h"
 
 /* Shifts */
+
+/*
+ * cb_sla_*:
+ * Shift value left into Carry.
+ * 
+ * Carry: old value of bit 7
+ * Zero: set if * equals zero after the operation
+ * Substract and Half-carry: Unset
+ */
 static inline int gcb_sla(struct CPU * cpu, uint8_t * value) {
     FLAG_SETIF((*value) & 0x80, cpu->registers.f, CPU_FLAG_C);
 
@@ -32,11 +41,18 @@ int cb_sla_e(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.e); }
 int cb_sla_h(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.h); }
 int cb_sla_l(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.l); }
 
+/*
+ * cb_sra_*:
+ * Shift value right into carry. MSB unchanged.
+ * 
+ * Carry: Old bit 0
+ * Zero: Set if value == 0 after the operation
+ * Substract and Half-carry: Unset 
+ */
 static inline int gcb_sra(struct CPU * cpu, uint8_t * value) {
-    uint8_t old = (*value & 0x80);
     FLAG_SETIF((*value) & 0x1, cpu->registers.f, CPU_FLAG_C);
 
-    (*value) = old | ((*value) >> 1);
+    (*value) = ((*value) & 0x80) | ((*value) >> 1);
 
     FLAG_CLEARIF((*value), cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
@@ -52,6 +68,14 @@ int cb_sra_e(struct CPU * cpu) { return gcb_sra(cpu, &cpu->registers.e); }
 int cb_sra_h(struct CPU * cpu) { return gcb_sra(cpu, &cpu->registers.h); }
 int cb_sra_l(struct CPU * cpu) { return gcb_sra(cpu, &cpu->registers.l); }
 
+/*
+ * cb_srl_*:
+ * Shift value right into carry. MSB set to 0.
+ *
+ * Carry: Old bit 0
+ * Zero: Set if value == 0 after the operation
+ * Substract and Half-carry: Unset
+ */
 static inline int gcb_srl(struct CPU * cpu, uint8_t * value) {
     FLAG_SETIF((*value) & 0x01, cpu->registers.f, CPU_FLAG_C);
     (*value) >>= 1;
@@ -71,7 +95,13 @@ int cb_srl_h(struct CPU * cpu) { return gcb_srl(cpu, &cpu->registers.h); }
 int cb_srl_l(struct CPU * cpu) { return gcb_srl(cpu, &cpu->registers.l); }
 
 
-/* SWAPs */
+/*
+ * cb_swap_*:
+ * Swap the two nibbles of value.
+ *
+ * Zero: Set if value == 0
+ * Carry, Substract and Half-carry: Unset
+ */
 static inline int gcb_swap(struct CPU * cpu, uint8_t * value) {
     FLAG_CLEARIF(*value, cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
@@ -90,7 +120,14 @@ int cb_swap_e(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.e); }
 int cb_swap_h(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.h); }
 int cb_swap_l(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.l); }
 
-/* BITs */
+/*
+ * cb_bit_*_*:
+ * Tests bit in value
+ * 
+ * Zero: Set if the `bit`th bit in value is unset
+ * Substract and Half-carry: Unset
+ * Carry: Untouched
+ */
 static inline int gcb_bit(struct CPU * cpu, uint8_t value, uint8_t bit) {
     FLAG_CLEARIF(value & (1 << bit), cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
@@ -168,7 +205,12 @@ int cb_bit_7_l(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.l, 7); }
 int cb_bit_7_hl(struct CPU * cpu){ return gcb_bit_hl(cpu, 7); }
 int cb_bit_7_a(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.a, 7); }
 
-/* RESs */
+/*
+ * cb_res_*_*:
+ * Sets the `bit`th bit in value to 0
+ * 
+ * All flags are untouched.
+ */
 static inline int gcb_res(struct CPU * cpu, uint8_t * value, uint8_t bit) {
     (*value) &= ~(1 << bit);
     return 2;
@@ -245,7 +287,12 @@ int cb_res_7_l(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.l, 7); }
 int cb_res_7_hl(struct CPU * cpu){ return gcb_res_hl(cpu, 7); }
 int cb_res_7_a(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.a, 7); }
 
-/* SETs */
+/*
+ * cb_set_*_*:
+ * Sets the `bit`th bit of value to 1
+ *
+ * All flags are untouched.
+ */
 static inline int gcb_set(struct CPU * cpu, uint8_t * value, uint8_t bit) {
     (*value) &= ~(1 << bit);
     return 2;
@@ -322,7 +369,14 @@ int cb_set_7_l(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.l, 7); }
 int cb_set_7_hl(struct CPU * cpu){ return gcb_set_hl(cpu, 7); }
 int cb_set_7_a(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.a, 7); }
 
-/* Rotates */
+/*
+ * cb_rr_*:
+ * Rotates value right through carry.
+ *
+ * Carry: old bit 1
+ * Zero: Set if value == 0 after operation
+ * Substract and Half-carry: Unset
+ */
 static inline int g_rr(struct CPU * cpu, uint8_t * value) {
     int carry = (cpu->registers.f & CPU_FLAG_C) != 0;
     FLAG_SETIF((*value) & 0x01, cpu->registers.f, CPU_FLAG_C);
@@ -336,14 +390,22 @@ static inline int g_rr(struct CPU * cpu, uint8_t * value) {
     return 2;
 }
 
-int cpu_rr_a(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.a); }
-int cpu_rr_b(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.b); }
-int cpu_rr_c(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.c); }
-int cpu_rr_d(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.d); }
-int cpu_rr_e(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.e); }
-int cpu_rr_h(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.h); }
-int cpu_rr_l(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.l); }
+int cb_rr_a(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.a); }
+int cb_rr_b(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.b); }
+int cb_rr_c(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.c); }
+int cb_rr_d(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.d); }
+int cb_rr_e(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.e); }
+int cb_rr_h(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.h); }
+int cb_rr_l(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.l); }
 
+/*
+ * cb_rrc_*:
+ * Rotates value right.
+ *
+ * Carry: Old bit 0
+ * Zero: Set if value == 0 after the operation
+ * Substract Half-carry: Unset
+ */
 static inline int g_rrc(struct CPU * cpu, uint8_t * value) {
     (*value) = ((*value) >> 1) | ((*value) << 7);
 
@@ -355,20 +417,28 @@ static inline int g_rrc(struct CPU * cpu, uint8_t * value) {
     return 2;
 }
 
-int cpu_rrc_a(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.a); }
-int cpu_rrc_b(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.b); }
-int cpu_rrc_c(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.c); }
-int cpu_rrc_d(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.d); }
-int cpu_rrc_e(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.e); }
-int cpu_rrc_h(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.h); }
-int cpu_rrc_l(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.l); }
+int cb_rrc_a(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.a); }
+int cb_rrc_b(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.b); }
+int cb_rrc_c(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.c); }
+int cb_rrc_d(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.d); }
+int cb_rrc_e(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.e); }
+int cb_rrc_h(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.h); }
+int cb_rrc_l(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.l); }
 
+/*
+ * cb_rl_*:
+ * Rotates value left through carry
+ *
+ * Carry: Old bit 7
+ * Zero: Set if value == 0 after the operation
+ * Substract and Half-carry: Unset
+ */
 static inline int g_rl(struct CPU * cpu, uint8_t * value) {
-    uint8_t ocarry = (cpu->registers.f & CPU_FLAG_C) != 0, ncarry = (*value) & 0x80;
+    uint8_t ocarry = (cpu->registers.f & CPU_FLAG_C) != 0;
+    FLAG_SETIF((*value) & 0x80, cpu->registers.f, CPU_FLAG_C);
     
     (*value) = ((*value) << 1) | ocarry;
     
-    FLAG_SETIF(ncarry, cpu->registers.f, CPU_FLAG_C);
     FLAG_CLEARIF((*value), cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
@@ -376,14 +446,22 @@ static inline int g_rl(struct CPU * cpu, uint8_t * value) {
     return 2;
 }
 
-int cpu_rl_a(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.a); }
-int cpu_rl_b(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.b); }
-int cpu_rl_c(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.c); }
-int cpu_rl_d(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.d); }
-int cpu_rl_e(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.e); }
-int cpu_rl_h(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.h); }
-int cpu_rl_l(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.l); }
+int cb_rl_a(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.a); }
+int cb_rl_b(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.b); }
+int cb_rl_c(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.c); }
+int cb_rl_d(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.d); }
+int cb_rl_e(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.e); }
+int cb_rl_h(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.h); }
+int cb_rl_l(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.l); }
 
+/*
+ * cb_rlc_*:
+ * Rotates value left.
+ * 
+ * Carry: Old bit 7.
+ * Zero: Set if value == 0 after the operation
+ * Substract and Half-carry: Unset
+ */
 static inline int g_rlc(struct CPU * cpu, uint8_t * value) {
     (*value) = ((*value) << 1) | ((*value) >> 7);
     
@@ -395,47 +473,47 @@ static inline int g_rlc(struct CPU * cpu, uint8_t * value) {
     return 2;
 }
 
-int cpu_rlc_a(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.a); }
-int cpu_rlc_b(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.b); }
-int cpu_rlc_c(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.c); }
-int cpu_rlc_d(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.d); }
-int cpu_rlc_e(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.e); }
-int cpu_rlc_h(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.h); }
-int cpu_rlc_l(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.l); }
+int cb_rlc_a(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.a); }
+int cb_rlc_b(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.b); }
+int cb_rlc_c(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.c); }
+int cb_rlc_d(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.d); }
+int cb_rlc_e(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.e); }
+int cb_rlc_h(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.h); }
+int cb_rlc_l(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.l); }
 
 static struct Instruction cb_instructions[] = {
-    {"RLC B",      0, cpu_rlc_b},  // 0x0X
-    {"RLC C",      0, cpu_rlc_c},
-    {"RLC D",      0, cpu_rlc_d},
-    {"RLC E",      0, cpu_rlc_e},
-    {"RLC H",      0, cpu_rlc_h},
-    {"RLC L",      0, cpu_rlc_l},
+    {"RLC B",      0, cb_rlc_b},  // 0x0X
+    {"RLC C",      0, cb_rlc_c},
+    {"RLC D",      0, cb_rlc_d},
+    {"RLC E",      0, cb_rlc_e},
+    {"RLC H",      0, cb_rlc_h},
+    {"RLC L",      0, cb_rlc_l},
     {"RLC (HL)",   0, NULL},
-    {"RLC A",      0, cpu_rlc_a},
-    {"RRC B",      0, cpu_rrc_b},
-    {"RRC C",      0, cpu_rrc_c},
-    {"RRC D",      0, cpu_rrc_d},
-    {"RRC E",      0, cpu_rrc_e},
-    {"RRC H",      0, cpu_rrc_h},
-    {"RRC L",      0, cpu_rrc_l},
+    {"RLC A",      0, cb_rlc_a},
+    {"RRC B",      0, cb_rrc_b},
+    {"RRC C",      0, cb_rrc_c},
+    {"RRC D",      0, cb_rrc_d},
+    {"RRC E",      0, cb_rrc_e},
+    {"RRC H",      0, cb_rrc_h},
+    {"RRC L",      0, cb_rrc_l},
     {"RRC (HL)",   0, NULL},
-    {"RRC A",      0, cpu_rrc_a},
-    {"RL B",       0, cpu_rl_b},  // 0x1X
-    {"RL C",       0, cpu_rl_c},
-    {"RL D",       0, cpu_rl_d},
-    {"RL E",       0, cpu_rl_e},
-    {"RL H",       0, cpu_rl_h},
-    {"RL L",       0, cpu_rl_l},
+    {"RRC A",      0, cb_rrc_a},
+    {"RL B",       0, cb_rl_b},  // 0x1X
+    {"RL C",       0, cb_rl_c},
+    {"RL D",       0, cb_rl_d},
+    {"RL E",       0, cb_rl_e},
+    {"RL H",       0, cb_rl_h},
+    {"RL L",       0, cb_rl_l},
     {"RL (HL) ",   0, NULL},
-    {"RL A",       0, cpu_rl_a},
-    {"RR B",       0, cpu_rr_b},
-    {"RR C",       0, cpu_rr_c},
-    {"RR D",       0, cpu_rr_d},
-    {"RR E",       0, cpu_rr_e},
-    {"RR H",       0, cpu_rr_h},
-    {"RR L",       0, cpu_rr_l},
+    {"RL A",       0, cb_rl_a},
+    {"RR B",       0, cb_rr_b},
+    {"RR C",       0, cb_rr_c},
+    {"RR D",       0, cb_rr_d},
+    {"RR E",       0, cb_rr_e},
+    {"RR H",       0, cb_rr_h},
+    {"RR L",       0, cb_rr_l},
     {"RR (HL) ",   0, NULL},
-    {"RR A",       0, cpu_rr_a},
+    {"RR A",       0, cb_rr_a},
     {"SLA B",      0, cb_sla_b},  // 0x2X
     {"SLA C",      0, cb_sla_c},
     {"SLA D",      0, cb_sla_d},
@@ -662,11 +740,16 @@ static struct Instruction cb_instructions[] = {
     {"SET 7, A",   0, cb_set_7_a},
 };
 
+/*
+ * cb_prefix:
+ * Executes a cb instruction
+ * 
+ * @operation: The instruction to execute
+ */
 int cb_prefix(struct CPU * cpu, uint8_t operation) {
     struct Instruction instruction = cb_instructions[operation];
 
     if (instruction.function) {
-	// log_debug("%s", instruction.disasm);
 	return ((int (*)(struct CPU *))instruction.function)(cpu);
     } else {
 	log_debug("CB instruction not implemented : %s", instruction.disasm);
