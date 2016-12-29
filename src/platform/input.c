@@ -3,10 +3,18 @@
  * Filename: input.c
  * Author: Jules <archjules>
  * Created: Thu Dec 15 14:44:01 2016 (+0100)
- * Last-Updated: Thu Dec 29 19:22:36 2016 (+0100)
+ * Last-Updated: Thu Dec 29 19:35:58 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include "input.h"
+#define KEY_A 24
+#define KEY_B 25
+#define KEY_START 36
+#define KEY_SELECT 65
+#define KEY_UP 111
+#define KEY_DOWN 116
+#define KEY_RIGHT 114
+#define KEY_LEFT 113
 
 void treat_events(struct CPU * cpu) {
     SDL_Event event;
@@ -18,56 +26,56 @@ void treat_events(struct CPU * cpu) {
 	    break;
 	case SDL_KEYDOWN:
 	    switch(event.key.keysym.scancode) {
-	    case 24: // A
+	    case KEY_A: // A
 		cpu->keys.buttons &= ~(0x01);
 		break;
-	    case 25: // B
+	    case KEY_B: // B
 		cpu->keys.buttons &= ~(0x02);
 		break;
-	    case 65: // Select
+	    case KEY_SELECT: // Select
 		cpu->keys.buttons &= ~(0x04);
 		break;
-	    case 36: // Start
+	    case KEY_START: // Start
 		cpu->keys.buttons &= ~(0x08);
 		break;
-	    case 114: // Right
+	    case KEY_RIGHT: // Right
 		cpu->keys.direction &= ~(0x01);
 		break;
-	    case 113: // Left
+	    case KEY_LEFT: // Left
 		cpu->keys.direction &= ~(0x02);
 		break;
-	    case 111: // Up
+	    case KEY_UP: // Up
 		cpu->keys.direction &= ~(0x04);
 		break;
-	    case 116: // Down
+	    case KEY_DOWN: // Down
 		cpu->keys.direction &= ~(0x08);
 		break;
 	    }
 	    break;
 	case SDL_KEYUP:
 	    switch(event.key.keysym.scancode) {
-	    case 24: // A
+	    case KEY_A: // A
 		cpu->keys.buttons |= 0x01;
 		break;
-	    case 25: // B
+	    case KEY_B: // B
 		cpu->keys.buttons |= 0x02;
 		break;
-	    case 65: // Select
+	    case KEY_SELECT: // Select
 		cpu->keys.buttons |= 0x04;
 		break;
-	    case 36: // Start
+	    case KEY_START: // Start
 		cpu->keys.buttons |= 0x08;
 		break;
-	    case 114: // Right
+	    case KEY_RIGHT: // Right
 		cpu->keys.direction |= 0x01;
 		break;
-	    case 113: // Left
+	    case KEY_LEFT: // Left
 		cpu->keys.direction |= 0x02;
 		break;
-	    case 111: // Up
+	    case KEY_UP: // Up
 		cpu->keys.direction |= 0x04;
 		break;
-	    case 116: // Down
+	    case KEY_DOWN: // Down
 		cpu->keys.direction |= 0x08;
 		break;
 	    }
