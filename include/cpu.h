@@ -3,7 +3,7 @@
  * Filename: cpu.h
  * Author: Jules <archjules>
  * Created: Wed Dec  7 09:03:16 2016 (+0100)
- * Last-Updated: Thu Dec 29 00:39:18 2016 (+0100)
+ * Last-Updated: Thu Dec 29 01:08:29 2016 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -84,6 +84,11 @@ struct CPU {
 	uint8_t io[0x100];
     } memory;
 
+    struct {
+	uint8_t direction;
+	uint8_t buttons;
+    } keys;
+    
     struct GPU gpu;
     Screen * screen;
 

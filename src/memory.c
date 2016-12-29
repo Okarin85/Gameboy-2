@@ -3,7 +3,7 @@
  * Filename: memory.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:40:29 2016 (+0100)
- * Last-Updated: Tue Dec 27 23:07:07 2016 (+0100)
+ * Last-Updated: Thu Dec 29 00:46:45 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include "logger.h"
@@ -76,7 +76,7 @@ void write_byte(struct CPU * cpu, uint16_t address, uint8_t value) {
     case 0x5000:
     case 0x6000:
     case 0x7000:
-	cpu->memory.rom[address] = value;
+        log_debug("The program tried to write %02x at %04x", value, address);
 	return;
     case 0x8000:
     case 0x9000:

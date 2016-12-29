@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Tue Dec 27 17:15:35 2016 (+0100)
+ * Last-Updated: Thu Dec 29 12:52:09 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -25,10 +25,13 @@ static inline uint32_t get_color(int color) {
 }
 
 uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
-    static int last = 0x90;
     switch(port) {
     case 0x00:
-	return 0x9f;
+	if (cpu->memory.io[0x00] & 0x20) {
+	    return cpu->memory.io[0x00] | cpu->keys.direction;
+	} else {
+	    return cpu->memory.io[0x00] | cpu->keys.buttons;
+	}
     case 0x40:
 	return 0x83 |
 	    cpu->gpu.bg_map << 3 |
@@ -53,6 +56,8 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
     cpu->memory.io[port] = value;
     
     switch(port) {
+    case 0x00:
+	cpu->memory.io[port] = value & 0x30;
     case 0x0F:
 	break;
     case 0x40:

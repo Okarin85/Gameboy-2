@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Thu Dec 29 00:41:50 2016 (+0100)
+ * Last-Updated: Thu Dec 29 12:44:15 2016 (+0100)
  *           By: Jules <archjules>
  */
 #define _GNU_SOURCE
@@ -94,6 +94,8 @@ void cpu_load_rom(struct CPU * cpu, char * filename) {
 	exit(EXIT_FAILURE);
     }
     cpu->memory.bios_inplace = true;
+    cpu->keys.buttons   = 0x0F;
+    cpu->keys.direction = 0x0F;
     cpu->gpu.mode = 3;
 
     cpu->registers.pc = 0;
