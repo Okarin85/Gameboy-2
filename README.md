@@ -3,7 +3,7 @@
 ;; Filename: README.md
 ;; Author: Jules <archjules>
 ;; Created: Thu Dec 29 19:37:03 2016 (+0100)
-;; Last-Updated: Thu Dec 29 20:01:06 2016 (+0100)
+;; Last-Updated: Thu Dec 29 23:45:55 2016 (+0100)
 ;;           By: Jules <archjules>
  -->
 
@@ -31,7 +31,7 @@ To use the program, run the executable with the ROM file as an argument
  * MBC implementation
  * DMA? I don't know if Pokemon Red uses it, I should implement it anyway
  
-## Things to do before the emulator is actually usable
+## Things to do before the emulator is actually pleasant to play with
 
  * Savegame implementation (after the MBC implementation)
  * Config file
