@@ -3,7 +3,7 @@
 ;; Filename: README.md
 ;; Author: Jules <archjules>
 ;; Created: Thu Dec 29 19:37:03 2016 (+0100)
-;; Last-Updated: Thu Dec 29 19:42:40 2016 (+0100)
+;; Last-Updated: Thu Dec 29 19:48:31 2016 (+0100)
 ;;           By: Jules <archjules>
  -->
 
@@ -24,6 +24,7 @@ To use the program, run the executable with the ROM file as an argument
 ## Things to do before Tetris is playable
 
  * Sprite implementation
+ * Timer implementation (and maybe framerate limitation at last)
  
 ## Things to do before Pokemon Red is playable
 
