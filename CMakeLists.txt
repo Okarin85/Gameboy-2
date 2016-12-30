@@ -14,6 +14,8 @@ add_executable(gameboy
   src/memory/memory.c
   src/memory/io.c
   src/gpu/gpu.c
+  src/gpu/background.c
+  src/gpu/oam.c
   src/platform/screen.c
   src/platform/input.c)
 

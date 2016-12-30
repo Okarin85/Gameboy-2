@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Thu Dec 29 12:52:09 2016 (+0100)
+ * Last-Updated: Fri Dec 30 01:01:46 2016 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -76,11 +76,11 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
 	log_debug("Writing LYC : %x", value);
 	break;
     case 0x47:
-	log_debug("Writing palette : %x", value);
-	cpu->gpu.palette[0] = get_color((value & 0b11));
-	cpu->gpu.palette[1] = get_color((value & 0b1100) >> 2);
-	cpu->gpu.palette[2] = get_color((value & 0b110000) >> 4);
-	cpu->gpu.palette[3] = get_color((value & 0b11000000) >> 6);
+	log_debug("Writing BG palette : %x", value);
+	cpu->gpu.bg_palette[0] = get_color((value & 0b11));
+	cpu->gpu.bg_palette[1] = get_color((value & 0b1100) >> 2);
+	cpu->gpu.bg_palette[2] = get_color((value & 0b110000) >> 4);
+	cpu->gpu.bg_palette[3] = get_color((value & 0b11000000) >> 6);
 	break;
     case 0x50:
 	cpu->memory.bios_inplace = false;

@@ -3,7 +3,7 @@
  * Filename: cpu.h
  * Author: Jules <archjules>
  * Created: Wed Dec  7 09:03:16 2016 (+0100)
- * Last-Updated: Thu Dec 29 01:08:29 2016 (+0100)
+ * Last-Updated: Fri Dec 30 01:02:05 2016 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -32,7 +32,7 @@ struct GPU {
     uint_fast8_t current_line;
     uint_fast8_t scroll_x, scroll_y;
     uint_fast16_t clock;
-    uint32_t palette[4];
+    uint32_t bg_palette[4];
 };
 
 struct CPU {
