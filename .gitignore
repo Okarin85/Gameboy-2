@@ -6,3 +6,4 @@ Makefile
 gameboy
 
 *.gb
+*_dump

@@ -3,7 +3,7 @@
  * Filename: background.c
  * Author: Jules <archjules>
  * Created: Fri Dec 30 00:58:45 2016 (+0100)
- * Last-Updated: Mon Jan  2 07:50:57 2017 (+0100)
+ * Last-Updated: Mon Jan  2 08:13:03 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -15,7 +15,7 @@
  * Get the color of a pixel in the background
  * @return: The color in 32bit RGBA format.
  */
-uint32_t background_get_color(struct CPU * cpu, int x, int y) {
+int background_get_color(struct CPU * cpu, int x, int y) {
     uint8_t tile1, tile2, tile_id;
     int offset, lineset, color, x_tile, y_tile;
     
@@ -39,5 +39,5 @@ uint32_t background_get_color(struct CPU * cpu, int x, int y) {
     
     color = ((tile1 >> (7 - x_tile)) & 0x1) | (((tile2 >> (7 - x_tile)) & 0x1) << 1);
 
-    return cpu->gpu.bg_palette[color];
+    return color;
 }

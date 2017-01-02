@@ -3,12 +3,13 @@
  * Filename: gpu.c
  * Author: Jules <archjules>
  * Created: Tue Dec 13 00:45:56 2016 (+0100)
- * Last-Updated: Mon Jan  2 07:50:47 2017 (+0100)
+ * Last-Updated: Mon Jan  2 08:13:39 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
 #include "cpu/cpu.h"
 #include "cpu/interrupt.h"
+#include "gpu/gpu.h"
 #include "platform/screen.h"
 #include "logger.h"
 
@@ -18,7 +19,7 @@
  */
 void gpu_render_line(struct CPU * cpu, int current_line) {
     for (int i = 0; i < SCREEN_WIDTH; i++) {
-	screen_put_pixel(cpu->screen, i, current_line, background_get_color(cpu, i, current_line));
+	screen_put_pixel(cpu->screen, i, current_line, cpu->gpu.bg_palette[background_get_color(cpu, i, current_line)]);
     }
 }
 

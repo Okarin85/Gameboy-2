@@ -3,15 +3,16 @@
  * Filename: cpu.h
  * Author: Jules <archjules>
  * Created: Wed Dec  7 09:03:16 2016 (+0100)
- * Last-Updated: Mon Jan  2 07:45:24 2017 (+0100)
+ * Last-Updated: Mon Jan  2 08:35:05 2017 (+0100)
  *           By: Jules <archjules>
  */
 
 #ifndef CPU_H
 #define CPU_H
-#include "platform/screen.h"
 #include <stdint.h>
 #include <stdbool.h>
+#include "platform/screen.h"
+#include "gpu/structs.h"
 
 #define CPU_FLAG_Z (1 << 7)
 #define CPU_FLAG_N (1 << 6)
@@ -22,18 +23,6 @@
 #define FLAG_UNSET(f, a) (f &= ~(a))
 #define FLAG_SETIF(c, f, a) if (c) { FLAG_SET((f), (a)); } else { FLAG_UNSET((f), (a)); }
 #define FLAG_CLEARIF(c, f, a) FLAG_SETIF(!(c), (f), (a))
-
-struct GPU {
-    bool state;
-    bool bg;
-    bool bg_map;
-    bool bg_tile;
-    uint_fast8_t mode;
-    uint_fast8_t current_line;
-    uint_fast8_t scroll_x, scroll_y;
-    uint_fast16_t clock;
-    uint32_t bg_palette[4];
-};
 
 struct CPU {
     bool state;
@@ -80,7 +69,6 @@ struct CPU {
 	uint8_t * eram;
 	uint8_t * wram;
 	uint8_t * zram;
-	uint8_t oam[0x100];
 	uint8_t io[0x100];
     } memory;
 
@@ -88,10 +76,17 @@ struct CPU {
 	uint8_t direction;
 	uint8_t buttons;
     } keys;
-    
+
+    // Graphical stuff
     struct GPU gpu;
     Screen * screen;
 
+    // DMA
+    bool dma_ongoing;
+    uint16_t dma_source;
+    uint16_t dma_dest;
+    
+    // Timer stuff
     uint_fast16_t clock;
     uint_fast8_t  time_last;
 };

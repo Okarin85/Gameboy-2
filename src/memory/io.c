@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Mon Jan  2 07:50:13 2017 (+0100)
+ * Last-Updated: Mon Jan  2 08:36:33 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -74,6 +74,12 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
 	break;
     case 0x45:
 	log_debug("Writing LYC : %x", value);
+	break;
+    case 0x46:
+        // Handling DMA
+	cpu->dma_source = (value << 8);
+	cpu->dma_dest   = 0xFE00;
+	cpu->dma_ongoing= true;
 	break;
     case 0x47:
 	log_debug("Writing BG palette : %x", value);

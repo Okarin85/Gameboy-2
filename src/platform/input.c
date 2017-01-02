@@ -3,10 +3,11 @@
  * Filename: input.c
  * Author: Jules <archjules>
  * Created: Thu Dec 15 14:44:01 2016 (+0100)
- * Last-Updated: Mon Jan  2 07:51:18 2017 (+0100)
+ * Last-Updated: Mon Jan  2 08:39:37 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "platform/input.h"
+#include "logger.h"
 #define KEY_A 24
 #define KEY_B 25
 #define KEY_START 36
@@ -17,6 +18,7 @@
 #define KEY_LEFT 113
 
 void treat_events(struct CPU * cpu) {
+    FILE * fp = NULL;
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
@@ -50,6 +52,12 @@ void treat_events(struct CPU * cpu) {
 	    case KEY_DOWN: // Down
 		cpu->keys.direction &= ~(0x08);
 		break;
+		// Debug keys
+	    case 67: // Dump gram (F1)
+		fp = fopen("gram_dump", "w");
+		fwrite(cpu->memory.gram, 1, 0x2000, fp);
+		fclose(fp);
+		log_debug("GRAM dumped to gram_dump");
 	    }
 	    break;
 	case SDL_KEYUP:
