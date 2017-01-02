@@ -3,7 +3,7 @@
  * Filename: gpu.c
  * Author: Jules <archjules>
  * Created: Tue Dec 13 00:45:56 2016 (+0100)
- * Last-Updated: Mon Jan  2 10:07:47 2017 (+0100)
+ * Last-Updated: Mon Jan  2 11:33:04 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -26,7 +26,11 @@ void gpu_render_line(struct CPU * cpu, int current_line) {
 	if (cpu->gpu.spr_enabled) obj = oam_get_sprite(cpu, i, current_line);
 	
 	if ((obj != NULL) && ((obj->bg_priority == 0) || (bg_color == 0))) {
-	    screen_put_pixel(cpu->screen, i, current_line, cpu->gpu.bg_palette[oam_get_color(cpu, obj, i, current_line)]);
+	    screen_put_pixel(cpu->screen,
+			     i,
+			     current_line,
+			     (obj->palette ? cpu->gpu.obp1 : cpu->gpu.obp0)[oam_get_color(cpu, obj, i, current_line)]
+		);
 	} else {
 	    screen_put_pixel(cpu->screen, i, current_line, cpu->gpu.bg_palette[bg_color]);
 	}

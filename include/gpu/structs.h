@@ -3,7 +3,7 @@
  * Filename: structs.h
  * Author: Jules <archjules>
  * Created: Mon Jan  2 07:59:19 2017 (+0100)
- * Last-Updated: Mon Jan  2 10:31:36 2017 (+0100)
+ * Last-Updated: Mon Jan  2 11:27:34 2017 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -40,6 +40,7 @@ struct GPU {
     // OAM
     struct Sprite oam[40];
     struct Sprite * line_cache[SCREEN_HEIGHT][10];
+    uint32_t obp0[4], obp1[4]; // Palettes
     bool spr_enabled;
     bool spr_height; // false = 8x8, true = 8x16
 };

@@ -3,7 +3,7 @@
  * Filename: oam.c
  * Author: Jules <archjules>
  * Created: Fri Dec 30 01:01:21 2016 (+0100)
- * Last-Updated: Mon Jan  2 11:11:55 2017 (+0100)
+ * Last-Updated: Mon Jan  2 11:30:46 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -27,6 +27,8 @@ void cache_sprite(struct CPU * cpu, int index) {
 	    if (cpu->gpu.line_cache[line][i] == NULL) {
 		cpu->gpu.line_cache[line][i] = &cpu->gpu.oam[index];
 		break;
+	    } else {
+		
 	    }
 	}
     }
