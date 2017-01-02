@@ -3,7 +3,7 @@
 ;; Filename: README.md
 ;; Author: Jules <archjules>
 ;; Created: Thu Dec 29 19:37:03 2016 (+0100)
-;; Last-Updated: Thu Dec 29 23:45:55 2016 (+0100)
+;; Last-Updated: Mon Jan  2 14:46:36 2017 (+0100)
 ;;           By: Jules <archjules>
  -->
 
@@ -23,13 +23,13 @@ To use the program, run the executable with the ROM file as an argument
 # TODO
 ## Things to do before Tetris is playable
 
- * Sprite implementation
+ * Sprite implementation (kinda done)
+ * DMA (done)
  * Timer implementation (and maybe framerate limitation at last)
  
 ## Things to do before Pokemon Red is playable
 
  * MBC implementation
- * DMA? I don't know if Pokemon Red uses it, I should implement it anyway
  
 ## Things to do before the emulator is actually pleasant to play with
 
