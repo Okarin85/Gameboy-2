@@ -3,7 +3,7 @@
  * Filename: main.c
  * Author: Jules <archjules>
  * Created: Wed Dec  7 08:48:50 2016 (+0100)
- * Last-Updated: Mon Jan  2 09:21:52 2017 (+0100)
+ * Last-Updated: Mon Jan  2 16:32:05 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -54,7 +54,6 @@ int main(int argc, char ** argv) {
 	treat_interruptions(&cpu);
 	dma_oam_handle(&cpu);
 	gpu_next(&cpu);
-	treat_events(&cpu);
     }
 
     screen_destroy(cpu.screen);

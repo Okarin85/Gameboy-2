@@ -3,7 +3,7 @@
  * Filename: gpu.c
  * Author: Jules <archjules>
  * Created: Tue Dec 13 00:45:56 2016 (+0100)
- * Last-Updated: Mon Jan  2 11:33:04 2017 (+0100)
+ * Last-Updated: Mon Jan  2 16:31:57 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -64,6 +64,8 @@ int gpu_next(struct CPU * cpu) {
 	if (cpu->gpu.clock >= 114) {
 	    cpu->gpu.current_line++;
 	    if (cpu->gpu.current_line == 153) {
+		// Now that a frame is complete, we do all we have to do
+		treat_events(cpu);
 		screen_flip(cpu->screen);
 		cpu->gpu.current_line = 0;
 		cpu->gpu.mode  = 2;
