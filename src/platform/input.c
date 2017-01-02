@@ -3,7 +3,7 @@
  * Filename: input.c
  * Author: Jules <archjules>
  * Created: Thu Dec 15 14:44:01 2016 (+0100)
- * Last-Updated: Mon Jan  2 08:39:37 2017 (+0100)
+ * Last-Updated: Mon Jan  2 11:11:26 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "platform/input.h"
@@ -16,6 +16,8 @@
 #define KEY_DOWN 116
 #define KEY_RIGHT 114
 #define KEY_LEFT 113
+
+extern uint8_t oam[0xA0];
 
 void treat_events(struct CPU * cpu) {
     FILE * fp = NULL;

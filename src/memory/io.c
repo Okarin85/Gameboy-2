@@ -3,17 +3,18 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Mon Jan  2 08:36:33 2017 (+0100)
+ * Last-Updated: Mon Jan  2 11:11:13 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
 #include "cpu/cpu.h"
+#include "gpu/oam.h"
 #include "logger.h"
 
-#define SCREEN_WHITE 0x00FFFFFF
-#define SCREEN_LGRAY 0x00AAAAAA
-#define SCREEN_DGRAY 0x00555555
-#define SCREEN_BLACK 0x00000000
+#define SCREEN_WHITE 0x00E0F8D0
+#define SCREEN_LGRAY 0x0088C070
+#define SCREEN_DGRAY 0x00346856
+#define SCREEN_BLACK 0x00081820
 
 static inline uint32_t get_color(int color) {
     switch(color) {
@@ -53,6 +54,7 @@ uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
 }
 
 void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
+    int old;
     cpu->memory.io[port] = value;
     
     switch(port) {
@@ -61,10 +63,13 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
     case 0x0F:
 	break;
     case 0x40:
-	cpu->gpu.bg_map = ((value & 0b1000) != 0);
-	cpu->gpu.bg_tile= ((value & 0b10000)!= 0);
-	log_debug("BG_Map = %d", cpu->gpu.bg_map);
-	log_debug("BG_Tile = %d", cpu->gpu.bg_tile);
+	old = cpu->gpu.spr_enabled;
+	cpu->gpu.spr_enabled= ((value & 0b10)   != 0);
+	cpu->gpu.spr_height = ((value & 0b100)  != 0);
+	cpu->gpu.bg_map     = ((value & 0b1000) != 0);
+	cpu->gpu.bg_tile    = ((value & 0b10000)!= 0);
+
+	if (old != cpu->gpu.spr_enabled) update_cache(cpu);
 	break;
     case 0x42:
 	cpu->gpu.scroll_y = value;

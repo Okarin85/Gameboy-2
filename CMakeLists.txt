@@ -9,6 +9,7 @@ add_executable(gameboy
   src/main.c
   src/cpu/cpu.c
   src/cpu/cb.c
+  src/cpu/dma.c
   src/cpu/instruction.c
   src/cpu/interrupt.c
   src/memory/memory.c

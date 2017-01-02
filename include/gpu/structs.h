@@ -3,7 +3,7 @@
  * Filename: structs.h
  * Author: Jules <archjules>
  * Created: Mon Jan  2 07:59:19 2017 (+0100)
- * Last-Updated: Mon Jan  2 08:16:56 2017 (+0100)
+ * Last-Updated: Mon Jan  2 10:31:36 2017 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -13,7 +13,6 @@
 #include "platform/screen.h"
 
 struct Sprite {
-    bool present;
     uint8_t x_pos;
     uint8_t y_pos;
     uint8_t tile;
@@ -40,7 +39,9 @@ struct GPU {
 
     // OAM
     struct Sprite oam[40];
-    struct Sprite * line_cache[10][SCREEN_HEIGHT];
+    struct Sprite * line_cache[SCREEN_HEIGHT][10];
+    bool spr_enabled;
+    bool spr_height; // false = 8x8, true = 8x16
 };
 
 #endif /* STRUCTS_H */

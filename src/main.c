@@ -3,7 +3,7 @@
  * Filename: main.c
  * Author: Jules <archjules>
  * Created: Wed Dec  7 08:48:50 2016 (+0100)
- * Last-Updated: Mon Jan  2 07:44:43 2017 (+0100)
+ * Last-Updated: Mon Jan  2 09:21:52 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -13,6 +13,7 @@
 #include "platform/screen.h"
 #include "platform/input.h"
 #include "cpu/cpu.h"
+#include "cpu/dma.h"
 #include "cpu/instruction.h"
 #include "cpu/interrupt.h"
 #include "memory/memory.h"
@@ -47,10 +48,11 @@ int main(int argc, char ** argv) {
     bzero(&cpu, sizeof(struct CPU));
     cpu_load_rom(&cpu, rom_filename);
     cpu.screen = new_screen();
-    
+
     while(!cpu.state) {
 	cpu_next_instruction(&cpu);
 	treat_interruptions(&cpu);
+	dma_oam_handle(&cpu);
 	gpu_next(&cpu);
 	treat_events(&cpu);
     }

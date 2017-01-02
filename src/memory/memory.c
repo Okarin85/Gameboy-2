@@ -3,10 +3,11 @@
  * Filename: memory.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:40:29 2016 (+0100)
- * Last-Updated: Mon Jan  2 08:20:15 2017 (+0100)
+ * Last-Updated: Mon Jan  2 10:16:22 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
+#include "gpu/oam.h"
 #include "memory/memory.h"
 #include "memory/io.h"
 #include "logger.h"
