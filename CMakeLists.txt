@@ -18,7 +18,9 @@ add_executable(gameboy
   src/gpu/background.c
   src/gpu/oam.c
   src/platform/screen.c
-  src/platform/input.c)
+  src/platform/input.c
+  src/platform/general.c
+)
 
 add_definitions(-DLOGLEVEL=0)
 target_link_libraries(gameboy SDL)

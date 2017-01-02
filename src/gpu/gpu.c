@@ -3,7 +3,7 @@
  * Filename: gpu.c
  * Author: Jules <archjules>
  * Created: Tue Dec 13 00:45:56 2016 (+0100)
- * Last-Updated: Mon Jan  2 16:31:57 2017 (+0100)
+ * Last-Updated: Mon Jan  2 16:38:32 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -12,6 +12,7 @@
 #include "gpu/gpu.h"
 #include "gpu/oam.h"
 #include "platform/screen.h"
+#include "platform/general.h"
 #include "logger.h"
 
 /*
@@ -65,8 +66,7 @@ int gpu_next(struct CPU * cpu) {
 	    cpu->gpu.current_line++;
 	    if (cpu->gpu.current_line == 153) {
 		// Now that a frame is complete, we do all we have to do
-		treat_events(cpu);
-		screen_flip(cpu->screen);
+		handle_new_frame(cpu);
 		cpu->gpu.current_line = 0;
 		cpu->gpu.mode  = 2;
 	    }
