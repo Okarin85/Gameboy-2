@@ -3,20 +3,20 @@
  * Filename: main.c
  * Author: Jules <archjules>
  * Created: Wed Dec  7 08:48:50 2016 (+0100)
- * Last-Updated: Wed Dec 28 11:04:29 2016 (+0100)
+ * Last-Updated: Mon Jan  2 07:44:43 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "memory.h"
-#include "screen.h"
-#include "input.h"
-#include "cpu.h"
-#include "gpu.h"
-#include "instruction.h"
-#include "interrupt.h"
+#include "platform/screen.h"
+#include "platform/input.h"
+#include "cpu/cpu.h"
+#include "cpu/instruction.h"
+#include "cpu/interrupt.h"
+#include "memory/memory.h"
+#include "gpu/gpu.h"
 #include "logger.h"
 
 /*

@@ -3,13 +3,13 @@
  * Filename: memory.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:40:29 2016 (+0100)
- * Last-Updated: Thu Dec 29 00:46:45 2016 (+0100)
+ * Last-Updated: Mon Jan  2 07:50:02 2017 (+0100)
  *           By: Jules <archjules>
  */
+#include "cpu/cpu.h"
+#include "memory/memory.h"
+#include "memory/io.h"
 #include "logger.h"
-#include "memory.h"
-#include "cpu.h"
-#include "io.h"
 
 static uint8_t gb_bios[] = {
     0x31, 0xFE, 0xFF, 0xAF, 0x21, 0xFF, 0x9F, 0x32, 0xCB, 0x7C, 0x20, 0xFB, 0x21, 0x26, 0xFF, 0x0E,

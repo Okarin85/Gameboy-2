@@ -3,17 +3,16 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Thu Dec 29 12:44:15 2016 (+0100)
+ * Last-Updated: Mon Jan  2 07:55:57 2017 (+0100)
  *           By: Jules <archjules>
  */
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "cpu/cpu.h"
+#include "cpu/instruction.h"
+#include "memory/memory.h"
 #include "logger.h"
-#include "cpu.h"
-#include "memory.h"
-#include "instruction.h"
 
 /*
  * General functions
@@ -36,7 +35,7 @@ static inline void print_registers(struct CPU * cpu) {
     log_debug("Clock : %d ticks", cpu->clock);
 }
 
-static inline uint16_t interpret_opcode(struct CPU * cpu, struct Instruction opcode, char ** str) {
+static inline uint16_t interpret_opcode(struct CPU * cpu, struct Instruction opcode) {
     uint16_t operand;
     if (opcode.operand == 1) {
 	operand = read_byte(cpu, cpu->registers.pc);
@@ -45,7 +44,6 @@ static inline uint16_t interpret_opcode(struct CPU * cpu, struct Instruction opc
     }
 
     cpu->registers.pc += opcode.operand;
-    asprintf(str, opcode.disasm, operand);
     return operand;
 }
 
@@ -111,7 +109,6 @@ void cpu_destroy(struct CPU * cpu) {
 }
 
 void cpu_next_instruction(struct CPU * cpu) {
-    char * str;
     uint8_t op;
     uint16_t operand;
     struct Instruction instruction;
@@ -122,9 +119,9 @@ void cpu_next_instruction(struct CPU * cpu) {
     } else {
 	op = read_byte(cpu, cpu->registers.pc++);
 	instruction = instructions[op];
-	operand = interpret_opcode(cpu, instruction, &str);
+	operand = interpret_opcode(cpu, instruction);
 	if (instruction.function == NULL) {
-	    log_warn("%#04x : Instruction not implemented ! (%#02x, %s)", cpu->registers.pc - 1 - instruction.operand, op, str);
+	    log_warn("%#04x : Instruction invalid ! (%#02x)", cpu->registers.pc - 1 - instruction.operand, op);
 	    print_registers(cpu);
 	    sleep(10);
 	} else {
@@ -141,6 +138,5 @@ void cpu_next_instruction(struct CPU * cpu) {
 	    }
 	    cpu->clock += cpu->time_last;
 	}
-	free(str);
     }
 }

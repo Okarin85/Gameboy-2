@@ -3,12 +3,12 @@
  * Filename: interrupt.c
  * Author: Jules <archjules>
  * Created: Tue Dec 20 23:09:01 2016 (+0100)
- * Last-Updated: Thu Dec 29 00:43:19 2016 (+0100)
+ * Last-Updated: Mon Jan  2 07:49:11 2017 (+0100)
  *           By: Jules <archjules>
  */
+#include "cpu/interrupt.h"
+#include "memory/memory.h"
 #include "logger.h"
-#include "memory.h"
-#include "interrupt.h"
 
 void treat_interruptions(struct CPU * cpu) {
     if (cpu->interrupts) {

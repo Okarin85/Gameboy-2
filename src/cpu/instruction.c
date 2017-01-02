@@ -3,17 +3,17 @@
  * Filename: instruction.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 12:36:49 2016 (+0100)
- * Last-Updated: Thu Dec 29 00:44:34 2016 (+0100)
+ * Last-Updated: Mon Jan  2 07:48:50 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
+#include "cpu/cpu.h"
+#include "cpu/instruction.h"
+#include "memory/memory.h"
 #include "logger.h"
-#include "cpu.h"
-#include "memory.h"
-#include "instruction.h"
 
 /*
- * Every instruction. Every instruction returns the number of cycles it took to complete.
+ * Every "normal" (unprefixed) instruction. Every instruction returns the number of cycles it took to complete.
  */
 
 /*

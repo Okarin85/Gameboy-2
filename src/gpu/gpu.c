@@ -3,14 +3,14 @@
  * Filename: gpu.c
  * Author: Jules <archjules>
  * Created: Tue Dec 13 00:45:56 2016 (+0100)
- * Last-Updated: Fri Dec 30 01:07:31 2016 (+0100)
+ * Last-Updated: Mon Jan  2 07:50:47 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
-#include "interrupt.h"
-#include "screen.h"
+#include "cpu/cpu.h"
+#include "cpu/interrupt.h"
+#include "platform/screen.h"
 #include "logger.h"
-#include "cpu.h"
 
 /*
  * gpu_render_line:

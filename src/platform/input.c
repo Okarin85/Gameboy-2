@@ -3,10 +3,10 @@
  * Filename: input.c
  * Author: Jules <archjules>
  * Created: Thu Dec 15 14:44:01 2016 (+0100)
- * Last-Updated: Thu Dec 29 19:35:58 2016 (+0100)
+ * Last-Updated: Mon Jan  2 07:51:18 2017 (+0100)
  *           By: Jules <archjules>
  */
-#include "input.h"
+#include "platform/input.h"
 #define KEY_A 24
 #define KEY_B 25
 #define KEY_START 36

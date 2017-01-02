@@ -3,14 +3,15 @@
  * Filename: cb.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 22:40:29 2016 (+0100)
- * Last-Updated: Wed Dec 28 12:16:39 2016 (+0100)
+ * Last-Updated: Mon Jan  2 07:48:17 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
-#include "cpu.h"
+#include <unistd.h>
+#include "cpu/cpu.h"
+#include "cpu/instruction.h"
+#include "memory/memory.h"
 #include "logger.h"
-#include "instruction.h"
-#include "memory.h"
 
 /*
  * cb_sla_*:

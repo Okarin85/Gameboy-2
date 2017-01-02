@@ -3,11 +3,11 @@
  * Filename: screen.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 18:19:15 2016 (+0100)
- * Last-Updated: Wed Dec 28 12:24:19 2016 (+0100)
+ * Last-Updated: Mon Jan  2 07:51:11 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <SDL/SDL.h>
-#include "screen.h"
+#include "platform/screen.h"
 
 /*
  * new_screen:

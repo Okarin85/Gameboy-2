@@ -3,12 +3,12 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Fri Dec 30 01:01:46 2016 (+0100)
+ * Last-Updated: Mon Jan  2 07:50:13 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
+#include "cpu/cpu.h"
 #include "logger.h"
-#include "cpu.h"
 
 #define SCREEN_WHITE 0x00FFFFFF
 #define SCREEN_LGRAY 0x00AAAAAA

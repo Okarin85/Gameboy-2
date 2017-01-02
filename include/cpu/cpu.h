@@ -3,13 +3,13 @@
  * Filename: cpu.h
  * Author: Jules <archjules>
  * Created: Wed Dec  7 09:03:16 2016 (+0100)
- * Last-Updated: Fri Dec 30 01:02:05 2016 (+0100)
+ * Last-Updated: Mon Jan  2 07:45:24 2017 (+0100)
  *           By: Jules <archjules>
  */
 
 #ifndef CPU_H
 #define CPU_H
-#include "screen.h"
+#include "platform/screen.h"
 #include <stdint.h>
 #include <stdbool.h>
 

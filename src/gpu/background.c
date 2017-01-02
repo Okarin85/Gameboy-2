@@ -3,12 +3,12 @@
  * Filename: background.c
  * Author: Jules <archjules>
  * Created: Fri Dec 30 00:58:45 2016 (+0100)
- * Last-Updated: Fri Dec 30 01:14:00 2016 (+0100)
+ * Last-Updated: Mon Jan  2 07:50:57 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
-#include "cpu.h"
-#include "gpu.h"
+#include "cpu/cpu.h"
+#include "gpu/gpu.h"
 
 /*
  * background_get_color:
