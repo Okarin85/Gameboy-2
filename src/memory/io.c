@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Mon Jan  2 11:30:07 2017 (+0100)
+ * Last-Updated: Mon Jan  2 16:17:13 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -33,6 +33,8 @@ uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
 	} else {
 	    return cpu->memory.io[0x00] | cpu->keys.buttons;
 	}
+    case 0x04:
+	return cpu->clock &= 0xFF;
     case 0x40:
 	return 0x83 |
 	    cpu->gpu.bg_map << 3 |
@@ -60,6 +62,9 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
     switch(port) {
     case 0x00:
 	cpu->memory.io[port] = value & 0x30;
+    case 0x04:
+	cpu->clock = 0;
+	break;
     case 0x0F:
 	break;
     case 0x40:
