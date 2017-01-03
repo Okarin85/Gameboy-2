@@ -3,7 +3,7 @@
  * Filename: oam.c
  * Author: Jules <archjules>
  * Created: Fri Dec 30 01:01:21 2016 (+0100)
- * Last-Updated: Mon Jan  2 11:30:46 2017 (+0100)
+ * Last-Updated: Mon Jan  2 17:35:06 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -99,11 +99,17 @@ struct Sprite * oam_get_sprite(struct CPU * cpu, int x, int y) {
 }
 
 int oam_get_color(struct CPU * cpu, struct Sprite * sprite, int x, int y) {
-    int base_spr, x_tile = x % 8, tile1, tile2;
+    int base_spr, x_tile, tile1, tile2;
     
     base_spr = (sprite->y_pos - 16);
     tile1 = cpu->memory.gram[(sprite->tile << 4) + ((y - base_spr) << 1) + 1];
     tile2 = cpu->memory.gram[(sprite->tile << 4) + ((y - base_spr) << 1)];
+
+    if (!sprite->x_flip) {
+	x_tile = x % 8;
+    } else {
+	x_tile = 8 - (x % 8);
+    }
     
     return ((tile1 >> (7 - x_tile)) & 0x1) | (((tile2 >> (7 - x_tile)) & 0x1) << 1);
 }

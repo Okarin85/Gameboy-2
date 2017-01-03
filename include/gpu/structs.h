@@ -3,7 +3,7 @@
  * Filename: structs.h
  * Author: Jules <archjules>
  * Created: Mon Jan  2 07:59:19 2017 (+0100)
- * Last-Updated: Mon Jan  2 11:27:34 2017 (+0100)
+ * Last-Updated: Tue Jan  3 17:42:37 2017 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -31,6 +31,15 @@ struct GPU {
     uint_fast8_t scroll_x, scroll_y;
     uint_fast16_t clock;
 
+    // LCDC Interrupt
+    uint8_t lyc;
+    bool coincidence;
+    
+    bool coincidence_enabled;
+    bool mode0_enabled;
+    bool mode1_enabled;
+    bool mode2_enabled;
+    
     // Background
     bool bg;
     bool bg_map;

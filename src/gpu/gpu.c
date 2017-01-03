@@ -3,7 +3,7 @@
  * Filename: gpu.c
  * Author: Jules <archjules>
  * Created: Tue Dec 13 00:45:56 2016 (+0100)
- * Last-Updated: Mon Jan  2 16:38:32 2017 (+0100)
+ * Last-Updated: Tue Jan  3 19:15:18 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -39,6 +39,15 @@ void gpu_render_line(struct CPU * cpu, int current_line) {
 }
 
 /*
+ * gpu_stat_interrupt:
+ * Request a STAT interrupt if enabled
+ */
+void gpu_stat_interrupt(struct CPU * cpu, uint8_t bit) {
+    if (bit)
+	provoke_interruption(cpu, INT_STAT);
+}
+
+/*
  * gpu_next:
  * Execute a step for the GPU.
  */
@@ -51,11 +60,17 @@ int gpu_next(struct CPU * cpu) {
 	    gpu_render_line(cpu, cpu->gpu.current_line);
 	    
 	    if (cpu->gpu.current_line == 143) {
+		gpu_stat_interrupt(cpu, cpu->gpu.mode1_enabled);
 		provoke_interruption(cpu, INT_VBLANK);
 		cpu->gpu.mode = 1;
 	    } else {
 		cpu->gpu.current_line++;
+		if (cpu->gpu.current_line == cpu->gpu.lyc) {
+		    cpu->gpu.coincidence = true;
+		    gpu_stat_interrupt(cpu, cpu->gpu.coincidence_enabled);
+		}
 		cpu->gpu.mode = 2;
+		gpu_stat_interrupt(cpu, cpu->gpu.mode2_enabled);
 	    }
 	    
 	    cpu->gpu.clock = 0;
@@ -69,6 +84,7 @@ int gpu_next(struct CPU * cpu) {
 		handle_new_frame(cpu);
 		cpu->gpu.current_line = 0;
 		cpu->gpu.mode  = 2;
+		gpu_stat_interrupt(cpu, cpu->gpu.mode2_enabled);
 	    }
 	    cpu->gpu.clock = 0;
 	}
@@ -77,12 +93,14 @@ int gpu_next(struct CPU * cpu) {
 	if (cpu->gpu.clock >= 20) {
 	    cpu->gpu.clock = 0;
 	    cpu->gpu.mode = 3;
+	    gpu_stat_interrupt(cpu, cpu->gpu.mode1_enabled);
 	}
 	break;
     case 3: // Reading VRAM
 	if (cpu->gpu.clock >= 43) {
 	    cpu->gpu.clock = 0;
 	    cpu->gpu.mode = 0;
+	    gpu_stat_interrupt(cpu, cpu->gpu.mode0_enabled);
 	}
     }
 }

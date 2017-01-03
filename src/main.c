@@ -3,7 +3,7 @@
  * Filename: main.c
  * Author: Jules <archjules>
  * Created: Wed Dec  7 08:48:50 2016 (+0100)
- * Last-Updated: Mon Jan  2 16:32:05 2017 (+0100)
+ * Last-Updated: Tue Jan  3 18:16:04 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -15,7 +15,9 @@
 #include "cpu/cpu.h"
 #include "cpu/dma.h"
 #include "cpu/instruction.h"
+#include "cpu/timer.h"
 #include "cpu/interrupt.h"
+#include "rom/load.h"
 #include "memory/memory.h"
 #include "gpu/gpu.h"
 #include "logger.h"
@@ -45,18 +47,24 @@ int main(int argc, char ** argv) {
 	return 1;
     }
 
-    bzero(&cpu, sizeof(struct CPU));
-    cpu_load_rom(&cpu, rom_filename);
+    cpu_init(&cpu);
+    rom_load(&cpu, rom_filename);
     cpu.screen = new_screen();
 
     while(!cpu.state) {
+	if (cpu.will_disable) {
+	    cpu.will_disable = false;
+	    cpu.interrupts   = false;
+	}
 	cpu_next_instruction(&cpu);
-	treat_interruptions(&cpu);
+	timer_handle(&cpu);
 	dma_oam_handle(&cpu);
 	gpu_next(&cpu);
+	treat_interruptions(&cpu);
     }
 
     screen_destroy(cpu.screen);
     cpu_destroy(&cpu);
+    rom_free(&cpu);
     return 0;
 }

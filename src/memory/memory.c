@@ -3,7 +3,7 @@
  * Filename: memory.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:40:29 2016 (+0100)
- * Last-Updated: Mon Jan  2 10:16:22 2017 (+0100)
+ * Last-Updated: Tue Jan  3 10:42:53 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -43,13 +43,13 @@ uint8_t read_byte(struct CPU * cpu, uint16_t address) {
     case 0x5000:
     case 0x6000:
     case 0x7000:
-	return cpu->memory.rom[address];
+	return cpu->rom.read_rom(cpu, address);
     case 0x8000:
     case 0x9000:
 	return cpu->memory.gram[address & 0x1FFF];
     case 0xA000:
     case 0xB000:
-	return cpu->memory.eram[address & 0x1FFF];
+	return cpu->rom.read_ram(cpu, address);
     case 0xC000:
     case 0xD000:
 	return cpu->memory.wram[address & 0x1FFF];
@@ -77,7 +77,7 @@ void write_byte(struct CPU * cpu, uint16_t address, uint8_t value) {
     case 0x5000:
     case 0x6000:
     case 0x7000:
-        log_debug("The program tried to write %02x at %04x", value, address);
+        cpu->rom.write_rom(cpu, address, value);
 	return;
     case 0x8000:
     case 0x9000:
@@ -85,8 +85,7 @@ void write_byte(struct CPU * cpu, uint16_t address, uint8_t value) {
 	return;
     case 0xA000:
     case 0xB000:
-	cpu->memory.eram[address & 0x1FFF] = value;
-	return;
+	cpu->rom.write_ram(cpu, address, value);
     case 0xC000:
     case 0xD000:
 	cpu->memory.wram[address & 0x1FFF] = value;

@@ -12,6 +12,10 @@ add_executable(gameboy
   src/cpu/dma.c
   src/cpu/instruction.c
   src/cpu/interrupt.c
+  src/cpu/timer.c
+  src/rom/load.c
+  src/rom/mbc0.c
+  src/rom/mbc1.c
   src/memory/memory.c
   src/memory/io.c
   src/gpu/gpu.c

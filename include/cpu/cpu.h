@@ -3,7 +3,7 @@
  * Filename: cpu.h
  * Author: Jules <archjules>
  * Created: Wed Dec  7 09:03:16 2016 (+0100)
- * Last-Updated: Mon Jan  2 08:35:05 2017 (+0100)
+ * Last-Updated: Tue Jan  3 18:58:06 2017 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "platform/screen.h"
+#include "rom/types.h"
 #include "gpu/structs.h"
 
 #define CPU_FLAG_Z (1 << 7)
@@ -28,6 +29,8 @@ struct CPU {
     bool state;
     bool halted;
     bool interrupts;
+    bool will_disable;
+    
     struct {
 	union {
 	    struct {
@@ -62,11 +65,21 @@ struct CPU {
     } registers;
 
     struct {
+	uint8_t * rom_data;
+	uint8_t * ram_data;
+	
+	uint8_t (*read_rom)(struct CPU *, uint16_t address);
+	uint8_t (*read_ram)(struct CPU *, uint16_t address);
+	void (*write_rom)(struct CPU *, uint16_t address, uint8_t value);
+	void (*write_ram)(struct CPU *, uint16_t address, uint8_t value);
+
+	void * mbc_info;
+    } rom;
+    
+    struct {
 	bool bios_inplace;
 	
-	uint8_t * rom;
 	uint8_t * gram;
-	uint8_t * eram;
 	uint8_t * wram;
 	uint8_t * zram;
 	uint8_t io[0x100];
@@ -87,11 +100,20 @@ struct CPU {
     uint16_t dma_dest;
     
     // Timer stuff
+    int timer_track_div;
+    int timer_track_tima;
+    
+    uint8_t timer_tma;
+    uint8_t timer_div;
+    uint8_t timer_tima;
+    uint8_t timer_tima_enabled;
+    int     timer_tima_speed;
+    
     uint_fast16_t clock;
     uint_fast8_t  time_last;
 };
 
 void cpu_next_instruction(struct CPU * cpu);
-void cpu_load_rom(struct CPU * cpu, char * filename);
+void cpu_init(struct CPU * cpu);
 void cpu_destroy(struct CPU * cpu);
 #endif /* CPU_H */

@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Mon Jan  2 16:17:13 2017 (+0100)
+ * Last-Updated: Tue Jan  3 18:57:46 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -34,13 +34,18 @@ uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
 	    return cpu->memory.io[0x00] | cpu->keys.buttons;
 	}
     case 0x04:
-	return cpu->clock &= 0xFF;
+	return cpu->timer_div;
     case 0x40:
 	return 0x83 |
 	    cpu->gpu.bg_map << 3 |
 	    cpu->gpu.bg_tile<< 4;
     case 0x41:
-	return (cpu->memory.io[0x41] & 0xfc) |
+	return
+	    (cpu->gpu.coincidence_enabled << 6) |
+	    (cpu->gpu.mode2_enabled << 5) |
+	    (cpu->gpu.mode1_enabled << 4) |
+	    (cpu->gpu.mode0_enabled << 3) |
+	    (cpu->gpu.coincidence   << 2) |
 	    cpu->gpu.mode;
     case 0x42:
 	return cpu->gpu.scroll_y;
@@ -63,8 +68,29 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
     case 0x00:
 	cpu->memory.io[port] = value & 0x30;
     case 0x04:
-	cpu->clock = 0;
+	cpu->timer_div = 0;
 	break;
+    case 0x05:
+	cpu->timer_tima= value;
+	break;
+    case 0x06:
+	cpu->timer_tma = value;
+	break;
+    case 0x07:
+	cpu->timer_tima_enabled = (value & 0x04);
+	switch(value & 0x02) {
+	case 0x00:
+	    cpu->timer_tima_speed = 256;
+	    break;
+	case 0x01:
+	    cpu->timer_tima_speed = 4;
+	    break;
+	case 0x02:
+	    cpu->timer_tima_speed = 16;
+	    break;
+	case 0x03:
+	    cpu->timer_tima_speed = 64;
+	}
     case 0x0F:
 	break;
     case 0x40:
@@ -75,6 +101,12 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
 	cpu->gpu.bg_tile    = ((value & 0b10000)!= 0);
 
 	if (old != cpu->gpu.spr_enabled) update_cache(cpu);
+	break;
+    case 0x41:
+	cpu->gpu.coincidence_enabled = (value & 0x40) != 0;
+	cpu->gpu.mode2_enabled       = (value & 0x20) != 0;
+	cpu->gpu.mode1_enabled       = (value & 0x10) != 0;
+	cpu->gpu.mode0_enabled       = (value & 0x08) != 0;
 	break;
     case 0x42:
 	cpu->gpu.scroll_y = value;

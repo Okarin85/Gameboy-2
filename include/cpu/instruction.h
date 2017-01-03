@@ -3,7 +3,7 @@
  * Filename: instruction.h
  * Author: Jules <archjules>
  * Created: Thu Dec  8 12:54:40 2016 (+0100)
- * Last-Updated: Thu Dec 29 00:44:48 2016 (+0100)
+ * Last-Updated: Tue Jan  3 11:58:40 2017 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -129,6 +129,7 @@ int cpu_ld_hl_nn(struct CPU *, uint16_t);
 int cpu_ld_sp_nn(struct CPU *, uint16_t);
 int cpu_ld_sp_hl(struct CPU *);
 int cpu_ld_nn_sp(struct CPU *);
+int cpu_ld_hl_spnn(struct CPU *, uint8_t);
 
 int cpu_pop_bc(struct CPU *);
 int cpu_pop_de(struct CPU *);
@@ -217,6 +218,8 @@ int cpu_add_hl_bc(struct CPU *);
 int cpu_add_hl_de(struct CPU *);
 int cpu_add_hl_hl(struct CPU *);
 int cpu_add_hl_sp(struct CPU *);
+
+int cpu_add_sp_nn(struct CPU *, uint8_t);
 
 int cpu_dec_bc(struct CPU *);
 int cpu_dec_de(struct CPU *);
@@ -533,7 +536,7 @@ static struct Instruction instructions[] = {
     {"PUSH HL",         0, cpu_push_hl},
     {"AND 0x%02x",      1, cpu_and_n},
     {"RST 0x20",        0, cpu_rst_20},
-    {"ADD SP, 0x%02x",  1, NULL},
+    {"ADD SP, 0x%02x",  1, cpu_add_sp_nn},
     {"JP (HL)",         0, cpu_jp_hl},
     {"LD (0x%04x), A",  2, cpu_ld_n_a},
     {"NONE",            0, NULL},
@@ -549,7 +552,7 @@ static struct Instruction instructions[] = {
     {"PUSH AF",         0, cpu_push_af},
     {"OR 0x%02x",       1, cpu_or_n},
     {"RST 0x30",        0, cpu_rst_30},
-    {"LD HL, SP+0x%02x",1, NULL},
+    {"LD HL, SP+0x%02x",1, cpu_ld_hl_spnn},
     {"LD SP, HL",       0, cpu_ld_sp_hl},
     {"LD A, (0x%04x)",  2, cpu_ld_a_nn},
     {"EI",              0, cpu_ei},

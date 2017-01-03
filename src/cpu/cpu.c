@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Mon Jan  2 07:55:57 2017 (+0100)
+ * Last-Updated: Tue Jan  3 00:58:19 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -47,36 +47,12 @@ static inline uint16_t interpret_opcode(struct CPU * cpu, struct Instruction opc
     return operand;
 }
 
-void cpu_load_rom(struct CPU * cpu, char * filename) {
-    int size;
-    FILE *fp = fopen(filename, "rb");
-    if (fp == NULL) {
-	log_fatal("Couldn't open %s", filename);
-	exit(EXIT_FAILURE);
-    }
+void cpu_init(struct CPU * cpu) {
+    bzero(cpu, sizeof(struct CPU));
     
-    // Getting the size
-    fseek(fp, 0, SEEK_END);
-    size = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-    
-    cpu->memory.rom = malloc(size);
-    if (cpu->memory.rom == NULL) {
-	log_fatal("Couldn't allocate memory for the ROM.");
-	exit(EXIT_FAILURE);
-    }
-
-    fread(cpu->memory.rom, 1, size, fp);
-
     cpu->memory.gram = malloc(0x2000);
     if (cpu->memory.gram == NULL) {
 	log_fatal("Couldn't allocate memory for GRAM.");
-	exit(EXIT_FAILURE);
-    }
-
-    cpu->memory.eram = malloc(0x8000);
-    if (cpu->memory.rom == NULL) {
-	log_fatal("Couldn't allocate memory for ERAM.");
 	exit(EXIT_FAILURE);
     }
 
@@ -97,13 +73,10 @@ void cpu_load_rom(struct CPU * cpu, char * filename) {
     cpu->gpu.mode = 3;
 
     cpu->registers.pc = 0;
-    log_info("Loaded %s (%d bytes)", filename, size);
 }
 
 void cpu_destroy(struct CPU * cpu) {
-    free(cpu->memory.rom);
     free(cpu->memory.gram);
-    free(cpu->memory.eram);
     free(cpu->memory.wram);
     free(cpu->memory.zram);
 }
