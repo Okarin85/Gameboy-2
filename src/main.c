@@ -3,7 +3,7 @@
  * Filename: main.c
  * Author: Jules <archjules>
  * Created: Wed Dec  7 08:48:50 2016 (+0100)
- * Last-Updated: Tue Jan  3 18:16:04 2017 (+0100)
+ * Last-Updated: Wed Jan  4 20:32:26 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -52,10 +52,6 @@ int main(int argc, char ** argv) {
     cpu.screen = new_screen();
 
     while(!cpu.state) {
-	if (cpu.will_disable) {
-	    cpu.will_disable = false;
-	    cpu.interrupts   = false;
-	}
 	cpu_next_instruction(&cpu);
 	timer_handle(&cpu);
 	dma_oam_handle(&cpu);

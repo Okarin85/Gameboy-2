@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Tue Jan  3 00:58:19 2017 (+0100)
+ * Last-Updated: Wed Jan  4 19:59:28 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -82,14 +82,18 @@ void cpu_destroy(struct CPU * cpu) {
 }
 
 void cpu_next_instruction(struct CPU * cpu) {
+    char str[20] = {0};
+    static int e = 0;
     uint8_t op;
     uint16_t operand;
+    
     struct Instruction instruction;
-
+    
     if (cpu->halted) {
 	cpu->time_last = 1;
 	cpu->clock += 1;
     } else {
+	int old_pc = cpu->registers.pc;
 	op = read_byte(cpu, cpu->registers.pc++);
 	instruction = instructions[op];
 	operand = interpret_opcode(cpu, instruction);

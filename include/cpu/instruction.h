@@ -3,7 +3,7 @@
  * Filename: instruction.h
  * Author: Jules <archjules>
  * Created: Thu Dec  8 12:54:40 2016 (+0100)
- * Last-Updated: Tue Jan  3 11:58:40 2017 (+0100)
+ * Last-Updated: Wed Jan  4 19:58:28 2017 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -128,7 +128,7 @@ int cpu_ld_de_nn(struct CPU *, uint16_t);
 int cpu_ld_hl_nn(struct CPU *, uint16_t);
 int cpu_ld_sp_nn(struct CPU *, uint16_t);
 int cpu_ld_sp_hl(struct CPU *);
-int cpu_ld_nn_sp(struct CPU *);
+int cpu_ld_nn_sp(struct CPU *, uint16_t);
 int cpu_ld_hl_spnn(struct CPU *, uint8_t);
 
 int cpu_pop_bc(struct CPU *);

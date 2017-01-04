@@ -3,7 +3,7 @@
  * Filename: instruction.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 12:36:49 2016 (+0100)
- * Last-Updated: Wed Jan  4 12:59:31 2017 (+0100)
+ * Last-Updated: Wed Jan  4 20:32:04 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -42,7 +42,7 @@ int cpu_stop(struct CPU * cpu, uint8_t nothing) { cpu->halted = true; return 1; 
  * All flags untouched
  */
 int cpu_ei(struct CPU * cpu) { cpu->interrupts   = true;  return 1; }
-int cpu_di(struct CPU * cpu) { cpu->will_disable = false; return 1; }
+int cpu_di(struct CPU * cpu) { cpu->interrupts   = false; return 1; }
 
 /* 8-bit simple loads */
 static inline int g_ld8_register(struct CPU * cpu, uint8_t * dest, uint8_t value) { (*dest) = value; return 1; }
@@ -201,12 +201,13 @@ int cpu_ld_sp_hl(struct CPU * cpu) { return g_ld16(cpu, &cpu->registers.sp, cpu-
  * Load SP+r8 into HL
  */
 int cpu_ld_hl_spnn(struct CPU * cpu, uint8_t operand) {
-    int8_t value = (int8_t)operand;
-    
+    int32_t value = (int8_t)operand;
+    int32_t res   = cpu->registers.sp + value;
+	
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
-    FLAG_SETIF(((cpu->registers.sp & 0xF) + (value & 0xF)) == 0x10, cpu->registers.f, CPU_FLAG_H);
-    FLAG_SETIF(((cpu->registers.sp & 0xFF)+ value) == 0x100, cpu->registers.f, CPU_FLAG_C);
+    FLAG_SETIF((cpu->registers.sp ^ value ^ res) & 0x10, cpu->registers.f, CPU_FLAG_H);
+    FLAG_SETIF((cpu->registers.sp ^ value ^ res) & 0x100, cpu->registers.f, CPU_FLAG_C);
 
     cpu->registers.hl = cpu->registers.sp + value;
     return 3;
@@ -216,8 +217,8 @@ int cpu_ld_hl_spnn(struct CPU * cpu, uint8_t operand) {
  * cpu_ld_nn_sp:
  * Writes SP at (HL).
  */
-int cpu_ld_nn_sp(struct CPU * cpu) {
-    write_word(cpu, cpu->registers.hl, cpu->registers.sp);
+int cpu_ld_nn_sp(struct CPU * cpu, uint16_t operand) {
+    write_word(cpu, operand, cpu->registers.sp);
     return 5;
 }
 
@@ -383,15 +384,13 @@ int cpu_adc_n(struct CPU * cpu, uint8_t operand) { return g_adc8(cpu, operand) +
  * Half-carry: Set if half-carry
  */
 static inline int g_sub8(struct CPU * cpu, uint8_t reg) {
-    int value = cpu->registers.a - reg;
-    
-    FLAG_SETIF((cpu->registers.a - reg), cpu->registers.f, CPU_FLAG_Z);
-    FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
-    FLAG_CLEARIF((((cpu->registers.a & 0xF) - (reg & 0xF)) & 0x10) == 0x10, cpu->registers.f, CPU_FLAG_H);
-    FLAG_CLEARIF(value < 0, cpu->registers.f, CPU_FLAG_C);
+    FLAG_SET(cpu->registers.f, CPU_FLAG_N);
+    FLAG_SETIF((cpu->registers.a & 0xF) < (reg & 0xF), cpu->registers.f, CPU_FLAG_H);
+    FLAG_SETIF(cpu->registers.a < reg, cpu->registers.f, CPU_FLAG_C);
     
     cpu->registers.a -= reg;
     
+    FLAG_CLEARIF(cpu->registers.a, cpu->registers.f, CPU_FLAG_Z);
     return 1;
 }
 
@@ -415,14 +414,15 @@ int cpu_sub_n(struct CPU * cpu, uint8_t operand) { return g_sub8(cpu, operand) +
  * Half-carry: Set if half-carry
  */
 static inline int g_sbc8(struct CPU * cpu, uint8_t reg) {
-    uint16_t v = reg + ((cpu->registers.f & CPU_FLAG_C) != 0);
+    int c = ((cpu->registers.f & CPU_FLAG_C) != 0);
+    int r = cpu->registers.a - reg - c;
+    
+    FLAG_SET(cpu->registers.f, CPU_FLAG_N);
+    FLAG_CLEARIF((cpu->registers.a - reg - c) & 0xFF, cpu->registers.f, CPU_FLAG_Z);
+    FLAG_SETIF(((cpu->registers.a & 0xF) - (reg & 0xF) - c) < 0, cpu->registers.f, CPU_FLAG_H);
+    FLAG_SETIF((cpu->registers.a - reg - c) < 0, cpu->registers.f, CPU_FLAG_C);
 
-    FLAG_SETIF((cpu->registers.a - v), cpu->registers.f, CPU_FLAG_Z);
-    FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
-    FLAG_CLEARIF((((cpu->registers.a & 0xF) - (v & 0xF)) & 0x10) == 0x10, cpu->registers.f, CPU_FLAG_H);
-    FLAG_CLEARIF(((cpu->registers.a + v) & 0x100) == 0x100, cpu->registers.f, CPU_FLAG_C);
-
-    cpu->registers.a -= v;
+    cpu->registers.a -= (reg + c);
     return 1;
 }
 
@@ -605,12 +605,13 @@ int cpu_add_hl_sp(struct CPU * cpu) { return g_add_hl16(cpu, cpu->registers.sp);
  * Add signed immediate value to SP
  */
 int cpu_add_sp_nn(struct CPU * cpu, uint8_t operand) {
-    int8_t value = (int8_t)operand;
+    int32_t value = (int8_t)operand;
+    int32_t res   = cpu->registers.sp + value;
     
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
-    FLAG_SETIF(((cpu->registers.sp & 0xF) + (value & 0xF)) == 0x10, cpu->registers.f, CPU_FLAG_H);
-    FLAG_SETIF(((cpu->registers.sp & 0xFF)+ value) == 0x100, cpu->registers.f, CPU_FLAG_C);
+    FLAG_SETIF((cpu->registers.sp ^ value ^ res) & 0x10, cpu->registers.f, CPU_FLAG_H);
+    FLAG_SETIF((cpu->registers.sp ^ value ^ res) & 0x100, cpu->registers.f, CPU_FLAG_C);
 
     cpu->registers.sp += value;
     return 4;
@@ -766,14 +767,14 @@ int cpu_ret_nc(struct CPU * cpu){ return g_cnret(cpu, CPU_FLAG_C); }
  * cpu_rst_*:
  * Calls *
  */
-int cpu_rst_00(struct CPU * cpu) { g_call(cpu, 0x00); return 8; }
-int cpu_rst_08(struct CPU * cpu) { g_call(cpu, 0x08); return 8; }
-int cpu_rst_10(struct CPU * cpu) { g_call(cpu, 0x10); return 8; }
-int cpu_rst_18(struct CPU * cpu) { g_call(cpu, 0x18); return 8; }
-int cpu_rst_20(struct CPU * cpu) { g_call(cpu, 0x20); return 8; }
-int cpu_rst_28(struct CPU * cpu) { g_call(cpu, 0x28); return 8; }
-int cpu_rst_30(struct CPU * cpu) { g_call(cpu, 0x30); return 8; }
-int cpu_rst_38(struct CPU * cpu) { g_call(cpu, 0x38); return 8; }
+int cpu_rst_00(struct CPU * cpu) { g_call(cpu, 0x00); return 4; }
+int cpu_rst_08(struct CPU * cpu) { g_call(cpu, 0x08); return 4; }
+int cpu_rst_10(struct CPU * cpu) { g_call(cpu, 0x10); return 4; }
+int cpu_rst_18(struct CPU * cpu) { g_call(cpu, 0x18); return 4; }
+int cpu_rst_20(struct CPU * cpu) { g_call(cpu, 0x20); return 4; }
+int cpu_rst_28(struct CPU * cpu) { g_call(cpu, 0x28); return 4; }
+int cpu_rst_30(struct CPU * cpu) { g_call(cpu, 0x30); return 4; }
+int cpu_rst_38(struct CPU * cpu) { g_call(cpu, 0x38); return 4; }
 
 /*
  * Bitwise AND between A and value. Result in A.
