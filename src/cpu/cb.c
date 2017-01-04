@@ -3,7 +3,7 @@
  * Filename: cb.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 22:40:29 2016 (+0100)
- * Last-Updated: Mon Jan  2 07:48:17 2017 (+0100)
+ * Last-Updated: Tue Jan  3 22:54:28 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -30,6 +30,12 @@ static inline int gcb_sla(struct CPU * cpu, uint8_t * value) {
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
     return 2;
+}
+
+static inline int cb_sla_hl(struct CPU * cpu) {
+    uint8_t value = read_byte(cpu, cpu->registers.hl);
+    gcb_sla(cpu, &value);
+    write_byte(cpu, cpu->registers.hl, value);
 }
 
 int cb_sla_a(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.a); }
@@ -519,7 +525,7 @@ static struct Instruction cb_instructions[] = {
     {"SLA E",      0, cb_sla_e},
     {"SLA H",      0, cb_sla_h},
     {"SLA L",      0, cb_sla_l},
-    {"SLA (HL)",   0, NULL},
+    {"SLA (HL)",   0, cb_sla_hl},
     {"SLA A",      0, cb_sla_a},
     {"SRA B",      0, cb_sra_b},
     {"SRA C",      0, cb_sra_c},

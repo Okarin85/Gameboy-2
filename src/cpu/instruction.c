@@ -3,7 +3,7 @@
  * Filename: instruction.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 12:36:49 2016 (+0100)
- * Last-Updated: Tue Jan  3 17:48:52 2017 (+0100)
+ * Last-Updated: Wed Jan  4 12:59:31 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -352,7 +352,15 @@ int cpu_add_n(struct CPU * cpu, uint8_t operand) { return g_add8(cpu, operand) +
  */
 static inline int g_adc8(struct CPU * cpu, uint8_t reg) {
     int carry = (cpu->registers.f & CPU_FLAG_C) != 0;
-    return g_add8(cpu, reg + carry);
+    int res = cpu->registers.a + reg + carry;
+    uint8_t resb = res & 0xFF;
+    
+    FLAG_CLEARIF(resb, cpu->registers.f, CPU_FLAG_Z);
+    FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
+    FLAG_SETIF((((cpu->registers.a & 0xF) + (reg & 0xF) + carry) & 0xF0), cpu->registers.f, CPU_FLAG_H);
+    FLAG_SETIF(res & 0x100, cpu->registers.f, CPU_FLAG_C);
+
+    cpu->registers.a = resb;
 }
 
 int cpu_adc_a(struct CPU * cpu) { return g_adc8(cpu, cpu->registers.a); }
@@ -375,10 +383,12 @@ int cpu_adc_n(struct CPU * cpu, uint8_t operand) { return g_adc8(cpu, operand) +
  * Half-carry: Set if half-carry
  */
 static inline int g_sub8(struct CPU * cpu, uint8_t reg) {
+    int value = cpu->registers.a - reg;
+    
     FLAG_SETIF((cpu->registers.a - reg), cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_CLEARIF((((cpu->registers.a & 0xF) - (reg & 0xF)) & 0x10) == 0x10, cpu->registers.f, CPU_FLAG_H);
-    FLAG_CLEARIF(((cpu->registers.a - reg) & 0x100) == 0x100, cpu->registers.f, CPU_FLAG_C);
+    FLAG_CLEARIF(value < 0, cpu->registers.f, CPU_FLAG_C);
     
     cpu->registers.a -= reg;
     
@@ -440,7 +450,7 @@ static inline int g_dec8_r(struct CPU * cpu, uint8_t * reg) {
     FLAG_CLEARIF(*reg & 0xf, cpu->registers.f, CPU_FLAG_H);
     (*reg)--;
     FLAG_CLEARIF(*reg, cpu->registers.f, CPU_FLAG_Z);
-
+    
     return 1;
 }
 
@@ -471,7 +481,7 @@ int cpu_decm_hl(struct CPU * cpu) {
  */
 static inline int g_inc8_r(struct CPU * cpu, uint8_t * reg) {
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
-    FLAG_CLEARIF((*reg & 0xf) == 0xf, cpu->registers.f, CPU_FLAG_H);
+    FLAG_SETIF((*reg & 0xf) == 0xf, cpu->registers.f, CPU_FLAG_H);
     (*reg)++;
     FLAG_CLEARIF(*reg, cpu->registers.f, CPU_FLAG_Z);
 
