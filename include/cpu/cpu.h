@@ -3,7 +3,7 @@
  * Filename: cpu.h
  * Author: Jules <archjules>
  * Created: Wed Dec  7 09:03:16 2016 (+0100)
- * Last-Updated: Wed Jan  4 20:52:05 2017 (+0100)
+ * Last-Updated: Thu Jan  5 06:27:47 2017 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -29,6 +29,7 @@ struct CPU {
     bool state;
     bool halted;
     bool interrupts;
+    bool halt_bug;
     
     struct {
 	union {

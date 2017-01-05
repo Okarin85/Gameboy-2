@@ -3,7 +3,7 @@
  * Filename: cb.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 22:40:29 2016 (+0100)
- * Last-Updated: Tue Jan  3 22:54:28 2017 (+0100)
+ * Last-Updated: Thu Jan  5 18:20:57 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -26,16 +26,10 @@ static inline int gcb_sla(struct CPU * cpu, uint8_t * value) {
 
     (*value) <<= 1;
 
-    FLAG_CLEARIF((*value) & 0x7f, cpu->registers.f, CPU_FLAG_Z);
+    FLAG_CLEARIF((*value), cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
     return 2;
-}
-
-static inline int cb_sla_hl(struct CPU * cpu) {
-    uint8_t value = read_byte(cpu, cpu->registers.hl);
-    gcb_sla(cpu, &value);
-    write_byte(cpu, cpu->registers.hl, value);
 }
 
 int cb_sla_a(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.a); }
@@ -45,6 +39,13 @@ int cb_sla_d(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.d); }
 int cb_sla_e(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.e); }
 int cb_sla_h(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.h); }
 int cb_sla_l(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.l); }
+
+int cb_sla_hl(struct CPU * cpu) {
+    uint8_t value = read_byte(cpu, cpu->registers.hl);
+    gcb_sla(cpu, &value);
+    write_byte(cpu, cpu->registers.hl, value);
+    return 4;
+}
 
 /*
  * cb_sra_*:
@@ -73,6 +74,13 @@ int cb_sra_e(struct CPU * cpu) { return gcb_sra(cpu, &cpu->registers.e); }
 int cb_sra_h(struct CPU * cpu) { return gcb_sra(cpu, &cpu->registers.h); }
 int cb_sra_l(struct CPU * cpu) { return gcb_sra(cpu, &cpu->registers.l); }
 
+int cb_sra_hl(struct CPU * cpu) {
+    uint8_t value = read_byte(cpu, cpu->registers.hl);
+    gcb_sra(cpu, &value);
+    write_byte(cpu, cpu->registers.hl, value);
+    return 4;
+}
+
 /*
  * cb_srl_*:
  * Shift value right into carry. MSB set to 0.
@@ -100,6 +108,12 @@ int cb_srl_h(struct CPU * cpu) { return gcb_srl(cpu, &cpu->registers.h); }
 int cb_srl_l(struct CPU * cpu) { return gcb_srl(cpu, &cpu->registers.l); }
 
 
+int cb_srl_hl(struct CPU * cpu) {
+    uint8_t value = read_byte(cpu, cpu->registers.hl);
+    gcb_srl(cpu, &value);
+    write_byte(cpu, cpu->registers.hl, value);
+}
+
 /*
  * cb_swap_*:
  * Swap the two nibbles of value.
@@ -124,6 +138,12 @@ int cb_swap_d(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.d); }
 int cb_swap_e(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.e); }
 int cb_swap_h(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.h); }
 int cb_swap_l(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.l); }
+
+int cb_swap_hl(struct CPU * cpu) {
+    uint8_t value = read_byte(cpu, cpu->registers.hl);
+    gcb_swap(cpu, &value);
+    write_byte(cpu, cpu->registers.hl, value);
+}
 
 /*
  * cb_bit_*_*:
@@ -299,12 +319,12 @@ int cb_res_7_a(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.a, 7); }
  * All flags are untouched.
  */
 static inline int gcb_set(struct CPU * cpu, uint8_t * value, uint8_t bit) {
-    (*value) &= ~(1 << bit);
+    (*value) |= (1 << bit);
     return 2;
 }
 
 static inline int gcb_set_hl(struct CPU * cpu, uint8_t bit) {
-    uint8_t value = read_byte(cpu, cpu->registers.hl) & ~(1 << bit);
+    uint8_t value = read_byte(cpu, cpu->registers.hl) | (1 << bit);
     write_byte(cpu, cpu->registers.hl, value);
     return 3;
 }
@@ -382,7 +402,7 @@ int cb_set_7_a(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.a, 7); }
  * Zero: Set if value == 0 after operation
  * Substract and Half-carry: Unset
  */
-static inline int g_rr(struct CPU * cpu, uint8_t * value) {
+static inline int gcb_rr(struct CPU * cpu, uint8_t * value) {
     int carry = (cpu->registers.f & CPU_FLAG_C) != 0;
     FLAG_SETIF((*value) & 0x01, cpu->registers.f, CPU_FLAG_C);
     
@@ -395,13 +415,19 @@ static inline int g_rr(struct CPU * cpu, uint8_t * value) {
     return 2;
 }
 
-int cb_rr_a(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.a); }
-int cb_rr_b(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.b); }
-int cb_rr_c(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.c); }
-int cb_rr_d(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.d); }
-int cb_rr_e(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.e); }
-int cb_rr_h(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.h); }
-int cb_rr_l(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.l); }
+int cb_rr_a(struct CPU * cpu) { return gcb_rr(cpu, &cpu->registers.a); }
+int cb_rr_b(struct CPU * cpu) { return gcb_rr(cpu, &cpu->registers.b); }
+int cb_rr_c(struct CPU * cpu) { return gcb_rr(cpu, &cpu->registers.c); }
+int cb_rr_d(struct CPU * cpu) { return gcb_rr(cpu, &cpu->registers.d); }
+int cb_rr_e(struct CPU * cpu) { return gcb_rr(cpu, &cpu->registers.e); }
+int cb_rr_h(struct CPU * cpu) { return gcb_rr(cpu, &cpu->registers.h); }
+int cb_rr_l(struct CPU * cpu) { return gcb_rr(cpu, &cpu->registers.l); }
+
+int cb_rr_hl(struct CPU * cpu) {
+    uint8_t value = read_byte(cpu, cpu->registers.hl);
+    gcb_rr(cpu, &value);
+    write_byte(cpu, cpu->registers.hl, value);
+}
 
 /*
  * cb_rrc_*:
@@ -411,7 +437,7 @@ int cb_rr_l(struct CPU * cpu) { return g_rr(cpu, &cpu->registers.l); }
  * Zero: Set if value == 0 after the operation
  * Substract Half-carry: Unset
  */
-static inline int g_rrc(struct CPU * cpu, uint8_t * value) {
+static inline int gcb_rrc(struct CPU * cpu, uint8_t * value) {
     (*value) = ((*value) >> 1) | ((*value) << 7);
 
     FLAG_CLEARIF(*value, cpu->registers.f, CPU_FLAG_Z);
@@ -422,13 +448,19 @@ static inline int g_rrc(struct CPU * cpu, uint8_t * value) {
     return 2;
 }
 
-int cb_rrc_a(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.a); }
-int cb_rrc_b(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.b); }
-int cb_rrc_c(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.c); }
-int cb_rrc_d(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.d); }
-int cb_rrc_e(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.e); }
-int cb_rrc_h(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.h); }
-int cb_rrc_l(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.l); }
+int cb_rrc_a(struct CPU * cpu) { return gcb_rrc(cpu, &cpu->registers.a); }
+int cb_rrc_b(struct CPU * cpu) { return gcb_rrc(cpu, &cpu->registers.b); }
+int cb_rrc_c(struct CPU * cpu) { return gcb_rrc(cpu, &cpu->registers.c); }
+int cb_rrc_d(struct CPU * cpu) { return gcb_rrc(cpu, &cpu->registers.d); }
+int cb_rrc_e(struct CPU * cpu) { return gcb_rrc(cpu, &cpu->registers.e); }
+int cb_rrc_h(struct CPU * cpu) { return gcb_rrc(cpu, &cpu->registers.h); }
+int cb_rrc_l(struct CPU * cpu) { return gcb_rrc(cpu, &cpu->registers.l); }
+
+int cb_rrc_hl(struct CPU * cpu) {
+    uint8_t value = read_byte(cpu, cpu->registers.hl);
+    gcb_rrc(cpu, &value);
+    write_byte(cpu, cpu->registers.hl, value);
+}
 
 /*
  * cb_rl_*:
@@ -438,7 +470,7 @@ int cb_rrc_l(struct CPU * cpu) { return g_rrc(cpu, &cpu->registers.l); }
  * Zero: Set if value == 0 after the operation
  * Substract and Half-carry: Unset
  */
-static inline int g_rl(struct CPU * cpu, uint8_t * value) {
+static inline int gcb_rl(struct CPU * cpu, uint8_t * value) {
     uint8_t ocarry = (cpu->registers.f & CPU_FLAG_C) != 0;
     FLAG_SETIF((*value) & 0x80, cpu->registers.f, CPU_FLAG_C);
     
@@ -451,13 +483,19 @@ static inline int g_rl(struct CPU * cpu, uint8_t * value) {
     return 2;
 }
 
-int cb_rl_a(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.a); }
-int cb_rl_b(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.b); }
-int cb_rl_c(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.c); }
-int cb_rl_d(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.d); }
-int cb_rl_e(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.e); }
-int cb_rl_h(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.h); }
-int cb_rl_l(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.l); }
+int cb_rl_a(struct CPU * cpu) { return gcb_rl(cpu, &cpu->registers.a); }
+int cb_rl_b(struct CPU * cpu) { return gcb_rl(cpu, &cpu->registers.b); }
+int cb_rl_c(struct CPU * cpu) { return gcb_rl(cpu, &cpu->registers.c); }
+int cb_rl_d(struct CPU * cpu) { return gcb_rl(cpu, &cpu->registers.d); }
+int cb_rl_e(struct CPU * cpu) { return gcb_rl(cpu, &cpu->registers.e); }
+int cb_rl_h(struct CPU * cpu) { return gcb_rl(cpu, &cpu->registers.h); }
+int cb_rl_l(struct CPU * cpu) { return gcb_rl(cpu, &cpu->registers.l); }
+
+int cb_rl_hl(struct CPU * cpu) {
+    uint8_t value = read_byte(cpu, cpu->registers.hl);
+    gcb_rl(cpu, &value);
+    write_byte(cpu, cpu->registers.hl, value);
+}
 
 /*
  * cb_rlc_*:
@@ -467,7 +505,7 @@ int cb_rl_l(struct CPU * cpu) { return g_rl(cpu, &cpu->registers.l); }
  * Zero: Set if value == 0 after the operation
  * Substract and Half-carry: Unset
  */
-static inline int g_rlc(struct CPU * cpu, uint8_t * value) {
+static inline int gcb_rlc(struct CPU * cpu, uint8_t * value) {
     (*value) = ((*value) << 1) | ((*value) >> 7);
     
     FLAG_CLEARIF((*value), cpu->registers.f, CPU_FLAG_Z);
@@ -478,13 +516,19 @@ static inline int g_rlc(struct CPU * cpu, uint8_t * value) {
     return 2;
 }
 
-int cb_rlc_a(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.a); }
-int cb_rlc_b(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.b); }
-int cb_rlc_c(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.c); }
-int cb_rlc_d(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.d); }
-int cb_rlc_e(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.e); }
-int cb_rlc_h(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.h); }
-int cb_rlc_l(struct CPU * cpu) { return g_rlc(cpu, &cpu->registers.l); }
+int cb_rlc_a(struct CPU * cpu) { return gcb_rlc(cpu, &cpu->registers.a); }
+int cb_rlc_b(struct CPU * cpu) { return gcb_rlc(cpu, &cpu->registers.b); }
+int cb_rlc_c(struct CPU * cpu) { return gcb_rlc(cpu, &cpu->registers.c); }
+int cb_rlc_d(struct CPU * cpu) { return gcb_rlc(cpu, &cpu->registers.d); }
+int cb_rlc_e(struct CPU * cpu) { return gcb_rlc(cpu, &cpu->registers.e); }
+int cb_rlc_h(struct CPU * cpu) { return gcb_rlc(cpu, &cpu->registers.h); }
+int cb_rlc_l(struct CPU * cpu) { return gcb_rlc(cpu, &cpu->registers.l); }
+
+int cb_rlc_hl(struct CPU * cpu) {
+    uint8_t value = read_byte(cpu, cpu->registers.hl);
+    gcb_rlc(cpu, &value);
+    write_byte(cpu, cpu->registers.hl, value);
+}
 
 static struct Instruction cb_instructions[] = {
     {"RLC B",      0, cb_rlc_b},  // 0x0X
@@ -493,7 +537,7 @@ static struct Instruction cb_instructions[] = {
     {"RLC E",      0, cb_rlc_e},
     {"RLC H",      0, cb_rlc_h},
     {"RLC L",      0, cb_rlc_l},
-    {"RLC (HL)",   0, NULL},
+    {"RLC (HL)",   0, cb_rlc_hl},
     {"RLC A",      0, cb_rlc_a},
     {"RRC B",      0, cb_rrc_b},
     {"RRC C",      0, cb_rrc_c},
@@ -501,7 +545,7 @@ static struct Instruction cb_instructions[] = {
     {"RRC E",      0, cb_rrc_e},
     {"RRC H",      0, cb_rrc_h},
     {"RRC L",      0, cb_rrc_l},
-    {"RRC (HL)",   0, NULL},
+    {"RRC (HL)",   0, cb_rrc_hl},
     {"RRC A",      0, cb_rrc_a},
     {"RL B",       0, cb_rl_b},  // 0x1X
     {"RL C",       0, cb_rl_c},
@@ -509,7 +553,7 @@ static struct Instruction cb_instructions[] = {
     {"RL E",       0, cb_rl_e},
     {"RL H",       0, cb_rl_h},
     {"RL L",       0, cb_rl_l},
-    {"RL (HL) ",   0, NULL},
+    {"RL (HL) ",   0, cb_rl_hl},
     {"RL A",       0, cb_rl_a},
     {"RR B",       0, cb_rr_b},
     {"RR C",       0, cb_rr_c},
@@ -517,7 +561,7 @@ static struct Instruction cb_instructions[] = {
     {"RR E",       0, cb_rr_e},
     {"RR H",       0, cb_rr_h},
     {"RR L",       0, cb_rr_l},
-    {"RR (HL) ",   0, NULL},
+    {"RR (HL) ",   0, cb_rr_hl},
     {"RR A",       0, cb_rr_a},
     {"SLA B",      0, cb_sla_b},  // 0x2X
     {"SLA C",      0, cb_sla_c},
@@ -533,7 +577,7 @@ static struct Instruction cb_instructions[] = {
     {"SRA E",      0, cb_sra_e},
     {"SRA H",      0, cb_sra_h},
     {"SRA L",      0, cb_sra_l},
-    {"SRA (HL)",   0, NULL},
+    {"SRA (HL)",   0, cb_sra_hl},
     {"SRA A",      0, cb_sra_a},
     {"SWAP B",     0, cb_swap_b},  // 0x3X
     {"SWAP C",     0, cb_swap_c},
@@ -541,7 +585,7 @@ static struct Instruction cb_instructions[] = {
     {"SWAP E",     0, cb_swap_e},
     {"SWAP H",     0, cb_swap_h},
     {"SWAP L",     0, cb_swap_l},
-    {"SWAP (HL)",  0, NULL},
+    {"SWAP (HL)",  0, cb_swap_hl},
     {"SWAP A",     0, cb_swap_a},
     {"SRL B",      0, cb_srl_b},
     {"SRL C",      0, cb_srl_c},
@@ -549,7 +593,7 @@ static struct Instruction cb_instructions[] = {
     {"SRL E",      0, cb_srl_e},
     {"SRL H",      0, cb_srl_h},
     {"SRL L",      0, cb_srl_l},
-    {"SRL (HL)",   0, NULL},
+    {"SRL (HL)",   0, cb_srl_hl},
     {"SRL A",      0, cb_srl_a},
     {"BIT 0, B",   0, cb_bit_0_b},  // 0x4X
     {"BIT 0, C",   0, cb_bit_0_c},

@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Wed Jan  4 19:59:28 2017 (+0100)
+ * Last-Updated: Thu Jan  5 18:25:26 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -32,6 +32,8 @@ static inline void print_registers(struct CPU * cpu) {
     log_debug("SP : 0x%04x", cpu->registers.sp);
     log_debug("IF : 0x%02x", cpu->memory.io[0xF]);
     log_debug("IE : 0x%02x", cpu->memory.io[0xFF]);
+    log_debug("TAC: 0x%02x", cpu->memory.io[0x07]);
+    log_debug("TIM: 0x%02x", cpu->timer_tima);
     log_debug("Clock : %d ticks", cpu->clock);
 }
 
@@ -82,8 +84,6 @@ void cpu_destroy(struct CPU * cpu) {
 }
 
 void cpu_next_instruction(struct CPU * cpu) {
-    char str[20] = {0};
-    static int e = 0;
     uint8_t op;
     uint16_t operand;
     

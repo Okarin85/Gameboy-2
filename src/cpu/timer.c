@@ -3,7 +3,7 @@
  * Filename: timer.c
  * Author: Jules <archjules>
  * Created: Tue Jan  3 18:09:59 2017 (+0100)
- * Last-Updated: Tue Jan  3 19:15:25 2017 (+0100)
+ * Last-Updated: Thu Jan  5 17:51:36 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"

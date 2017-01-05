@@ -3,7 +3,7 @@
  * Filename: mbc1.c
  * Author: Jules <archjules>
  * Created: Tue Jan  3 10:52:18 2017 (+0100)
- * Last-Updated: Tue Jan  3 12:01:59 2017 (+0100)
+ * Last-Updated: Thu Jan  5 17:59:21 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -39,15 +39,16 @@ uint8_t mbc1_read_ram(struct CPU * cpu, uint16_t address) {
 void mbc1_write_rom(struct CPU * cpu, uint16_t address, uint8_t value) {
     int bank;
     
-    switch(address) {
+    switch(address & 0xF000) {
     case 0x0000:
-    case 0x0001:
+    case 0x1000:
 	((struct MBC1 *)cpu->rom.mbc_info)->ram_enable = ((value & 0xF) == 0xA);
 	break;
-    case 0x0002:
-    case 0x0003:
+    case 0x2000:
+    case 0x3000:
 	if ((value == 0x00) || (value == 0x20) || (value == 0x40) || (value == 0x60))
 	    value++;
+	log_debug("Switching to ROM bank %d", value);
 	((struct MBC1 *)cpu->rom.mbc_info)->rom_bank = value;
 	break;
     }

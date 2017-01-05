@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Tue Jan  3 18:57:46 2017 (+0100)
+ * Last-Updated: Thu Jan  5 17:52:13 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -35,6 +35,8 @@ uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
 	}
     case 0x04:
 	return cpu->timer_div;
+    case 0x05:
+	return cpu->timer_tima;
     case 0x40:
 	return 0x83 |
 	    cpu->gpu.bg_map << 3 |
@@ -56,7 +58,7 @@ uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
     case 0x47:
 	return cpu->memory.io[0x47];
     default:
-	return 1;
+	return cpu->memory.io[port];
     }
 }
 
@@ -78,7 +80,7 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
 	break;
     case 0x07:
 	cpu->timer_tima_enabled = (value & 0x04);
-	switch(value & 0x02) {
+	switch(value & 0x03) {
 	case 0x00:
 	    cpu->timer_tima_speed = 256;
 	    break;
