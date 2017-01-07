@@ -3,7 +3,7 @@
  * Filename: oam.c
  * Author: Jules <archjules>
  * Created: Fri Dec 30 01:01:21 2016 (+0100)
- * Last-Updated: Mon Jan  2 17:35:06 2017 (+0100)
+ * Last-Updated: Sat Jan  7 19:12:39 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -22,13 +22,15 @@ void cache_sprite(struct CPU * cpu, int index) {
     for (int line = pos_y_start; line < pos_y_end; line++) {
 	if ((line < 0) || (line > SCREEN_HEIGHT)) continue;
 	if (cpu->gpu.line_cache[line][9] != NULL)  continue;
-	
+
 	for (int i = 0; i < 10; i++) {
 	    if (cpu->gpu.line_cache[line][i] == NULL) {
 		cpu->gpu.line_cache[line][i] = &cpu->gpu.oam[index];
 		break;
-	    } else {
-		
+	    } else if (pos_x < cpu->gpu.line_cache[line][i]->x_pos) {
+		memmove(&(cpu->gpu.line_cache[line][i + 1]), &(cpu->gpu.line_cache[line][i]), (9 - i) * sizeof(struct Sprite *));
+		cpu->gpu.line_cache[line][i] = &cpu->gpu.oam[index];
+		break;
 	    }
 	}
     }
@@ -99,9 +101,15 @@ struct Sprite * oam_get_sprite(struct CPU * cpu, int x, int y) {
 }
 
 int oam_get_color(struct CPU * cpu, struct Sprite * sprite, int x, int y) {
-    int base_spr, x_tile, tile1, tile2;
-    
+    int base_spr, tile_id, x_tile, tile1, tile2;
+
     base_spr = (sprite->y_pos - 16);
+    
+    if (cpu->gpu.spr_height) {
+	tile_id = sprite->tile & 0xfe;
+	if ((y - base_spr) > 7) tile_id++;
+    }
+    
     tile1 = cpu->memory.gram[(sprite->tile << 4) + ((y - base_spr) << 1) + 1];
     tile2 = cpu->memory.gram[(sprite->tile << 4) + ((y - base_spr) << 1)];
 

@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Thu Jan  5 17:52:13 2017 (+0100)
+ * Last-Updated: Fri Jan  6 18:24:57 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -134,14 +134,12 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
 	break;
     case 0x48:
 	log_debug("Writing OPB0 : %x", value);
-	cpu->gpu.obp0[0] = get_color((value & 0b11));
 	cpu->gpu.obp0[1] = get_color((value & 0b1100) >> 2);
 	cpu->gpu.obp0[2] = get_color((value & 0b110000) >> 4);
 	cpu->gpu.obp0[3] = get_color((value & 0b11000000) >> 6);
 	break;
     case 0x49:
 	log_debug("Writing OBP1 : %x", value);
-	cpu->gpu.obp1[0] = get_color((value & 0b11));
 	cpu->gpu.obp1[1] = get_color((value & 0b1100) >> 2);
 	cpu->gpu.obp1[2] = get_color((value & 0b110000) >> 4);
 	cpu->gpu.obp1[3] = get_color((value & 0b11000000) >> 6);

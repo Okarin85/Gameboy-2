@@ -3,7 +3,7 @@
  * Filename: interrupt.c
  * Author: Jules <archjules>
  * Created: Tue Dec 20 23:09:01 2016 (+0100)
- * Last-Updated: Thu Jan  5 17:57:23 2017 (+0100)
+ * Last-Updated: Thu Jan  5 21:28:57 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "cpu/interrupt.h"
@@ -26,10 +26,18 @@ void treat_interruptions(struct CPU * cpu) {
     }
 }
 
+/*
+ * remove_interruption:
+ * Remove an interruption from IF
+ */
 void remove_interruption(struct CPU * cpu, uint8_t interruption) {
     cpu->memory.io[0x0F] &= ~interruption;
 }
 
+/*
+ * provoke_interruption:
+ * Sets halted to false, and sets a bit if 
+ */
 void provoke_interruption(struct CPU * cpu, uint8_t interruption) {
     cpu->halted = false;
     cpu->memory.io[0x0F] |= interruption;

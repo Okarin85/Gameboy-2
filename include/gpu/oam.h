@@ -3,7 +3,7 @@
  * Filename: oam.h
  * Author: Jules <archjules>
  * Created: Mon Jan  2 08:07:40 2017 (+0100)
- * Last-Updated: Mon Jan  2 10:15:57 2017 (+0100)
+ * Last-Updated: Fri Jan  6 17:56:17 2017 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -14,8 +14,8 @@
 
 // Flags
 #define OAM_BG_PRIORITY (1 << 7)
-#define OAM_X_FLIP      (1 << 6)
-#define OAM_Y_FLIP      (1 << 5)
+#define OAM_Y_FLIP      (1 << 6)
+#define OAM_X_FLIP      (1 << 5)
 #define OAM_PALETTE     (1 << 4)
 
 void update_cache(struct CPU *);
