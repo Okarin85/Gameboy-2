@@ -3,7 +3,7 @@
  * Filename: structs.h
  * Author: Jules <archjules>
  * Created: Mon Jan  2 07:59:19 2017 (+0100)
- * Last-Updated: Tue Jan  3 17:42:37 2017 (+0100)
+ * Last-Updated: Sun Jan  8 12:55:10 2017 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -41,11 +41,17 @@ struct GPU {
     bool mode2_enabled;
     
     // Background
-    bool bg;
+    bool bg_enabled;
     bool bg_map;
     bool bg_tile;
     uint32_t bg_palette[4];
 
+    // Window
+    uint8_t wd_x;
+    uint8_t wd_y;
+    bool wd_map;
+    bool wd_enabled;
+    
     // OAM
     struct Sprite oam[40];
     struct Sprite * line_cache[SCREEN_HEIGHT][10];

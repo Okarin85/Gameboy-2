@@ -3,7 +3,7 @@
  * Filename: general.c
  * Author: Jules <archjules>
  * Created: Mon Jan  2 16:37:27 2017 (+0100)
- * Last-Updated: Tue Jan  3 00:59:19 2017 (+0100)
+ * Last-Updated: Sun Jan  8 14:37:48 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <SDL/SDL.h>
@@ -18,7 +18,7 @@ void handle_new_frame(struct CPU * cpu) {
     
     treat_events(cpu);
     screen_flip(cpu->screen);
-
+    
     if ((now - last) < 17) {
 	SDL_Delay(17 - (now - last));
     }

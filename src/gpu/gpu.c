@@ -3,7 +3,7 @@
  * Filename: gpu.c
  * Author: Jules <archjules>
  * Created: Tue Dec 13 00:45:56 2016 (+0100)
- * Last-Updated: Sun Jan  8 09:08:42 2017 (+0100)
+ * Last-Updated: Sun Jan  8 15:04:48 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -32,7 +32,14 @@ void gpu_render_line(struct CPU * cpu, int current_line) {
     int bg_color = 0, color = 0;
     struct Sprite * obj = NULL;
     for (int i = 0; i < SCREEN_WIDTH; i++) {
-	bg_color = background_get_color(cpu, i, current_line);
+	// Getting the background/window pixel
+	if (cpu->gpu.wd_enabled && (i >= (cpu->gpu.wd_x - 7)) && (current_line >= cpu->gpu.wd_y)) {
+	    bg_color = window_get_color(cpu, i, current_line);
+	} else if (cpu->gpu.bg_enabled) {
+	    bg_color = background_get_color(cpu, i, current_line);
+	} else {
+	    bg_color = 0;
+	}
 	screen_put_pixel(cpu->screen,
 			 i,
 			 current_line,
@@ -45,8 +52,21 @@ void gpu_render_line(struct CPU * cpu, int current_line) {
  * Request a STAT interrupt if enabled
  */
 void gpu_stat_interrupt(struct CPU * cpu, uint8_t bit) {
-    if (bit)
+    if (bit) {
 	provoke_interruption(cpu, INT_STAT);
+    }
+}
+
+/*
+ * change_current_line:
+ * Change the current line, and sets the coincidence flag if new_line == LYC
+ */
+static inline void change_current_line(struct CPU * cpu, int new_line) {
+    cpu->gpu.current_line = new_line;
+    if (new_line == cpu->gpu.lyc) {
+	cpu->gpu.coincidence = true;
+	gpu_stat_interrupt(cpu, cpu->gpu.coincidence_enabled);
+    }
 }
 
 /*
@@ -66,11 +86,7 @@ int gpu_next(struct CPU * cpu) {
 		provoke_interruption(cpu, INT_VBLANK);
 		cpu->gpu.mode = 1;
 	    } else {
-		cpu->gpu.current_line++;
-		if (cpu->gpu.current_line == cpu->gpu.lyc) {
-		    cpu->gpu.coincidence = true;
-		    gpu_stat_interrupt(cpu, cpu->gpu.coincidence_enabled);
-		}
+		change_current_line(cpu, cpu->gpu.current_line + 1);
 		cpu->gpu.mode = 2;
 		gpu_stat_interrupt(cpu, cpu->gpu.mode2_enabled);
 	    }
@@ -80,11 +96,11 @@ int gpu_next(struct CPU * cpu) {
 	break;
     case 1: // Vblank
 	if (cpu->gpu.clock >= 114) {
-	    cpu->gpu.current_line++;
+	    change_current_line(cpu, cpu->gpu.current_line + 1);
 	    if (cpu->gpu.current_line == 153) {
 		// Now that a frame is complete, we do all we have to do
 		handle_new_frame(cpu);
-		cpu->gpu.current_line = 0;
+	        change_current_line(cpu, 0);
 		cpu->gpu.mode  = 2;
 		gpu_stat_interrupt(cpu, cpu->gpu.mode2_enabled);
 	    }

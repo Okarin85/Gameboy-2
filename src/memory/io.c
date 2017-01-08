@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Sat Jan  7 20:32:05 2017 (+0100)
+ * Last-Updated: Sun Jan  8 15:05:37 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -24,9 +24,14 @@ uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
     case 0x05:
 	return cpu->timer_tima;
     case 0x40:
-	return 0x83 |
-	    cpu->gpu.bg_map << 3 |
-	    cpu->gpu.bg_tile<< 4;
+	return 0x80 |
+	    cpu->gpu.wd_map     << 6 |
+	    cpu->gpu.wd_enabled << 5 |
+	    cpu->gpu.bg_tile    << 4 |
+	    cpu->gpu.bg_map     << 3 |
+	    cpu->gpu.spr_height << 2 |
+	    cpu->gpu.spr_enabled<< 1 |
+	    cpu->gpu.bg_enabled << 0;
     case 0x41:
 	return
 	    (cpu->gpu.coincidence_enabled << 6) |
@@ -43,6 +48,10 @@ uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
 	return cpu->gpu.current_line;
     case 0x47:
 	return cpu->memory.io[0x47];
+    case 0x4A:
+	return cpu->gpu.wd_y;
+    case 0x4B:
+	return cpu->gpu.wd_x;
     default:
 	return cpu->memory.io[port];
     }
@@ -83,10 +92,13 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
 	break;
     case 0x40:
 	old = cpu->gpu.spr_enabled;
-	cpu->gpu.spr_enabled= ((value & 0b10)   != 0);
-	cpu->gpu.spr_height = ((value & 0b100)  != 0);
-	cpu->gpu.bg_map     = ((value & 0b1000) != 0);
-	cpu->gpu.bg_tile    = ((value & 0b10000)!= 0);
+	cpu->gpu.bg_enabled = ((value & (1 << 0)) != 0);
+	cpu->gpu.spr_enabled= ((value & (1 << 1)) != 0);
+	cpu->gpu.spr_height = ((value & (1 << 2)) != 0);
+	cpu->gpu.bg_map     = ((value & (1 << 3)) != 0);
+	cpu->gpu.bg_tile    = ((value & (1 << 4)) != 0);
+	cpu->gpu.wd_enabled = ((value & (1 << 5)) != 0);
+	cpu->gpu.wd_map     = ((value & (1 << 6)) != 0);
 
 	if (old != cpu->gpu.spr_enabled) update_cache(cpu);
 	break;
@@ -103,7 +115,7 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
 	cpu->gpu.scroll_x = value;
 	break;
     case 0x45:
-	log_debug("Writing LYC : %x", value);
+	cpu->gpu.lyc = value;
 	break;
     case 0x46:
         // Handling DMA
@@ -112,23 +124,26 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
 	cpu->dma_ongoing= true;
 	break;
     case 0x47:
-	log_debug("Writing BG palette : %x", value);
 	cpu->gpu.bg_palette[0] = (value & 0b11);
 	cpu->gpu.bg_palette[1] = (value & 0b1100) >> 2;
 	cpu->gpu.bg_palette[2] = (value & 0b110000) >> 4;
 	cpu->gpu.bg_palette[3] = (value & 0b11000000) >> 6;
 	break;
     case 0x48:
-	log_debug("Writing OPB0 : %x", value);
 	cpu->gpu.obp0[1] = (value & 0b1100) >> 2;
 	cpu->gpu.obp0[2] = (value & 0b110000) >> 4;
 	cpu->gpu.obp0[3] = (value & 0b11000000) >> 6;
 	break;
     case 0x49:
-	log_debug("Writing OBP1 : %x", value);
 	cpu->gpu.obp1[1] = (value & 0b1100) >> 2;
 	cpu->gpu.obp1[2] = (value & 0b110000) >> 4;
 	cpu->gpu.obp1[3] = (value & 0b11000000) >> 6;
+	break;
+    case 0x4A:
+	cpu->gpu.wd_y = value;
+	break;
+    case 0x4B:
+	cpu->gpu.wd_x = value;
 	break;
     case 0x50:
 	cpu->memory.bios_inplace = false;
