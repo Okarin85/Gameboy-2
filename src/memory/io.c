@@ -3,27 +3,13 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Fri Jan  6 18:24:57 2017 (+0100)
+ * Last-Updated: Sat Jan  7 20:32:05 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
 #include "cpu/cpu.h"
 #include "gpu/oam.h"
 #include "logger.h"
-
-#define SCREEN_WHITE 0x00E0F8D0
-#define SCREEN_LGRAY 0x0088C070
-#define SCREEN_DGRAY 0x00346856
-#define SCREEN_BLACK 0x00081820
-
-static inline uint32_t get_color(int color) {
-    switch(color) {
-    case 0: return SCREEN_WHITE;
-    case 1: return SCREEN_LGRAY;
-    case 2: return SCREEN_DGRAY;
-    case 3: return SCREEN_BLACK;
-    }
-}
 
 uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
     switch(port) {
@@ -127,22 +113,22 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
 	break;
     case 0x47:
 	log_debug("Writing BG palette : %x", value);
-	cpu->gpu.bg_palette[0] = get_color((value & 0b11));
-	cpu->gpu.bg_palette[1] = get_color((value & 0b1100) >> 2);
-	cpu->gpu.bg_palette[2] = get_color((value & 0b110000) >> 4);
-	cpu->gpu.bg_palette[3] = get_color((value & 0b11000000) >> 6);
+	cpu->gpu.bg_palette[0] = (value & 0b11);
+	cpu->gpu.bg_palette[1] = (value & 0b1100) >> 2;
+	cpu->gpu.bg_palette[2] = (value & 0b110000) >> 4;
+	cpu->gpu.bg_palette[3] = (value & 0b11000000) >> 6;
 	break;
     case 0x48:
 	log_debug("Writing OPB0 : %x", value);
-	cpu->gpu.obp0[1] = get_color((value & 0b1100) >> 2);
-	cpu->gpu.obp0[2] = get_color((value & 0b110000) >> 4);
-	cpu->gpu.obp0[3] = get_color((value & 0b11000000) >> 6);
+	cpu->gpu.obp0[1] = (value & 0b1100) >> 2;
+	cpu->gpu.obp0[2] = (value & 0b110000) >> 4;
+	cpu->gpu.obp0[3] = (value & 0b11000000) >> 6;
 	break;
     case 0x49:
 	log_debug("Writing OBP1 : %x", value);
-	cpu->gpu.obp1[1] = get_color((value & 0b1100) >> 2);
-	cpu->gpu.obp1[2] = get_color((value & 0b110000) >> 4);
-	cpu->gpu.obp1[3] = get_color((value & 0b11000000) >> 6);
+	cpu->gpu.obp1[1] = (value & 0b1100) >> 2;
+	cpu->gpu.obp1[2] = (value & 0b110000) >> 4;
+	cpu->gpu.obp1[3] = (value & 0b11000000) >> 6;
 	break;
     case 0x50:
 	cpu->memory.bios_inplace = false;

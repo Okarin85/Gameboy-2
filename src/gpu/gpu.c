@@ -3,7 +3,7 @@
  * Filename: gpu.c
  * Author: Jules <archjules>
  * Created: Tue Dec 13 00:45:56 2016 (+0100)
- * Last-Updated: Fri Jan  6 17:24:30 2017 (+0100)
+ * Last-Updated: Sun Jan  8 09:08:42 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -15,6 +15,15 @@
 #include "platform/general.h"
 #include "logger.h"
 
+static inline uint32_t get_color(int color) {
+    switch(color) {
+    case 0: return SCREEN_WHITE;
+    case 1: return SCREEN_LGRAY;
+    case 2: return SCREEN_DGRAY;
+    case 3: return SCREEN_BLACK;
+    }
+}
+
 /*
  * gpu_render_line:
  * Render a line on the screen
@@ -24,20 +33,10 @@ void gpu_render_line(struct CPU * cpu, int current_line) {
     struct Sprite * obj = NULL;
     for (int i = 0; i < SCREEN_WIDTH; i++) {
 	bg_color = background_get_color(cpu, i, current_line);
-	if (cpu->gpu.spr_enabled) obj = oam_get_sprite(cpu, i, current_line);
-	
-	if (obj != NULL) {
-	    color = oam_get_color(cpu, obj, i, current_line);
-	    if (((obj->bg_priority == 0) || (bg_color == 0)) && (color != 0)) {
-		screen_put_pixel(cpu->screen,
-				 i,
-				 current_line,
-				 (obj->palette ? cpu->gpu.obp1 : cpu->gpu.obp0)[color]
-		    );
-		continue;
-	    }
-	}
-	screen_put_pixel(cpu->screen, i, current_line, cpu->gpu.bg_palette[bg_color]);
+	screen_put_pixel(cpu->screen,
+			 i,
+			 current_line,
+			 get_color(cpu->gpu.bg_palette[bg_color]));
     }
 }
 

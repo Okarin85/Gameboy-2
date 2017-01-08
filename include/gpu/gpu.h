@@ -3,7 +3,7 @@
  * Filename: gpu.h
  * Author: Jules <archjules>
  * Created: Tue Dec 13 00:46:44 2016 (+0100)
- * Last-Updated: Mon Jan  2 08:13:18 2017 (+0100)
+ * Last-Updated: Sat Jan  7 20:30:15 2017 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -11,6 +11,11 @@
 #define GPU_H
 #include <stdint.h>
 #include "cpu/cpu.h"
+
+#define SCREEN_WHITE 0x00E0F8D0
+#define SCREEN_LGRAY 0x0088C070
+#define SCREEN_DGRAY 0x00346856
+#define SCREEN_BLACK 0x00081820
 
 // General GPU
 int gpu_next(struct CPU *);

@@ -3,7 +3,7 @@
  * Filename: oam.h
  * Author: Jules <archjules>
  * Created: Mon Jan  2 08:07:40 2017 (+0100)
- * Last-Updated: Fri Jan  6 17:56:17 2017 (+0100)
+ * Last-Updated: Sat Jan  7 20:21:55 2017 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -24,6 +24,6 @@ void oam_write_byte(struct CPU *, uint16_t, uint8_t);
 uint8_t oam_read_byte(struct CPU *, uint16_t);
 
 struct Sprite * oam_get_sprite(struct CPU *, int, int);
-int oam_get_color(struct CPU *, struct Sprite *, int, int);
+uint32_t oam_get_color(struct CPU *, struct Sprite *, int, int, int);
 
 #endif /* OAM_H */

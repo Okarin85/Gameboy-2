@@ -3,7 +3,7 @@
  * Filename: oam.c
  * Author: Jules <archjules>
  * Created: Fri Dec 30 01:01:21 2016 (+0100)
- * Last-Updated: Sat Jan  7 19:12:39 2017 (+0100)
+ * Last-Updated: Sun Jan  8 08:58:01 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -47,7 +47,7 @@ void update_cache(struct CPU * cpu) {
 
 void oam_write_byte(struct CPU * cpu, uint16_t address, uint8_t value) {
     bool update = false;
-    uint8_t spr_nb, spr_attr, old;
+    uint8_t spr_nb, spr_attr;
     spr_nb   = address / 4;
     spr_attr = address % 4;
     
@@ -81,43 +81,18 @@ void oam_write_byte(struct CPU * cpu, uint16_t address, uint8_t value) {
 }
 
 uint8_t oam_read_byte(struct CPU * cpu, uint16_t address) {
-    log_debug("Reading OAM byte %x", address);
-}
+    int spr_nb, spr_attr;
+    spr_nb   = address / 4;
+    spr_attr = address % 4;
 
-// Actual rendering functions
-struct Sprite * oam_get_sprite(struct CPU * cpu, int x, int y) {
-    int diff;
-    
-    for (int i = 0; i < 10; i++) {
-	if(cpu->gpu.line_cache[y][i] == NULL) return NULL;
-
-        diff = x - cpu->gpu.line_cache[y][i]->x_pos + 8;
-	if ((diff < 0) || (diff > 7)) continue;
-	
-	return cpu->gpu.line_cache[y][i];
+    switch(spr_attr) {
+    case 0: return cpu->gpu.oam[spr_nb].y_pos;
+    case 1: return cpu->gpu.oam[spr_nb].x_pos;
+    case 2: return cpu->gpu.oam[spr_nb].tile;
+    case 3: return
+	    cpu->gpu.oam[spr_nb].bg_priority << 7 |
+	    cpu->gpu.oam[spr_nb].y_flip      << 6 |
+	    cpu->gpu.oam[spr_nb].x_flip      << 5 |
+	    cpu->gpu.oam[spr_nb].palette     << 4;
     }
-
-    return NULL;
-}
-
-int oam_get_color(struct CPU * cpu, struct Sprite * sprite, int x, int y) {
-    int base_spr, tile_id, x_tile, tile1, tile2;
-
-    base_spr = (sprite->y_pos - 16);
-    
-    if (cpu->gpu.spr_height) {
-	tile_id = sprite->tile & 0xfe;
-	if ((y - base_spr) > 7) tile_id++;
-    }
-    
-    tile1 = cpu->memory.gram[(sprite->tile << 4) + ((y - base_spr) << 1) + 1];
-    tile2 = cpu->memory.gram[(sprite->tile << 4) + ((y - base_spr) << 1)];
-
-    if (!sprite->x_flip) {
-	x_tile = x % 8;
-    } else {
-	x_tile = 8 - (x % 8);
-    }
-    
-    return ((tile1 >> (7 - x_tile)) & 0x1) | (((tile2 >> (7 - x_tile)) & 0x1) << 1);
 }
