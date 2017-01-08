@@ -3,7 +3,7 @@
  * Filename: gpu.h
  * Author: Jules <archjules>
  * Created: Tue Dec 13 00:46:44 2016 (+0100)
- * Last-Updated: Sat Jan  7 20:30:15 2017 (+0100)
+ * Last-Updated: Sun Jan  8 12:17:31 2017 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -19,6 +19,9 @@
 
 // General GPU
 int gpu_next(struct CPU *);
+
+// Tiles
+int tile_get_pixel(struct CPU *, int, int, int, int);
 
 // Background
 int background_get_color(struct CPU *, int, int);

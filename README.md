@@ -3,7 +3,7 @@
 ;; Filename: README.md
 ;; Author: Jules <archjules>
 ;; Created: Thu Dec 29 19:37:03 2016 (+0100)
-;; Last-Updated: Mon Jan  2 14:46:36 2017 (+0100)
+;; Last-Updated: Sun Jan  8 12:04:42 2017 (+0100)
 ;;           By: Jules <archjules>
  -->
 
@@ -25,16 +25,16 @@ To use the program, run the executable with the ROM file as an argument
 
  * Sprite implementation (kinda done)
  * DMA (done)
- * Timer implementation (and maybe framerate limitation at last)
+ * Timer implementation (done, but apparently not perfect)
  
 ## Things to do before Pokemon Red is playable
 
- * MBC implementation
+ * MBC implementation (begun, but only MBC0 and MBC1 are implemented, so no Pokemon Red)
  
 ## Things to do before the emulator is actually pleasant to play with
 
  * Savegame implementation (after the MBC implementation)
- * Config file
+ * Config file (libherring is done, so I just have to add it to this project)
  
 ## Things to do after all of this
 
