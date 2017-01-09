@@ -3,11 +3,12 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Mon Jan  9 09:57:27 2017 (+0100)
+ * Last-Updated: Mon Jan  9 19:07:42 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
 #include "cpu/cpu.h"
+#include "platform/screen.h"
 #include "gpu/oam.h"
 #include "logger.h"
 
@@ -46,6 +47,8 @@ uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
 	return cpu->gpu.scroll_x;
     case 0x44:
 	return cpu->gpu.current_line;
+    case 0x46:
+	return (cpu->dma_source >> 8);
     case 0x47:
 	return cpu->memory.io[0x47];
     case 0x4A:
@@ -130,7 +133,6 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
 	cpu->gpu.bg_palette[3] = (value & 0b11000000) >> 6;
 	break;
     case 0x48:
-	log_debug("Writing OBP0 : %x", value);
 	cpu->gpu.obp0[1] = (value & 0b1100) >> 2;
 	cpu->gpu.obp0[2] = (value & 0b110000) >> 4;
 	cpu->gpu.obp0[3] = (value & 0b11000000) >> 6;

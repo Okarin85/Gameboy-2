@@ -3,7 +3,7 @@
  * Filename: main.c
  * Author: Jules <archjules>
  * Created: Wed Dec  7 08:48:50 2016 (+0100)
- * Last-Updated: Sun Jan  8 21:40:48 2017 (+0100)
+ * Last-Updated: Mon Jan  9 19:28:00 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -14,7 +14,6 @@
 #include "platform/input.h"
 #include "cpu/cpu.h"
 #include "cpu/dma.h"
-#include "cpu/instruction.h"
 #include "cpu/timer.h"
 #include "cpu/interrupt.h"
 #include "rom/load.h"
@@ -53,9 +52,6 @@ int main(int argc, char ** argv) {
 
     while(!cpu.state) {
 	cpu_next_instruction(&cpu);
-	treat_interruptions(&cpu);
-	dma_oam_handle(&cpu);
-	gpu_next(&cpu);
     }
 
     screen_destroy(cpu.screen);

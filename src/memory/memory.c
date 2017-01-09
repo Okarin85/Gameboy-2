@@ -3,7 +3,7 @@
  * Filename: memory.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:40:29 2016 (+0100)
- * Last-Updated: Sun Jan  8 22:58:44 2017 (+0100)
+ * Last-Updated: Mon Jan  9 18:46:48 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -67,6 +67,12 @@ uint8_t read_byte(struct CPU * cpu, uint16_t address) {
     }
 }
 
+uint8_t fetch_byte(struct CPU * cpu, uint16_t address) {
+    uint8_t value = read_byte(cpu, address);
+    cpu_delay(cpu, 1);
+    return value;
+}
+
 void write_byte(struct CPU * cpu, uint16_t address, uint8_t value) {
     switch (address & 0xF000) {
     case 0x0000:
@@ -105,9 +111,18 @@ void write_byte(struct CPU * cpu, uint16_t address, uint8_t value) {
     }
 }
 
+void store_byte(struct CPU * cpu, uint16_t address, uint8_t value) {
+    write_byte(cpu, address, value);
+    cpu_delay(cpu, 1);
+}
+
 uint16_t read_word(struct CPU * cpu, uint16_t address) {
     // log_debug("Reading word 0x%04x", address);
     return (read_byte(cpu, address + 1) << 8) | read_byte(cpu, address);
+}
+
+uint16_t fetch_word(struct CPU * cpu, uint16_t address) {
+    return (fetch_byte(cpu, address + 1) << 8) | fetch_byte(cpu, address);
 }
 
 void write_word(struct CPU * cpu, uint16_t address, uint16_t value) {
@@ -115,13 +130,22 @@ void write_word(struct CPU * cpu, uint16_t address, uint16_t value) {
     write_byte(cpu, address, value & 0x00FF);
 }
 
+void store_word(struct CPU * cpu, uint16_t address, uint16_t value) {
+    store_byte(cpu, address + 1, (value & 0xFF00) >> 8);
+    store_byte(cpu, address, value & 0x00FF);    
+}
+
 uint16_t pop_word(struct CPU * cpu) {
-    uint16_t value = read_word(cpu, cpu->registers.sp);
-    cpu->registers.sp += 2;
+    uint16_t value = fetch_byte(cpu, cpu->registers.sp);
+    cpu->registers.sp++;
+    value |= (fetch_byte(cpu, cpu->registers.sp) << 8);
+    cpu->registers.sp++;
     return value;
 }
 
 void push_word(struct CPU * cpu, uint16_t value) {
-    cpu->registers.sp -= 2;
-    write_word(cpu, cpu->registers.sp, value);
+    cpu->registers.sp--;
+    store_byte(cpu, cpu->registers.sp, (value & 0xFF00) >> 8);
+    cpu->registers.sp--;
+    store_byte(cpu, cpu->registers.sp, (value & 0xFF));
 }

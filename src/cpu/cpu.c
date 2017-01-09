@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Sun Jan  8 22:58:36 2017 (+0100)
+ * Last-Updated: Mon Jan  9 19:26:06 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -35,15 +35,15 @@ void print_registers(struct CPU * cpu) {
     log_debug("IE : 0x%02x", cpu->memory.io[0xFF]);
     log_debug("TAC: 0x%02x", cpu->memory.io[0x07]);
     log_debug("TIM: 0x%02x", cpu->timer_tima);
-    log_debug("Clock : %d ticks", cpu->clock);
+    log_debug("Clock : %ld ticks", cpu->clock);
 }
 
 static inline uint16_t interpret_opcode(struct CPU * cpu, struct Instruction opcode) {
     uint16_t operand;
     if (opcode.operand == 1) {
-	operand = read_byte(cpu, cpu->registers.pc);
+	operand = fetch_byte(cpu, cpu->registers.pc);
     } else if (opcode.operand == 2) {
-	operand = read_word(cpu, cpu->registers.pc);
+	operand = fetch_word(cpu, cpu->registers.pc);
     }
 
     cpu->registers.pc += opcode.operand;
@@ -85,6 +85,14 @@ void cpu_destroy(struct CPU * cpu) {
     free(cpu->memory.zram);
 }
 
+void cpu_delay(struct CPU * cpu, int m_cycles) {
+    for (int i = 0; i < (4 * m_cycles); i++) {
+	dma_oam_handle(cpu);
+	gpu_next(cpu);
+	timer_step(cpu);
+    }
+}
+
 void cpu_next_instruction(struct CPU * cpu) {
     uint8_t op;
     uint16_t operand;
@@ -92,8 +100,7 @@ void cpu_next_instruction(struct CPU * cpu) {
     struct Instruction instruction;
     
     if (cpu->halted) {
-	cpu->time_last = 1;
-	cpu->clock += 1;
+	cpu_delay(cpu, 1);
     } else {
 	op = read_byte(cpu, cpu->registers.pc++);
 	instruction = instructions[op];
@@ -106,17 +113,18 @@ void cpu_next_instruction(struct CPU * cpu) {
 	} else {
 	    switch(instruction.operand) {
 	    case 0:
-		cpu->time_last = ((int (*)(struct CPU *))instruction.function)(cpu);
+		((void (*)(struct CPU *))instruction.function)(cpu);
 		break;
 	    case 1:
-		cpu->time_last = ((int (*)(struct CPU *, uint8_t))instruction.function)(cpu, (uint8_t)operand);
+		((void (*)(struct CPU *, uint8_t))instruction.function)(cpu, (uint8_t)operand);
 		break;
 	    case 2:
-		cpu->time_last = ((int (*)(struct CPU *, uint16_t))instruction.function)(cpu, operand);
+	        ((void (*)(struct CPU *, uint16_t))instruction.function)(cpu, operand);
 		break;
 	    }
-	    // printf("%s %d\n", instruction.disasm, cpu->time_last);
-	    timer_handle(cpu, cpu->time_last);
+
+	    cpu_delay(cpu, 1);
+	    treat_interruptions(cpu);
 	}
     }
 }

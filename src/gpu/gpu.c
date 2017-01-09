@@ -3,7 +3,7 @@
  * Filename: gpu.c
  * Author: Jules <archjules>
  * Created: Tue Dec 13 00:45:56 2016 (+0100)
- * Last-Updated: Mon Jan  9 10:01:26 2017 (+0100)
+ * Last-Updated: Mon Jan  9 19:05:54 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -21,6 +21,7 @@ static inline uint32_t get_color(int color) {
     case 1: return SCREEN_LGRAY;
     case 2: return SCREEN_DGRAY;
     case 3: return SCREEN_BLACK;
+    default: return 0;
     }
 }
 
@@ -73,11 +74,13 @@ static inline void change_current_line(struct CPU * cpu, int new_line) {
  * Execute a step for the GPU.
  */
 void gpu_next(struct CPU * cpu) {
-    cpu->gpu.clock += cpu->time_last;
+    if (cpu->gpu.lcd_off) return;
+    
+    cpu->gpu.clock++;
     
     switch(cpu->gpu.mode) {
     case 0: // Hblank
-	if (cpu->gpu.clock >= 51) {
+	if (cpu->gpu.clock >= 204) {
 	    gpu_render_line(cpu, cpu->gpu.current_line);
 	    
 	    if (cpu->gpu.current_line == 143) {
@@ -94,7 +97,7 @@ void gpu_next(struct CPU * cpu) {
 	}
 	break;
     case 1: // Vblank
-	if (cpu->gpu.clock >= 114) {
+	if (cpu->gpu.clock >= 456) {
 	    change_current_line(cpu, cpu->gpu.current_line + 1);
 	    if (cpu->gpu.current_line == 153) {
 		// Now that a frame is complete, we do all we have to do
@@ -107,14 +110,14 @@ void gpu_next(struct CPU * cpu) {
 	}
 	break;
     case 2: // Reading OAM
-	if (cpu->gpu.clock >= 20) {
+	if (cpu->gpu.clock >= 80) {
 	    cpu->gpu.clock = 0;
 	    cpu->gpu.mode = 3;
 	    gpu_stat_interrupt(cpu, cpu->gpu.mode1_enabled);
 	}
 	break;
     case 3: // Reading VRAM
-	if (cpu->gpu.clock >= 43) {
+	if (cpu->gpu.clock >= 172) {
 	    cpu->gpu.clock = 0;
 	    cpu->gpu.mode = 0;
 	    gpu_stat_interrupt(cpu, cpu->gpu.mode0_enabled);

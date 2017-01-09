@@ -3,7 +3,7 @@
  * Filename: cb.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 22:40:29 2016 (+0100)
- * Last-Updated: Sun Jan  8 19:00:51 2017 (+0100)
+ * Last-Updated: Mon Jan  9 19:31:55 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -21,7 +21,7 @@
  * Zero: set if * equals zero after the operation
  * Substract and Half-carry: Unset
  */
-static inline int gcb_sla(struct CPU * cpu, uint8_t * value) {
+static inline void gcb_sla(struct CPU * cpu, uint8_t * value) {
     FLAG_SETIF((*value) & 0x80, cpu->registers.f, CPU_FLAG_C);
 
     (*value) <<= 1;
@@ -29,22 +29,20 @@ static inline int gcb_sla(struct CPU * cpu, uint8_t * value) {
     FLAG_CLEARIF((*value), cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
-    return 2;
 }
 
-int cb_sla_a(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.a); }
-int cb_sla_b(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.b); }
-int cb_sla_c(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.c); }
-int cb_sla_d(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.d); }
-int cb_sla_e(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.e); }
-int cb_sla_h(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.h); }
-int cb_sla_l(struct CPU * cpu) { return gcb_sla(cpu, &cpu->registers.l); }
+void cb_sla_a(struct CPU * cpu) { gcb_sla(cpu, &cpu->registers.a); }
+void cb_sla_b(struct CPU * cpu) { gcb_sla(cpu, &cpu->registers.b); }
+void cb_sla_c(struct CPU * cpu) { gcb_sla(cpu, &cpu->registers.c); }
+void cb_sla_d(struct CPU * cpu) { gcb_sla(cpu, &cpu->registers.d); }
+void cb_sla_e(struct CPU * cpu) { gcb_sla(cpu, &cpu->registers.e); }
+void cb_sla_h(struct CPU * cpu) { gcb_sla(cpu, &cpu->registers.h); }
+void cb_sla_l(struct CPU * cpu) { gcb_sla(cpu, &cpu->registers.l); }
 
-int cb_sla_hl(struct CPU * cpu) {
-    uint8_t value = read_byte(cpu, cpu->registers.hl);
+void cb_sla_hl(struct CPU * cpu) {
+    uint8_t value = fetch_byte(cpu, cpu->registers.hl);
     gcb_sla(cpu, &value);
     write_byte(cpu, cpu->registers.hl, value);
-    return 4;
 }
 
 /*
@@ -55,7 +53,7 @@ int cb_sla_hl(struct CPU * cpu) {
  * Zero: Set if value == 0 after the operation
  * Substract and Half-carry: Unset 
  */
-static inline int gcb_sra(struct CPU * cpu, uint8_t * value) {
+static inline void gcb_sra(struct CPU * cpu, uint8_t * value) {
     FLAG_SETIF((*value) & 0x1, cpu->registers.f, CPU_FLAG_C);
 
     (*value) = ((*value) & 0x80) | ((*value) >> 1);
@@ -63,22 +61,20 @@ static inline int gcb_sra(struct CPU * cpu, uint8_t * value) {
     FLAG_CLEARIF((*value), cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
-    return 2;
 }
 
-int cb_sra_a(struct CPU * cpu) { return gcb_sra(cpu, &cpu->registers.a); }
-int cb_sra_b(struct CPU * cpu) { return gcb_sra(cpu, &cpu->registers.b); }
-int cb_sra_c(struct CPU * cpu) { return gcb_sra(cpu, &cpu->registers.c); }
-int cb_sra_d(struct CPU * cpu) { return gcb_sra(cpu, &cpu->registers.d); }
-int cb_sra_e(struct CPU * cpu) { return gcb_sra(cpu, &cpu->registers.e); }
-int cb_sra_h(struct CPU * cpu) { return gcb_sra(cpu, &cpu->registers.h); }
-int cb_sra_l(struct CPU * cpu) { return gcb_sra(cpu, &cpu->registers.l); }
+void cb_sra_a(struct CPU * cpu) { gcb_sra(cpu, &cpu->registers.a); }
+void cb_sra_b(struct CPU * cpu) { gcb_sra(cpu, &cpu->registers.b); }
+void cb_sra_c(struct CPU * cpu) { gcb_sra(cpu, &cpu->registers.c); }
+void cb_sra_d(struct CPU * cpu) { gcb_sra(cpu, &cpu->registers.d); }
+void cb_sra_e(struct CPU * cpu) { gcb_sra(cpu, &cpu->registers.e); }
+void cb_sra_h(struct CPU * cpu) { gcb_sra(cpu, &cpu->registers.h); }
+void cb_sra_l(struct CPU * cpu) { gcb_sra(cpu, &cpu->registers.l); }
 
-int cb_sra_hl(struct CPU * cpu) {
-    uint8_t value = read_byte(cpu, cpu->registers.hl);
+void cb_sra_hl(struct CPU * cpu) {
+    uint8_t value = fetch_byte(cpu, cpu->registers.hl);
     gcb_sra(cpu, &value);
     write_byte(cpu, cpu->registers.hl, value);
-    return 4;
 }
 
 /*
@@ -89,30 +85,28 @@ int cb_sra_hl(struct CPU * cpu) {
  * Zero: Set if value == 0 after the operation
  * Substract and Half-carry: Unset
  */
-static inline int gcb_srl(struct CPU * cpu, uint8_t * value) {
+static inline void gcb_srl(struct CPU * cpu, uint8_t * value) {
     FLAG_SETIF((*value) & 0x01, cpu->registers.f, CPU_FLAG_C);
     (*value) >>= 1;
 
     FLAG_CLEARIF((*value), cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
-    return 2;
 }
 
-int cb_srl_a(struct CPU * cpu) { return gcb_srl(cpu, &cpu->registers.a); }
-int cb_srl_b(struct CPU * cpu) { return gcb_srl(cpu, &cpu->registers.b); }
-int cb_srl_c(struct CPU * cpu) { return gcb_srl(cpu, &cpu->registers.c); }
-int cb_srl_d(struct CPU * cpu) { return gcb_srl(cpu, &cpu->registers.d); }
-int cb_srl_e(struct CPU * cpu) { return gcb_srl(cpu, &cpu->registers.e); }
-int cb_srl_h(struct CPU * cpu) { return gcb_srl(cpu, &cpu->registers.h); }
-int cb_srl_l(struct CPU * cpu) { return gcb_srl(cpu, &cpu->registers.l); }
+void cb_srl_a(struct CPU * cpu) { gcb_srl(cpu, &cpu->registers.a); }
+void cb_srl_b(struct CPU * cpu) { gcb_srl(cpu, &cpu->registers.b); }
+void cb_srl_c(struct CPU * cpu) { gcb_srl(cpu, &cpu->registers.c); }
+void cb_srl_d(struct CPU * cpu) { gcb_srl(cpu, &cpu->registers.d); }
+void cb_srl_e(struct CPU * cpu) { gcb_srl(cpu, &cpu->registers.e); }
+void cb_srl_h(struct CPU * cpu) { gcb_srl(cpu, &cpu->registers.h); }
+void cb_srl_l(struct CPU * cpu) { gcb_srl(cpu, &cpu->registers.l); }
 
 
-int cb_srl_hl(struct CPU * cpu) {
-    uint8_t value = read_byte(cpu, cpu->registers.hl);
+void cb_srl_hl(struct CPU * cpu) {
+    uint8_t value = fetch_byte(cpu, cpu->registers.hl);
     gcb_srl(cpu, &value);
     write_byte(cpu, cpu->registers.hl, value);
-    return 4;
 }
 
 /*
@@ -122,29 +116,27 @@ int cb_srl_hl(struct CPU * cpu) {
  * Zero: Set if value == 0
  * Carry, Substract and Half-carry: Unset
  */
-static inline int gcb_swap(struct CPU * cpu, uint8_t * value) {
+static inline void gcb_swap(struct CPU * cpu, uint8_t * value) {
     FLAG_CLEARIF(*value, cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_C);
 
     (*value) = (((*value) & 0x0F) << 4) | (((*value) & 0xF0) >> 4);
-    return 2;
 }
 
-int cb_swap_a(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.a); }
-int cb_swap_b(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.b); }
-int cb_swap_c(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.c); }
-int cb_swap_d(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.d); }
-int cb_swap_e(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.e); }
-int cb_swap_h(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.h); }
-int cb_swap_l(struct CPU * cpu) { return gcb_swap(cpu, &cpu->registers.l); }
+void cb_swap_a(struct CPU * cpu) { gcb_swap(cpu, &cpu->registers.a); }
+void cb_swap_b(struct CPU * cpu) { gcb_swap(cpu, &cpu->registers.b); }
+void cb_swap_c(struct CPU * cpu) { gcb_swap(cpu, &cpu->registers.c); }
+void cb_swap_d(struct CPU * cpu) { gcb_swap(cpu, &cpu->registers.d); }
+void cb_swap_e(struct CPU * cpu) { gcb_swap(cpu, &cpu->registers.e); }
+void cb_swap_h(struct CPU * cpu) { gcb_swap(cpu, &cpu->registers.h); }
+void cb_swap_l(struct CPU * cpu) { gcb_swap(cpu, &cpu->registers.l); }
 
-int cb_swap_hl(struct CPU * cpu) {
-    uint8_t value = read_byte(cpu, cpu->registers.hl);
+void cb_swap_hl(struct CPU * cpu) {
+    uint8_t value = fetch_byte(cpu, cpu->registers.hl);
     gcb_swap(cpu, &value);
     write_byte(cpu, cpu->registers.hl, value);
-    return 4;
 }
 
 /*
@@ -155,82 +147,80 @@ int cb_swap_hl(struct CPU * cpu) {
  * Substract and Half-carry: Unset
  * Carry: Untouched
  */
-static inline int gcb_bit(struct CPU * cpu, uint8_t value, uint8_t bit) {
+static inline void gcb_bit(struct CPU * cpu, uint8_t value, uint8_t bit) {
     FLAG_CLEARIF(value & (1 << bit), cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_SET(cpu->registers.f, CPU_FLAG_H);
-    return 2;
 }
 
-static inline int gcb_bit_hl(struct CPU * cpu, uint8_t bit) {
-    gcb_bit(cpu, read_byte(cpu, cpu->registers.hl), bit);
-    return 3;
+static inline void gcb_bit_hl(struct CPU * cpu, uint8_t bit) {
+    gcb_bit(cpu, fetch_byte(cpu, cpu->registers.hl), bit);
 }
 
-int cb_bit_0_b(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.b, 0); }
-int cb_bit_0_c(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.c, 0); }
-int cb_bit_0_d(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.d, 0); }
-int cb_bit_0_e(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.e, 0); }
-int cb_bit_0_h(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.h, 0); }
-int cb_bit_0_l(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.l, 0); }
-int cb_bit_0_hl(struct CPU * cpu){ return gcb_bit_hl(cpu, 0); }
-int cb_bit_0_a(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.a, 0); }
-int cb_bit_1_b(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.b, 1); }
-int cb_bit_1_c(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.c, 1); }
-int cb_bit_1_d(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.d, 1); }
-int cb_bit_1_e(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.e, 1); }
-int cb_bit_1_h(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.h, 1); }
-int cb_bit_1_l(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.l, 1); }
-int cb_bit_1_hl(struct CPU * cpu){ return gcb_bit_hl(cpu, 1); }
-int cb_bit_1_a(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.a, 1); }
-int cb_bit_2_b(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.b, 2); }
-int cb_bit_2_c(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.c, 2); }
-int cb_bit_2_d(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.d, 2); }
-int cb_bit_2_e(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.e, 2); }
-int cb_bit_2_h(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.h, 2); }
-int cb_bit_2_l(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.l, 2); }
-int cb_bit_2_hl(struct CPU * cpu){ return gcb_bit_hl(cpu, 2); }
-int cb_bit_2_a(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.a, 2); }
-int cb_bit_3_b(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.b, 3); }
-int cb_bit_3_c(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.c, 3); }
-int cb_bit_3_d(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.d, 3); }
-int cb_bit_3_e(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.e, 3); }
-int cb_bit_3_h(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.h, 3); }
-int cb_bit_3_l(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.l, 3); }
-int cb_bit_3_hl(struct CPU * cpu){ return gcb_bit_hl(cpu, 3); }
-int cb_bit_3_a(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.a, 3); }
-int cb_bit_4_b(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.b, 4); }
-int cb_bit_4_c(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.c, 4); }
-int cb_bit_4_d(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.d, 4); }
-int cb_bit_4_e(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.e, 4); }
-int cb_bit_4_h(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.h, 4); }
-int cb_bit_4_l(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.l, 4); }
-int cb_bit_4_hl(struct CPU * cpu){ return gcb_bit_hl(cpu, 4); }
-int cb_bit_4_a(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.a, 4); }
-int cb_bit_5_b(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.b, 5); }
-int cb_bit_5_c(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.c, 5); }
-int cb_bit_5_d(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.d, 5); }
-int cb_bit_5_e(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.e, 5); }
-int cb_bit_5_h(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.h, 5); }
-int cb_bit_5_l(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.l, 5); }
-int cb_bit_5_hl(struct CPU * cpu){ return gcb_bit_hl(cpu, 5); }
-int cb_bit_5_a(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.a, 5); }
-int cb_bit_6_b(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.b, 6); }
-int cb_bit_6_c(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.c, 6); }
-int cb_bit_6_d(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.d, 6); }
-int cb_bit_6_e(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.e, 6); }
-int cb_bit_6_h(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.h, 6); }
-int cb_bit_6_l(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.l, 6); }
-int cb_bit_6_hl(struct CPU * cpu){ return gcb_bit_hl(cpu, 6); }
-int cb_bit_6_a(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.a, 6); }
-int cb_bit_7_b(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.b, 7); }
-int cb_bit_7_c(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.c, 7); }
-int cb_bit_7_d(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.d, 7); }
-int cb_bit_7_e(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.e, 7); }
-int cb_bit_7_h(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.h, 7); }
-int cb_bit_7_l(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.l, 7); }
-int cb_bit_7_hl(struct CPU * cpu){ return gcb_bit_hl(cpu, 7); }
-int cb_bit_7_a(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.a, 7); }
+void cb_bit_0_b(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.b, 0); }
+void cb_bit_0_c(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.c, 0); }
+void cb_bit_0_d(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.d, 0); }
+void cb_bit_0_e(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.e, 0); }
+void cb_bit_0_h(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.h, 0); }
+void cb_bit_0_l(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.l, 0); }
+void cb_bit_0_hl(struct CPU * cpu){ gcb_bit_hl(cpu, 0); }
+void cb_bit_0_a(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.a, 0); }
+void cb_bit_1_b(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.b, 1); }
+void cb_bit_1_c(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.c, 1); }
+void cb_bit_1_d(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.d, 1); }
+void cb_bit_1_e(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.e, 1); }
+void cb_bit_1_h(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.h, 1); }
+void cb_bit_1_l(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.l, 1); }
+void cb_bit_1_hl(struct CPU * cpu){ gcb_bit_hl(cpu, 1); }
+void cb_bit_1_a(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.a, 1); }
+void cb_bit_2_b(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.b, 2); }
+void cb_bit_2_c(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.c, 2); }
+void cb_bit_2_d(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.d, 2); }
+void cb_bit_2_e(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.e, 2); }
+void cb_bit_2_h(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.h, 2); }
+void cb_bit_2_l(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.l, 2); }
+void cb_bit_2_hl(struct CPU * cpu){ gcb_bit_hl(cpu, 2); }
+void cb_bit_2_a(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.a, 2); }
+void cb_bit_3_b(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.b, 3); }
+void cb_bit_3_c(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.c, 3); }
+void cb_bit_3_d(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.d, 3); }
+void cb_bit_3_e(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.e, 3); }
+void cb_bit_3_h(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.h, 3); }
+void cb_bit_3_l(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.l, 3); }
+void cb_bit_3_hl(struct CPU * cpu){ gcb_bit_hl(cpu, 3); }
+void cb_bit_3_a(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.a, 3); }
+void cb_bit_4_b(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.b, 4); }
+void cb_bit_4_c(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.c, 4); }
+void cb_bit_4_d(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.d, 4); }
+void cb_bit_4_e(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.e, 4); }
+void cb_bit_4_h(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.h, 4); }
+void cb_bit_4_l(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.l, 4); }
+void cb_bit_4_hl(struct CPU * cpu){ gcb_bit_hl(cpu, 4); }
+void cb_bit_4_a(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.a, 4); }
+void cb_bit_5_b(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.b, 5); }
+void cb_bit_5_c(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.c, 5); }
+void cb_bit_5_d(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.d, 5); }
+void cb_bit_5_e(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.e, 5); }
+void cb_bit_5_h(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.h, 5); }
+void cb_bit_5_l(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.l, 5); }
+void cb_bit_5_hl(struct CPU * cpu){ gcb_bit_hl(cpu, 5); }
+void cb_bit_5_a(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.a, 5); }
+void cb_bit_6_b(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.b, 6); }
+void cb_bit_6_c(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.c, 6); }
+void cb_bit_6_d(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.d, 6); }
+void cb_bit_6_e(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.e, 6); }
+void cb_bit_6_h(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.h, 6); }
+void cb_bit_6_l(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.l, 6); }
+void cb_bit_6_hl(struct CPU * cpu){ gcb_bit_hl(cpu, 6); }
+void cb_bit_6_a(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.a, 6); }
+void cb_bit_7_b(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.b, 7); }
+void cb_bit_7_c(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.c, 7); }
+void cb_bit_7_d(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.d, 7); }
+void cb_bit_7_e(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.e, 7); }
+void cb_bit_7_h(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.h, 7); }
+void cb_bit_7_l(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.l, 7); }
+void cb_bit_7_hl(struct CPU * cpu){ gcb_bit_hl(cpu, 7); }
+void cb_bit_7_a(struct CPU * cpu) { gcb_bit(cpu, cpu->registers.a, 7); }
 
 /*
  * cb_res_*_*:
@@ -238,81 +228,79 @@ int cb_bit_7_a(struct CPU * cpu) { return gcb_bit(cpu, cpu->registers.a, 7); }
  * 
  * All flags are untouched.
  */
-static inline int gcb_res(struct CPU * cpu, uint8_t * value, uint8_t bit) {
+static inline void gcb_res(struct CPU * cpu, uint8_t * value, uint8_t bit) {
     (*value) &= ~(1 << bit);
-    return 2;
 }
 
-static inline int gcb_res_hl(struct CPU * cpu, uint8_t bit) {
-    uint8_t value = read_byte(cpu, cpu->registers.hl) & ~(1 << bit);
+static inline void gcb_res_hl(struct CPU * cpu, uint8_t bit) {
+    uint8_t value = fetch_byte(cpu, cpu->registers.hl) & ~(1 << bit);
     write_byte(cpu, cpu->registers.hl, value);
-    return 3;
 }
 
-int cb_res_0_b(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.b, 0); }
-int cb_res_0_c(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.c, 0); }
-int cb_res_0_d(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.d, 0); }
-int cb_res_0_e(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.e, 0); }
-int cb_res_0_h(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.h, 0); }
-int cb_res_0_l(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.l, 0); }
-int cb_res_0_hl(struct CPU * cpu){ return gcb_res_hl(cpu, 0); }
-int cb_res_0_a(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.a, 0); }
-int cb_res_1_b(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.b, 1); }
-int cb_res_1_c(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.c, 1); }
-int cb_res_1_d(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.d, 1); }
-int cb_res_1_e(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.e, 1); }
-int cb_res_1_h(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.h, 1); }
-int cb_res_1_l(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.l, 1); }
-int cb_res_1_hl(struct CPU * cpu){ return gcb_res_hl(cpu, 1); }
-int cb_res_1_a(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.a, 1); }
-int cb_res_2_b(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.b, 2); }
-int cb_res_2_c(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.c, 2); }
-int cb_res_2_d(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.d, 2); }
-int cb_res_2_e(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.e, 2); }
-int cb_res_2_h(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.h, 2); }
-int cb_res_2_l(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.l, 2); }
-int cb_res_2_hl(struct CPU * cpu){ return gcb_res_hl(cpu, 2); }
-int cb_res_2_a(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.a, 2); }
-int cb_res_3_b(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.b, 3); }
-int cb_res_3_c(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.c, 3); }
-int cb_res_3_d(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.d, 3); }
-int cb_res_3_e(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.e, 3); }
-int cb_res_3_h(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.h, 3); }
-int cb_res_3_l(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.l, 3); }
-int cb_res_3_hl(struct CPU * cpu){ return gcb_res_hl(cpu, 3); }
-int cb_res_3_a(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.a, 3); }
-int cb_res_4_b(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.b, 4); }
-int cb_res_4_c(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.c, 4); }
-int cb_res_4_d(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.d, 4); }
-int cb_res_4_e(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.e, 4); }
-int cb_res_4_h(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.h, 4); }
-int cb_res_4_l(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.l, 4); }
-int cb_res_4_hl(struct CPU * cpu){ return gcb_res_hl(cpu, 4); }
-int cb_res_4_a(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.a, 4); }
-int cb_res_5_b(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.b, 5); }
-int cb_res_5_c(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.c, 5); }
-int cb_res_5_d(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.d, 5); }
-int cb_res_5_e(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.e, 5); }
-int cb_res_5_h(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.h, 5); }
-int cb_res_5_l(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.l, 5); }
-int cb_res_5_hl(struct CPU * cpu){ return gcb_res_hl(cpu, 5); }
-int cb_res_5_a(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.a, 5); }
-int cb_res_6_b(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.b, 6); }
-int cb_res_6_c(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.c, 6); }
-int cb_res_6_d(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.d, 6); }
-int cb_res_6_e(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.e, 6); }
-int cb_res_6_h(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.h, 6); }
-int cb_res_6_l(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.l, 6); }
-int cb_res_6_hl(struct CPU * cpu){ return gcb_res_hl(cpu, 6); }
-int cb_res_6_a(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.a, 6); }
-int cb_res_7_b(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.b, 7); }
-int cb_res_7_c(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.c, 7); }
-int cb_res_7_d(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.d, 7); }
-int cb_res_7_e(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.e, 7); }
-int cb_res_7_h(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.h, 7); }
-int cb_res_7_l(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.l, 7); }
-int cb_res_7_hl(struct CPU * cpu){ return gcb_res_hl(cpu, 7); }
-int cb_res_7_a(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.a, 7); }
+void cb_res_0_b(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.b, 0); }
+void cb_res_0_c(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.c, 0); }
+void cb_res_0_d(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.d, 0); }
+void cb_res_0_e(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.e, 0); }
+void cb_res_0_h(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.h, 0); }
+void cb_res_0_l(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.l, 0); }
+void cb_res_0_hl(struct CPU * cpu){ gcb_res_hl(cpu, 0); }
+void cb_res_0_a(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.a, 0); }
+void cb_res_1_b(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.b, 1); }
+void cb_res_1_c(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.c, 1); }
+void cb_res_1_d(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.d, 1); }
+void cb_res_1_e(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.e, 1); }
+void cb_res_1_h(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.h, 1); }
+void cb_res_1_l(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.l, 1); }
+void cb_res_1_hl(struct CPU * cpu){ gcb_res_hl(cpu, 1); }
+void cb_res_1_a(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.a, 1); }
+void cb_res_2_b(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.b, 2); }
+void cb_res_2_c(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.c, 2); }
+void cb_res_2_d(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.d, 2); }
+void cb_res_2_e(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.e, 2); }
+void cb_res_2_h(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.h, 2); }
+void cb_res_2_l(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.l, 2); }
+void cb_res_2_hl(struct CPU * cpu){ gcb_res_hl(cpu, 2); }
+void cb_res_2_a(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.a, 2); }
+void cb_res_3_b(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.b, 3); }
+void cb_res_3_c(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.c, 3); }
+void cb_res_3_d(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.d, 3); }
+void cb_res_3_e(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.e, 3); }
+void cb_res_3_h(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.h, 3); }
+void cb_res_3_l(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.l, 3); }
+void cb_res_3_hl(struct CPU * cpu){ gcb_res_hl(cpu, 3); }
+void cb_res_3_a(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.a, 3); }
+void cb_res_4_b(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.b, 4); }
+void cb_res_4_c(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.c, 4); }
+void cb_res_4_d(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.d, 4); }
+void cb_res_4_e(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.e, 4); }
+void cb_res_4_h(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.h, 4); }
+void cb_res_4_l(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.l, 4); }
+void cb_res_4_hl(struct CPU * cpu){ gcb_res_hl(cpu, 4); }
+void cb_res_4_a(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.a, 4); }
+void cb_res_5_b(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.b, 5); }
+void cb_res_5_c(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.c, 5); }
+void cb_res_5_d(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.d, 5); }
+void cb_res_5_e(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.e, 5); }
+void cb_res_5_h(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.h, 5); }
+void cb_res_5_l(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.l, 5); }
+void cb_res_5_hl(struct CPU * cpu){ gcb_res_hl(cpu, 5); }
+void cb_res_5_a(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.a, 5); }
+void cb_res_6_b(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.b, 6); }
+void cb_res_6_c(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.c, 6); }
+void cb_res_6_d(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.d, 6); }
+void cb_res_6_e(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.e, 6); }
+void cb_res_6_h(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.h, 6); }
+void cb_res_6_l(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.l, 6); }
+void cb_res_6_hl(struct CPU * cpu){ gcb_res_hl(cpu, 6); }
+void cb_res_6_a(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.a, 6); }
+void cb_res_7_b(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.b, 7); }
+void cb_res_7_c(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.c, 7); }
+void cb_res_7_d(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.d, 7); }
+void cb_res_7_e(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.e, 7); }
+void cb_res_7_h(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.h, 7); }
+void cb_res_7_l(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.l, 7); }
+void cb_res_7_hl(struct CPU * cpu){ gcb_res_hl(cpu, 7); }
+void cb_res_7_a(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.a, 7); }
 
 /*
  * cb_set_*_*:
@@ -320,81 +308,79 @@ int cb_res_7_a(struct CPU * cpu) { return gcb_res(cpu, &cpu->registers.a, 7); }
  *
  * All flags are untouched.
  */
-static inline int gcb_set(struct CPU * cpu, uint8_t * value, uint8_t bit) {
+static inline void gcb_set(struct CPU * cpu, uint8_t * value, uint8_t bit) {
     (*value) |= (1 << bit);
-    return 2;
 }
 
-static inline int gcb_set_hl(struct CPU * cpu, uint8_t bit) {
-    uint8_t value = read_byte(cpu, cpu->registers.hl) | (1 << bit);
-    write_byte(cpu, cpu->registers.hl, value);
-    return 3;
+static inline void gcb_set_hl(struct CPU * cpu, uint8_t bit) {
+    uint8_t value = fetch_byte(cpu, cpu->registers.hl) | (1 << bit);
+    store_byte(cpu, cpu->registers.hl, value);
 }
 
-int cb_set_0_b(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.b, 0); }
-int cb_set_0_c(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.c, 0); }
-int cb_set_0_d(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.d, 0); }
-int cb_set_0_e(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.e, 0); }
-int cb_set_0_h(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.h, 0); }
-int cb_set_0_l(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.l, 0); }
-int cb_set_0_hl(struct CPU * cpu){ return gcb_set_hl(cpu, 0); }
-int cb_set_0_a(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.a, 0); }
-int cb_set_1_b(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.b, 1); }
-int cb_set_1_c(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.c, 1); }
-int cb_set_1_d(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.d, 1); }
-int cb_set_1_e(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.e, 1); }
-int cb_set_1_h(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.h, 1); }
-int cb_set_1_l(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.l, 1); }
-int cb_set_1_hl(struct CPU * cpu){ return gcb_set_hl(cpu, 1); }
-int cb_set_1_a(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.a, 1); }
-int cb_set_2_b(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.b, 2); }
-int cb_set_2_c(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.c, 2); }
-int cb_set_2_d(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.d, 2); }
-int cb_set_2_e(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.e, 2); }
-int cb_set_2_h(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.h, 2); }
-int cb_set_2_l(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.l, 2); }
-int cb_set_2_hl(struct CPU * cpu){ return gcb_set_hl(cpu, 2); }
-int cb_set_2_a(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.a, 2); }
-int cb_set_3_b(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.b, 3); }
-int cb_set_3_c(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.c, 3); }
-int cb_set_3_d(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.d, 3); }
-int cb_set_3_e(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.e, 3); }
-int cb_set_3_h(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.h, 3); }
-int cb_set_3_l(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.l, 3); }
-int cb_set_3_hl(struct CPU * cpu){ return gcb_set_hl(cpu, 3); }
-int cb_set_3_a(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.a, 3); }
-int cb_set_4_b(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.b, 4); }
-int cb_set_4_c(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.c, 4); }
-int cb_set_4_d(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.d, 4); }
-int cb_set_4_e(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.e, 4); }
-int cb_set_4_h(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.h, 4); }
-int cb_set_4_l(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.l, 4); }
-int cb_set_4_hl(struct CPU * cpu){ return gcb_set_hl(cpu, 4); }
-int cb_set_4_a(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.a, 4); }
-int cb_set_5_b(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.b, 5); }
-int cb_set_5_c(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.c, 5); }
-int cb_set_5_d(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.d, 5); }
-int cb_set_5_e(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.e, 5); }
-int cb_set_5_h(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.h, 5); }
-int cb_set_5_l(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.l, 5); }
-int cb_set_5_hl(struct CPU * cpu){ return gcb_set_hl(cpu, 5); }
-int cb_set_5_a(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.a, 5); }
-int cb_set_6_b(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.b, 6); }
-int cb_set_6_c(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.c, 6); }
-int cb_set_6_d(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.d, 6); }
-int cb_set_6_e(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.e, 6); }
-int cb_set_6_h(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.h, 6); }
-int cb_set_6_l(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.l, 6); }
-int cb_set_6_hl(struct CPU * cpu){ return gcb_set_hl(cpu, 6); }
-int cb_set_6_a(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.a, 6); }
-int cb_set_7_b(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.b, 7); }
-int cb_set_7_c(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.c, 7); }
-int cb_set_7_d(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.d, 7); }
-int cb_set_7_e(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.e, 7); }
-int cb_set_7_h(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.h, 7); }
-int cb_set_7_l(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.l, 7); }
-int cb_set_7_hl(struct CPU * cpu){ return gcb_set_hl(cpu, 7); }
-int cb_set_7_a(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.a, 7); }
+void cb_set_0_b(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.b, 0); }
+void cb_set_0_c(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.c, 0); }
+void cb_set_0_d(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.d, 0); }
+void cb_set_0_e(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.e, 0); }
+void cb_set_0_h(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.h, 0); }
+void cb_set_0_l(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.l, 0); }
+void cb_set_0_hl(struct CPU * cpu){ gcb_set_hl(cpu, 0); }
+void cb_set_0_a(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.a, 0); }
+void cb_set_1_b(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.b, 1); }
+void cb_set_1_c(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.c, 1); }
+void cb_set_1_d(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.d, 1); }
+void cb_set_1_e(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.e, 1); }
+void cb_set_1_h(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.h, 1); }
+void cb_set_1_l(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.l, 1); }
+void cb_set_1_hl(struct CPU * cpu){ gcb_set_hl(cpu, 1); }
+void cb_set_1_a(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.a, 1); }
+void cb_set_2_b(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.b, 2); }
+void cb_set_2_c(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.c, 2); }
+void cb_set_2_d(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.d, 2); }
+void cb_set_2_e(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.e, 2); }
+void cb_set_2_h(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.h, 2); }
+void cb_set_2_l(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.l, 2); }
+void cb_set_2_hl(struct CPU * cpu){ gcb_set_hl(cpu, 2); }
+void cb_set_2_a(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.a, 2); }
+void cb_set_3_b(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.b, 3); }
+void cb_set_3_c(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.c, 3); }
+void cb_set_3_d(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.d, 3); }
+void cb_set_3_e(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.e, 3); }
+void cb_set_3_h(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.h, 3); }
+void cb_set_3_l(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.l, 3); }
+void cb_set_3_hl(struct CPU * cpu){ gcb_set_hl(cpu, 3); }
+void cb_set_3_a(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.a, 3); }
+void cb_set_4_b(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.b, 4); }
+void cb_set_4_c(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.c, 4); }
+void cb_set_4_d(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.d, 4); }
+void cb_set_4_e(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.e, 4); }
+void cb_set_4_h(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.h, 4); }
+void cb_set_4_l(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.l, 4); }
+void cb_set_4_hl(struct CPU * cpu){ gcb_set_hl(cpu, 4); }
+void cb_set_4_a(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.a, 4); }
+void cb_set_5_b(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.b, 5); }
+void cb_set_5_c(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.c, 5); }
+void cb_set_5_d(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.d, 5); }
+void cb_set_5_e(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.e, 5); }
+void cb_set_5_h(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.h, 5); }
+void cb_set_5_l(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.l, 5); }
+void cb_set_5_hl(struct CPU * cpu){ gcb_set_hl(cpu, 5); }
+void cb_set_5_a(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.a, 5); }
+void cb_set_6_b(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.b, 6); }
+void cb_set_6_c(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.c, 6); }
+void cb_set_6_d(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.d, 6); }
+void cb_set_6_e(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.e, 6); }
+void cb_set_6_h(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.h, 6); }
+void cb_set_6_l(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.l, 6); }
+void cb_set_6_hl(struct CPU * cpu){ gcb_set_hl(cpu, 6); }
+void cb_set_6_a(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.a, 6); }
+void cb_set_7_b(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.b, 7); }
+void cb_set_7_c(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.c, 7); }
+void cb_set_7_d(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.d, 7); }
+void cb_set_7_e(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.e, 7); }
+void cb_set_7_h(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.h, 7); }
+void cb_set_7_l(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.l, 7); }
+void cb_set_7_hl(struct CPU * cpu){ gcb_set_hl(cpu, 7); }
+void cb_set_7_a(struct CPU * cpu) { gcb_set(cpu, &cpu->registers.a, 7); }
 
 /*
  * cb_rr_*:
@@ -404,7 +390,7 @@ int cb_set_7_a(struct CPU * cpu) { return gcb_set(cpu, &cpu->registers.a, 7); }
  * Zero: Set if value == 0 after operation
  * Substract and Half-carry: Unset
  */
-static inline int gcb_rr(struct CPU * cpu, uint8_t * value) {
+static inline void gcb_rr(struct CPU * cpu, uint8_t * value) {
     int carry = (cpu->registers.f & CPU_FLAG_C) != 0;
     FLAG_SETIF((*value) & 0x01, cpu->registers.f, CPU_FLAG_C);
     
@@ -413,23 +399,20 @@ static inline int gcb_rr(struct CPU * cpu, uint8_t * value) {
     FLAG_CLEARIF((*value), cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
-    
-    return 2;
 }
 
-int cb_rr_a(struct CPU * cpu) { return gcb_rr(cpu, &cpu->registers.a); }
-int cb_rr_b(struct CPU * cpu) { return gcb_rr(cpu, &cpu->registers.b); }
-int cb_rr_c(struct CPU * cpu) { return gcb_rr(cpu, &cpu->registers.c); }
-int cb_rr_d(struct CPU * cpu) { return gcb_rr(cpu, &cpu->registers.d); }
-int cb_rr_e(struct CPU * cpu) { return gcb_rr(cpu, &cpu->registers.e); }
-int cb_rr_h(struct CPU * cpu) { return gcb_rr(cpu, &cpu->registers.h); }
-int cb_rr_l(struct CPU * cpu) { return gcb_rr(cpu, &cpu->registers.l); }
+void cb_rr_a(struct CPU * cpu) { gcb_rr(cpu, &cpu->registers.a); }
+void cb_rr_b(struct CPU * cpu) { gcb_rr(cpu, &cpu->registers.b); }
+void cb_rr_c(struct CPU * cpu) { gcb_rr(cpu, &cpu->registers.c); }
+void cb_rr_d(struct CPU * cpu) { gcb_rr(cpu, &cpu->registers.d); }
+void cb_rr_e(struct CPU * cpu) { gcb_rr(cpu, &cpu->registers.e); }
+void cb_rr_h(struct CPU * cpu) { gcb_rr(cpu, &cpu->registers.h); }
+void cb_rr_l(struct CPU * cpu) { gcb_rr(cpu, &cpu->registers.l); }
 
-int cb_rr_hl(struct CPU * cpu) {
-    uint8_t value = read_byte(cpu, cpu->registers.hl);
+void cb_rr_hl(struct CPU * cpu) {
+    uint8_t value = fetch_byte(cpu, cpu->registers.hl);
     gcb_rr(cpu, &value);
     write_byte(cpu, cpu->registers.hl, value);
-    return 4;
 }
 
 /*
@@ -440,30 +423,27 @@ int cb_rr_hl(struct CPU * cpu) {
  * Zero: Set if value == 0 after the operation
  * Substract Half-carry: Unset
  */
-static inline int gcb_rrc(struct CPU * cpu, uint8_t * value) {
+static inline void gcb_rrc(struct CPU * cpu, uint8_t * value) {
     (*value) = ((*value) >> 1) | ((*value) << 7);
 
     FLAG_CLEARIF(*value, cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
     FLAG_SETIF((*value) & 0x80, cpu->registers.f, CPU_FLAG_C);
-
-    return 2;
 }
 
-int cb_rrc_a(struct CPU * cpu) { return gcb_rrc(cpu, &cpu->registers.a); }
-int cb_rrc_b(struct CPU * cpu) { return gcb_rrc(cpu, &cpu->registers.b); }
-int cb_rrc_c(struct CPU * cpu) { return gcb_rrc(cpu, &cpu->registers.c); }
-int cb_rrc_d(struct CPU * cpu) { return gcb_rrc(cpu, &cpu->registers.d); }
-int cb_rrc_e(struct CPU * cpu) { return gcb_rrc(cpu, &cpu->registers.e); }
-int cb_rrc_h(struct CPU * cpu) { return gcb_rrc(cpu, &cpu->registers.h); }
-int cb_rrc_l(struct CPU * cpu) { return gcb_rrc(cpu, &cpu->registers.l); }
+void cb_rrc_a(struct CPU * cpu) { gcb_rrc(cpu, &cpu->registers.a); }
+void cb_rrc_b(struct CPU * cpu) { gcb_rrc(cpu, &cpu->registers.b); }
+void cb_rrc_c(struct CPU * cpu) { gcb_rrc(cpu, &cpu->registers.c); }
+void cb_rrc_d(struct CPU * cpu) { gcb_rrc(cpu, &cpu->registers.d); }
+void cb_rrc_e(struct CPU * cpu) { gcb_rrc(cpu, &cpu->registers.e); }
+void cb_rrc_h(struct CPU * cpu) { gcb_rrc(cpu, &cpu->registers.h); }
+void cb_rrc_l(struct CPU * cpu) { gcb_rrc(cpu, &cpu->registers.l); }
 
-int cb_rrc_hl(struct CPU * cpu) {
-    uint8_t value = read_byte(cpu, cpu->registers.hl);
+void cb_rrc_hl(struct CPU * cpu) {
+    uint8_t value = fetch_byte(cpu, cpu->registers.hl);
     gcb_rrc(cpu, &value);
     write_byte(cpu, cpu->registers.hl, value);
-    return 4;
 }
 
 /*
@@ -474,7 +454,7 @@ int cb_rrc_hl(struct CPU * cpu) {
  * Zero: Set if value == 0 after the operation
  * Substract and Half-carry: Unset
  */
-static inline int gcb_rl(struct CPU * cpu, uint8_t * value) {
+static inline void gcb_rl(struct CPU * cpu, uint8_t * value) {
     uint8_t ocarry = (cpu->registers.f & CPU_FLAG_C) != 0;
     FLAG_SETIF((*value) & 0x80, cpu->registers.f, CPU_FLAG_C);
     
@@ -483,23 +463,20 @@ static inline int gcb_rl(struct CPU * cpu, uint8_t * value) {
     FLAG_CLEARIF((*value), cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
-    
-    return 2;
 }
 
-int cb_rl_a(struct CPU * cpu) { return gcb_rl(cpu, &cpu->registers.a); }
-int cb_rl_b(struct CPU * cpu) { return gcb_rl(cpu, &cpu->registers.b); }
-int cb_rl_c(struct CPU * cpu) { return gcb_rl(cpu, &cpu->registers.c); }
-int cb_rl_d(struct CPU * cpu) { return gcb_rl(cpu, &cpu->registers.d); }
-int cb_rl_e(struct CPU * cpu) { return gcb_rl(cpu, &cpu->registers.e); }
-int cb_rl_h(struct CPU * cpu) { return gcb_rl(cpu, &cpu->registers.h); }
-int cb_rl_l(struct CPU * cpu) { return gcb_rl(cpu, &cpu->registers.l); }
+void cb_rl_a(struct CPU * cpu) { gcb_rl(cpu, &cpu->registers.a); }
+void cb_rl_b(struct CPU * cpu) { gcb_rl(cpu, &cpu->registers.b); }
+void cb_rl_c(struct CPU * cpu) { gcb_rl(cpu, &cpu->registers.c); }
+void cb_rl_d(struct CPU * cpu) { gcb_rl(cpu, &cpu->registers.d); }
+void cb_rl_e(struct CPU * cpu) { gcb_rl(cpu, &cpu->registers.e); }
+void cb_rl_h(struct CPU * cpu) { gcb_rl(cpu, &cpu->registers.h); }
+void cb_rl_l(struct CPU * cpu) { gcb_rl(cpu, &cpu->registers.l); }
 
-int cb_rl_hl(struct CPU * cpu) {
-    uint8_t value = read_byte(cpu, cpu->registers.hl);
+void cb_rl_hl(struct CPU * cpu) {
+    uint8_t value = fetch_byte(cpu, cpu->registers.hl);
     gcb_rl(cpu, &value);
     write_byte(cpu, cpu->registers.hl, value);
-    return 4;
 }
 
 /*
@@ -510,30 +487,27 @@ int cb_rl_hl(struct CPU * cpu) {
  * Zero: Set if value == 0 after the operation
  * Substract and Half-carry: Unset
  */
-static inline int gcb_rlc(struct CPU * cpu, uint8_t * value) {
+static inline void gcb_rlc(struct CPU * cpu, uint8_t * value) {
     (*value) = ((*value) << 1) | ((*value) >> 7);
     
     FLAG_CLEARIF((*value), cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
     FLAG_SETIF((*value) & 1, cpu->registers.f, CPU_FLAG_C);
-
-    return 2;
 }
 
-int cb_rlc_a(struct CPU * cpu) { return gcb_rlc(cpu, &cpu->registers.a); }
-int cb_rlc_b(struct CPU * cpu) { return gcb_rlc(cpu, &cpu->registers.b); }
-int cb_rlc_c(struct CPU * cpu) { return gcb_rlc(cpu, &cpu->registers.c); }
-int cb_rlc_d(struct CPU * cpu) { return gcb_rlc(cpu, &cpu->registers.d); }
-int cb_rlc_e(struct CPU * cpu) { return gcb_rlc(cpu, &cpu->registers.e); }
-int cb_rlc_h(struct CPU * cpu) { return gcb_rlc(cpu, &cpu->registers.h); }
-int cb_rlc_l(struct CPU * cpu) { return gcb_rlc(cpu, &cpu->registers.l); }
+void cb_rlc_a(struct CPU * cpu) { gcb_rlc(cpu, &cpu->registers.a); }
+void cb_rlc_b(struct CPU * cpu) { gcb_rlc(cpu, &cpu->registers.b); }
+void cb_rlc_c(struct CPU * cpu) { gcb_rlc(cpu, &cpu->registers.c); }
+void cb_rlc_d(struct CPU * cpu) { gcb_rlc(cpu, &cpu->registers.d); }
+void cb_rlc_e(struct CPU * cpu) { gcb_rlc(cpu, &cpu->registers.e); }
+void cb_rlc_h(struct CPU * cpu) { gcb_rlc(cpu, &cpu->registers.h); }
+void cb_rlc_l(struct CPU * cpu) { gcb_rlc(cpu, &cpu->registers.l); }
 
-int cb_rlc_hl(struct CPU * cpu) {
-    uint8_t value = read_byte(cpu, cpu->registers.hl);
+void cb_rlc_hl(struct CPU * cpu) {
+    uint8_t value = fetch_byte(cpu, cpu->registers.hl);
     gcb_rlc(cpu, &value);
     write_byte(cpu, cpu->registers.hl, value);
-    return 4;
 }
 
 static struct Instruction cb_instructions[] = {
@@ -801,14 +775,13 @@ static struct Instruction cb_instructions[] = {
  * 
  * @operation: The instruction to execute
  */
-int cb_prefix(struct CPU * cpu, uint8_t operation) {
+void cb_prefix(struct CPU * cpu, uint8_t operation) {
     struct Instruction instruction = cb_instructions[operation];
 
     if (instruction.function) {
-	return ((int (*)(struct CPU *))instruction.function)(cpu);
+	((void (*)(struct CPU *))instruction.function)(cpu);
     } else {
 	log_debug("CB instruction not implemented : %s", instruction.disasm);
 	sleep(5);
-	return 0;
     }
 }
