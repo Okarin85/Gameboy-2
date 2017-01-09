@@ -3,7 +3,7 @@
  * Filename: gpu.c
  * Author: Jules <archjules>
  * Created: Tue Dec 13 00:45:56 2016 (+0100)
- * Last-Updated: Sun Jan  8 15:04:48 2017 (+0100)
+ * Last-Updated: Mon Jan  9 10:01:26 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -30,7 +30,7 @@ static inline uint32_t get_color(int color) {
  */
 void gpu_render_line(struct CPU * cpu, int current_line) {
     int bg_color = 0, color = 0;
-    struct Sprite * obj = NULL;
+    
     for (int i = 0; i < SCREEN_WIDTH; i++) {
 	// Getting the background/window pixel
 	if (cpu->gpu.wd_enabled && (i >= (cpu->gpu.wd_x - 7)) && (current_line >= cpu->gpu.wd_y)) {
@@ -40,10 +40,9 @@ void gpu_render_line(struct CPU * cpu, int current_line) {
 	} else {
 	    bg_color = 0;
 	}
-	screen_put_pixel(cpu->screen,
-			 i,
-			 current_line,
-			 get_color(cpu->gpu.bg_palette[bg_color]));
+
+	color = oam_render_sprite(cpu, i, current_line, bg_color);
+	screen_put_pixel(cpu->screen, i, current_line, get_color(color));
     }
 }
 
@@ -73,7 +72,7 @@ static inline void change_current_line(struct CPU * cpu, int new_line) {
  * gpu_next:
  * Execute a step for the GPU.
  */
-int gpu_next(struct CPU * cpu) {
+void gpu_next(struct CPU * cpu) {
     cpu->gpu.clock += cpu->time_last;
     
     switch(cpu->gpu.mode) {

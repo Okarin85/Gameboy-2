@@ -3,7 +3,7 @@
  * Filename: mbc1.c
  * Author: Jules <archjules>
  * Created: Tue Jan  3 10:52:18 2017 (+0100)
- * Last-Updated: Fri Jan  6 23:43:16 2017 (+0100)
+ * Last-Updated: Sun Jan  8 22:56:29 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -28,10 +28,12 @@ uint8_t mbc1_read_rom(struct CPU * cpu, uint16_t address) {
 	bank_base = (((struct MBC1 *)cpu->rom.mbc_info)->rom_bank) * 0x4000;
 	return cpu->rom.rom_data[bank_base + (address & 0x3FFF)];
     }
+
+    return 0xFF;
 }
 
 uint8_t mbc1_read_ram(struct CPU * cpu, uint16_t address) {
-    return 0xFF;
+    return ((struct MBC1 *)cpu->rom.mbc_info)->ram[address & 0x1FFF];
 }
 
 /* Write functions */
@@ -61,11 +63,13 @@ void mbc1_write_rom(struct CPU * cpu, uint16_t address, uint8_t value) {
     case 0x6000:
     case 0x7000:
 	printf("Mode select : %x\n", value);
+	((struct MBC1 *)cpu->rom.mbc_info)->mode = value;
 	break;
     }
 }
 
 void mbc1_write_ram(struct CPU * cpu, uint16_t address, uint8_t value) {
+    ((struct MBC1 *)cpu->rom.mbc_info)->ram[address & 0x1FFF] = value;
     return;
 }
 
@@ -86,6 +90,8 @@ void mbc1_configure(struct CPU * cpu) {
     mbc->mode = false;
     mbc->ram_enable = false;
 
+    mbc->ram = malloc(0x2000);
+    
     mbc->rom_bank = 1;
     mbc->ram_bank = 0;
 

@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Sun Jan  8 15:05:37 2017 (+0100)
+ * Last-Updated: Mon Jan  9 09:57:27 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -20,7 +20,7 @@ uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
 	    return cpu->memory.io[0x00] | cpu->keys.buttons;
 	}
     case 0x04:
-	return cpu->timer_div;
+	return (uint8_t)(cpu->timer_track >> 8);
     case 0x05:
 	return cpu->timer_tima;
     case 0x40:
@@ -65,7 +65,7 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
     case 0x00:
 	cpu->memory.io[port] = value & 0x30;
     case 0x04:
-	cpu->timer_div = 0;
+	cpu->timer_track = 0;
 	break;
     case 0x05:
 	cpu->timer_tima= value;
@@ -77,16 +77,16 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
 	cpu->timer_tima_enabled = (value & 0x04);
 	switch(value & 0x03) {
 	case 0x00:
-	    cpu->timer_tima_speed = 256;
+	    cpu->timer_tima_speed = 10;
 	    break;
 	case 0x01:
 	    cpu->timer_tima_speed = 4;
 	    break;
 	case 0x02:
-	    cpu->timer_tima_speed = 16;
+	    cpu->timer_tima_speed = 6;
 	    break;
 	case 0x03:
-	    cpu->timer_tima_speed = 64;
+	    cpu->timer_tima_speed = 8;
 	}
     case 0x0F:
 	break;
@@ -130,6 +130,7 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
 	cpu->gpu.bg_palette[3] = (value & 0b11000000) >> 6;
 	break;
     case 0x48:
+	log_debug("Writing OBP0 : %x", value);
 	cpu->gpu.obp0[1] = (value & 0b1100) >> 2;
 	cpu->gpu.obp0[2] = (value & 0b110000) >> 4;
 	cpu->gpu.obp0[3] = (value & 0b11000000) >> 6;

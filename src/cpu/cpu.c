@@ -3,13 +3,14 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Thu Jan  5 18:25:26 2017 (+0100)
+ * Last-Updated: Sun Jan  8 22:58:36 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include "cpu/cpu.h"
+#include "cpu/timer.h"
 #include "cpu/instruction.h"
 #include "memory/memory.h"
 #include "logger.h"
@@ -17,7 +18,7 @@
 /*
  * General functions
  */
-static inline void print_registers(struct CPU * cpu) {
+void print_registers(struct CPU * cpu) {
     log_debug("AF : 0x%04x (Z : %x, N : %x, H : %x, C : %x)",
 	      cpu->registers.af,
 	      cpu->registers.f & CPU_FLAG_Z,
@@ -70,6 +71,7 @@ void cpu_init(struct CPU * cpu) {
 	exit(EXIT_FAILURE);
     }
     cpu->memory.bios_inplace = true;
+    cpu->timer_tima_speed = 10;
     cpu->keys.buttons   = 0x0F;
     cpu->keys.direction = 0x0F;
     cpu->gpu.mode = 3;
@@ -93,10 +95,10 @@ void cpu_next_instruction(struct CPU * cpu) {
 	cpu->time_last = 1;
 	cpu->clock += 1;
     } else {
-	int old_pc = cpu->registers.pc;
 	op = read_byte(cpu, cpu->registers.pc++);
 	instruction = instructions[op];
 	operand = interpret_opcode(cpu, instruction);
+	
 	if (instruction.function == NULL) {
 	    log_warn("%#04x : Instruction invalid ! (%#02x)", cpu->registers.pc - 1 - instruction.operand, op);
 	    print_registers(cpu);
@@ -113,7 +115,8 @@ void cpu_next_instruction(struct CPU * cpu) {
 		cpu->time_last = ((int (*)(struct CPU *, uint16_t))instruction.function)(cpu, operand);
 		break;
 	    }
-	    cpu->clock += cpu->time_last;
+	    // printf("%s %d\n", instruction.disasm, cpu->time_last);
+	    timer_handle(cpu, cpu->time_last);
 	}
     }
 }

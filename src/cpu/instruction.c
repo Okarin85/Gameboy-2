@@ -3,7 +3,7 @@
  * Filename: instruction.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 12:36:49 2016 (+0100)
- * Last-Updated: Thu Jan  5 17:53:19 2017 (+0100)
+ * Last-Updated: Sun Jan  8 21:34:37 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -70,7 +70,7 @@ int cpu_ld_a_d(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.a,
 int cpu_ld_a_e(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.a, cpu->registers.e); }
 int cpu_ld_a_h(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.a, cpu->registers.h); }
 int cpu_ld_a_l(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.a, cpu->registers.l); }
-int cpu_ld_a_hl(struct CPU * cpu) { return g_ld8_register(cpu,&cpu->registers.a, read_byte(cpu, cpu->registers.hl)); }
+int cpu_ld_a_hl(struct CPU * cpu) { g_ld8_register(cpu,&cpu->registers.a, read_byte(cpu, cpu->registers.hl)); return 2; }
 
 int cpu_ld_b_a(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.b, cpu->registers.a); }
 int cpu_ld_b_b(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.b, cpu->registers.b); }
@@ -79,7 +79,7 @@ int cpu_ld_b_d(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.b,
 int cpu_ld_b_e(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.b, cpu->registers.e); }
 int cpu_ld_b_h(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.b, cpu->registers.h); }
 int cpu_ld_b_l(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.b, cpu->registers.l); }
-int cpu_ld_b_hl(struct CPU * cpu) { return g_ld8_register(cpu,&cpu->registers.b, read_byte(cpu, cpu->registers.hl)); }
+int cpu_ld_b_hl(struct CPU * cpu) { g_ld8_register(cpu,&cpu->registers.b, read_byte(cpu, cpu->registers.hl)); return 2; }
 
 int cpu_ld_c_a(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.c, cpu->registers.a); }
 int cpu_ld_c_b(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.c, cpu->registers.b); }
@@ -88,7 +88,7 @@ int cpu_ld_c_d(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.c,
 int cpu_ld_c_e(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.c, cpu->registers.e); }
 int cpu_ld_c_h(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.c, cpu->registers.h); }
 int cpu_ld_c_l(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.c, cpu->registers.l); }
-int cpu_ld_c_hl(struct CPU * cpu) { return g_ld8_register(cpu,&cpu->registers.c, read_byte(cpu, cpu->registers.hl)); }
+int cpu_ld_c_hl(struct CPU * cpu) { g_ld8_register(cpu,&cpu->registers.c, read_byte(cpu, cpu->registers.hl)); return 2; }
 
 int cpu_ld_d_a(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.d, cpu->registers.a); }
 int cpu_ld_d_b(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.d, cpu->registers.b); }
@@ -97,7 +97,7 @@ int cpu_ld_d_d(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.d,
 int cpu_ld_d_e(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.d, cpu->registers.e); }
 int cpu_ld_d_h(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.d, cpu->registers.h); }
 int cpu_ld_d_l(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.d, cpu->registers.l); }
-int cpu_ld_d_hl(struct CPU * cpu) { return g_ld8_register(cpu,&cpu->registers.d, read_byte(cpu, cpu->registers.hl)); }
+int cpu_ld_d_hl(struct CPU * cpu) { g_ld8_register(cpu,&cpu->registers.d, read_byte(cpu, cpu->registers.hl)); return 2;}
 
 int cpu_ld_e_a(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.e, cpu->registers.a); }
 int cpu_ld_e_b(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.e, cpu->registers.b); }
@@ -106,7 +106,7 @@ int cpu_ld_e_d(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.e,
 int cpu_ld_e_e(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.e, cpu->registers.e); }
 int cpu_ld_e_h(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.e, cpu->registers.h); }
 int cpu_ld_e_l(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.e, cpu->registers.l); }
-int cpu_ld_e_hl(struct CPU * cpu) { return g_ld8_register(cpu,&cpu->registers.e, read_byte(cpu, cpu->registers.hl)); }
+int cpu_ld_e_hl(struct CPU * cpu) { g_ld8_register(cpu,&cpu->registers.e, read_byte(cpu, cpu->registers.hl)); return 2;}
 
 int cpu_ld_h_a(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.h, cpu->registers.a); }
 int cpu_ld_h_b(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.h, cpu->registers.b); }
@@ -115,7 +115,7 @@ int cpu_ld_h_d(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.h,
 int cpu_ld_h_e(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.h, cpu->registers.e); }
 int cpu_ld_h_h(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.h, cpu->registers.h); }
 int cpu_ld_h_l(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.h, cpu->registers.l); }
-int cpu_ld_h_hl(struct CPU * cpu) { return g_ld8_register(cpu,&cpu->registers.h, read_byte(cpu, cpu->registers.hl)); }
+int cpu_ld_h_hl(struct CPU * cpu) { g_ld8_register(cpu,&cpu->registers.h, read_byte(cpu, cpu->registers.hl)); return 2; }
 
 int cpu_ld_l_a(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.l, cpu->registers.a); }
 int cpu_ld_l_b(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.l, cpu->registers.b); }
@@ -124,15 +124,15 @@ int cpu_ld_l_d(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.l,
 int cpu_ld_l_e(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.l, cpu->registers.e); }
 int cpu_ld_l_h(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.l, cpu->registers.h); }
 int cpu_ld_l_l(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.l, cpu->registers.l); }
-int cpu_ld_l_hl(struct CPU * cpu) { return g_ld8_register(cpu,&cpu->registers.l, read_byte(cpu, cpu->registers.hl)); }
+int cpu_ld_l_hl(struct CPU * cpu) { g_ld8_register(cpu,&cpu->registers.l, read_byte(cpu, cpu->registers.hl)); return 2; }
 
 int cpu_ld_a_nn(struct CPU * cpu, uint16_t operand) { g_ld8_register(cpu, &cpu->registers.a, read_byte(cpu, operand)); return 4; }
 
-int cpu_ld_bc_a(struct CPU * cpu) { return g_ld8_memory(cpu, cpu->registers.bc, cpu->registers.a); }
-int cpu_ld_de_a(struct CPU * cpu) { return g_ld8_memory(cpu, cpu->registers.de, cpu->registers.a); }
+int cpu_ld_bc_a(struct CPU * cpu) { g_ld8_memory(cpu, cpu->registers.bc, cpu->registers.a); return 2; }
+int cpu_ld_de_a(struct CPU * cpu) { g_ld8_memory(cpu, cpu->registers.de, cpu->registers.a); return 2; }
 
-int cpu_ld_a_bc(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.a, read_byte(cpu, cpu->registers.bc)) + 1; }
-int cpu_ld_a_de(struct CPU * cpu) { return g_ld8_register(cpu, &cpu->registers.a, read_byte(cpu, cpu->registers.de)) + 1; }
+int cpu_ld_a_bc(struct CPU * cpu) { g_ld8_register(cpu, &cpu->registers.a, read_byte(cpu, cpu->registers.bc)); return 2; }
+int cpu_ld_a_de(struct CPU * cpu) { g_ld8_register(cpu, &cpu->registers.a, read_byte(cpu, cpu->registers.de)); return 2; }
 
 int cpu_ld_hl_a(struct CPU * cpu) { return g_ld8_memory(cpu, cpu->registers.hl, cpu->registers.a); }
 int cpu_ld_hl_b(struct CPU * cpu) { return g_ld8_memory(cpu, cpu->registers.hl, cpu->registers.b); }
@@ -148,7 +148,7 @@ int cpu_ld_hl_l(struct CPU * cpu) { return g_ld8_memory(cpu, cpu->registers.hl, 
  * 
  * All flags untouched.
  */
-int cpu_ld_n_a(struct CPU * cpu, uint16_t operand) { return g_ld8_memory(cpu, operand, cpu->registers.a) + 2; }
+int cpu_ld_n_a(struct CPU * cpu, uint16_t operand) { g_ld8_memory(cpu, operand, cpu->registers.a); return 4; }
 
 /*
  * cpu_ld{i,d}_hl_a:
@@ -194,7 +194,7 @@ int cpu_ld_bc_nn(struct CPU * cpu, uint16_t operand) { return g_ld16(cpu, &cpu->
 int cpu_ld_de_nn(struct CPU * cpu, uint16_t operand) { return g_ld16(cpu, &cpu->registers.de, operand); }
 int cpu_ld_hl_nn(struct CPU * cpu, uint16_t operand) { return g_ld16(cpu, &cpu->registers.hl, operand); }
 int cpu_ld_sp_nn(struct CPU * cpu, uint16_t operand) { return g_ld16(cpu, &cpu->registers.sp, operand); }
-int cpu_ld_sp_hl(struct CPU * cpu) { return g_ld16(cpu, &cpu->registers.sp, cpu->registers.hl); }
+int cpu_ld_sp_hl(struct CPU * cpu) { g_ld16(cpu, &cpu->registers.sp, cpu->registers.hl); return 2;      }
 
 /*
  * cpu_ld_hl_spnn:
@@ -215,7 +215,7 @@ int cpu_ld_hl_spnn(struct CPU * cpu, uint8_t operand) {
 
 /*
  * cpu_ld_nn_sp:
- * Writes SP at (HL).
+ * Writes SP at (nn).
  */
 int cpu_ld_nn_sp(struct CPU * cpu, uint16_t operand) {
     write_word(cpu, operand, cpu->registers.sp);
@@ -299,6 +299,7 @@ int cpu_rla(struct CPU * cpu) {
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
+    return 1;
 }
 
 int cpu_rlca(struct CPU * cpu) {
@@ -308,6 +309,7 @@ int cpu_rlca(struct CPU * cpu) {
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_H);
     FLAG_SETIF(cpu->registers.a & 0x1, cpu->registers.f, CPU_FLAG_C);
+    return 1;
 }
 
 /*
@@ -339,8 +341,8 @@ int cpu_add_d(struct CPU * cpu) { return g_add8(cpu, cpu->registers.d); }
 int cpu_add_e(struct CPU * cpu) { return g_add8(cpu, cpu->registers.e); }
 int cpu_add_h(struct CPU * cpu) { return g_add8(cpu, cpu->registers.h); }
 int cpu_add_l(struct CPU * cpu) { return g_add8(cpu, cpu->registers.l); }
-int cpu_add_hl(struct CPU * cpu){ return g_add8(cpu, read_byte(cpu, cpu->registers.hl)) + 1; }
-int cpu_add_n(struct CPU * cpu, uint8_t operand) { return g_add8(cpu, operand) + 1; }
+int cpu_add_hl(struct CPU * cpu){ g_add8(cpu, read_byte(cpu, cpu->registers.hl)); return 2; }
+int cpu_add_n(struct CPU * cpu, uint8_t operand) { g_add8(cpu, operand); return 2;}
 
 /*
  * cpu_adc_*:
@@ -362,6 +364,7 @@ static inline int g_adc8(struct CPU * cpu, uint8_t reg) {
     FLAG_SETIF(res & 0x100, cpu->registers.f, CPU_FLAG_C);
 
     cpu->registers.a = resb;
+    return 1;
 }
 
 int cpu_adc_a(struct CPU * cpu) { return g_adc8(cpu, cpu->registers.a); }
@@ -371,8 +374,8 @@ int cpu_adc_d(struct CPU * cpu) { return g_adc8(cpu, cpu->registers.d); }
 int cpu_adc_e(struct CPU * cpu) { return g_adc8(cpu, cpu->registers.e); }
 int cpu_adc_h(struct CPU * cpu) { return g_adc8(cpu, cpu->registers.h); }
 int cpu_adc_l(struct CPU * cpu) { return g_adc8(cpu, cpu->registers.l); }
-int cpu_adc_hl(struct CPU * cpu){ return g_adc8(cpu, read_byte(cpu, cpu->registers.hl)) + 1; }
-int cpu_adc_n(struct CPU * cpu, uint8_t operand) { return g_adc8(cpu, operand) + 1; }
+int cpu_adc_hl(struct CPU * cpu){ g_adc8(cpu, read_byte(cpu, cpu->registers.hl)); return 2; }
+int cpu_adc_n(struct CPU * cpu, uint8_t operand) { g_adc8(cpu, operand); return 2;}
 
 /*
  * cpu_sub_*
@@ -401,8 +404,8 @@ int cpu_sub_d(struct CPU * cpu) { return g_sub8(cpu, cpu->registers.d); }
 int cpu_sub_e(struct CPU * cpu) { return g_sub8(cpu, cpu->registers.e); }
 int cpu_sub_h(struct CPU * cpu) { return g_sub8(cpu, cpu->registers.h); }
 int cpu_sub_l(struct CPU * cpu) { return g_sub8(cpu, cpu->registers.l); }
-int cpu_sub_hl(struct CPU * cpu){ return g_sub8(cpu, read_byte(cpu, cpu->registers.hl)) + 1; }
-int cpu_sub_n(struct CPU * cpu, uint8_t operand) { return g_sub8(cpu, operand) + 1; }
+int cpu_sub_hl(struct CPU * cpu){ g_sub8(cpu, read_byte(cpu, cpu->registers.hl)); return 2;}
+int cpu_sub_n(struct CPU * cpu, uint8_t operand) { g_sub8(cpu, operand); return 2;}
 
 /*
  * cpu_sbc_*
@@ -415,7 +418,6 @@ int cpu_sub_n(struct CPU * cpu, uint8_t operand) { return g_sub8(cpu, operand) +
  */
 static inline int g_sbc8(struct CPU * cpu, uint8_t reg) {
     int c = ((cpu->registers.f & CPU_FLAG_C) != 0);
-    int r = cpu->registers.a - reg - c;
     
     FLAG_SET(cpu->registers.f, CPU_FLAG_N);
     FLAG_CLEARIF((cpu->registers.a - reg - c) & 0xFF, cpu->registers.f, CPU_FLAG_Z);
@@ -433,8 +435,8 @@ int cpu_sbc_d(struct CPU * cpu) { return g_sbc8(cpu, cpu->registers.d); }
 int cpu_sbc_e(struct CPU * cpu) { return g_sbc8(cpu, cpu->registers.e); }
 int cpu_sbc_h(struct CPU * cpu) { return g_sbc8(cpu, cpu->registers.h); }
 int cpu_sbc_l(struct CPU * cpu) { return g_sbc8(cpu, cpu->registers.l); }
-int cpu_sbc_hl(struct CPU * cpu){ return g_sbc8(cpu, read_byte(cpu, cpu->registers.hl)) + 1; }
-int cpu_sbc_n(struct CPU * cpu, uint8_t operand) { return g_sbc8(cpu, operand) + 1; }
+int cpu_sbc_hl(struct CPU * cpu){ g_sbc8(cpu, read_byte(cpu, cpu->registers.hl)); return 2;}
+int cpu_sbc_n(struct CPU * cpu, uint8_t operand) { g_sbc8(cpu, operand); return 2;}
 
 /*
  * cpu_dec_*:
@@ -467,7 +469,7 @@ int cpu_decm_hl(struct CPU * cpu) {
     g_dec8_r(cpu, &val);
     write_byte(cpu, cpu->registers.hl, val);
 
-    return 2;
+    return 3;
 }
 
 /*
@@ -501,7 +503,7 @@ int cpu_incm_hl(struct CPU * cpu) {
     g_inc8_r(cpu, &val);
     write_byte(cpu, cpu->registers.hl, val);
 
-    return 2;
+    return 3;
 }
 
 /*
@@ -529,8 +531,8 @@ int cpu_cp_d(struct CPU * cpu) { return g_cp(cpu, cpu->registers.d); }
 int cpu_cp_e(struct CPU * cpu) { return g_cp(cpu, cpu->registers.e); }
 int cpu_cp_h(struct CPU * cpu) { return g_cp(cpu, cpu->registers.h); }
 int cpu_cp_l(struct CPU * cpu) { return g_cp(cpu, cpu->registers.l); }
-int cpu_cp_hl(struct CPU * cpu) { return g_cp(cpu, read_byte(cpu, cpu->registers.hl)) + 1; }
-int cpu_cp_n(struct CPU * cpu, uint8_t operand) { return g_cp(cpu, operand) + 1; }
+int cpu_cp_hl(struct CPU * cpu) { g_cp(cpu, read_byte(cpu, cpu->registers.hl)); return 2;}
+int cpu_cp_n(struct CPU * cpu, uint8_t operand) { g_cp(cpu, operand); return 2;}
 
 /*
  * cpu_cpl:
@@ -641,7 +643,7 @@ int cpu_jp_hl(struct CPU * cpu) { cpu->registers.pc = cpu->registers.hl; return 
  */
 static inline int g_cjp(struct CPU * cpu, uint16_t operand, uint8_t flag) {
     if (cpu->registers.f & flag) return cpu_jp(cpu, operand);
-    else                         return 2;
+    else                         return 3;
 }
 int cpu_jp_z(struct CPU * cpu, uint16_t operand) { return g_cjp(cpu, operand, CPU_FLAG_Z); }
 int cpu_jp_c(struct CPU * cpu, uint16_t operand) { return g_cjp(cpu, operand, CPU_FLAG_C); }
@@ -651,7 +653,7 @@ int cpu_jp_c(struct CPU * cpu, uint16_t operand) { return g_cjp(cpu, operand, CP
  * Jump to given address if * flag is unset
  */
 static inline int g_cnjp(struct CPU * cpu, uint16_t operand, uint8_t flag) {
-    if (cpu->registers.f & flag) return 2;
+    if (cpu->registers.f & flag) return 3;
     else                         return cpu_jp(cpu, operand);
 }
 int cpu_jp_nz(struct CPU * cpu, uint16_t operand) { return g_cnjp(cpu, operand, CPU_FLAG_Z); }
@@ -723,7 +725,7 @@ static inline int g_ret(struct CPU * cpu) {
     uint16_t address = pop_word(cpu);
     cpu->registers.pc = address;
 
-    return 2;
+    return 4;
 }
 
 int cpu_ret(struct CPU * cpu) { return g_ret(cpu); }
@@ -733,10 +735,8 @@ int cpu_ret(struct CPU * cpu) { return g_ret(cpu); }
  * Like cpu_ret, but enables interrupts
  */
 int cpu_reti(struct CPU * cpu) {
-    g_ret(cpu);
     cpu->interrupts = true;
-
-    return 2;
+    return g_ret(cpu);
 }
 
 /*
@@ -801,8 +801,8 @@ int cpu_and_d(struct CPU * cpu)  { return g_and(cpu, cpu->registers.d); }
 int cpu_and_e(struct CPU * cpu)  { return g_and(cpu, cpu->registers.e); }
 int cpu_and_h(struct CPU * cpu)  { return g_and(cpu, cpu->registers.h); }
 int cpu_and_l(struct CPU * cpu)  { return g_and(cpu, cpu->registers.l); }
-int cpu_and_hl(struct CPU * cpu) { return g_and(cpu, read_byte(cpu, cpu->registers.hl)) + 1; }
-int cpu_and_n(struct CPU * cpu, uint8_t operand) { return g_and(cpu, operand) + 1; }
+int cpu_and_hl(struct CPU * cpu) { g_and(cpu, read_byte(cpu, cpu->registers.hl)); return 2; }
+int cpu_and_n(struct CPU * cpu, uint8_t operand) { g_and(cpu, operand); return 2; }
 
 /*
  * Bitwise OR between A and value. Result in A.
@@ -829,8 +829,8 @@ int cpu_or_d(struct CPU * cpu)  { return g_or(cpu, cpu->registers.d); }
 int cpu_or_e(struct CPU * cpu)  { return g_or(cpu, cpu->registers.e); }
 int cpu_or_h(struct CPU * cpu)  { return g_or(cpu, cpu->registers.h); }
 int cpu_or_l(struct CPU * cpu)  { return g_or(cpu, cpu->registers.l); }
-int cpu_or_hl(struct CPU * cpu) { return g_or(cpu, read_byte(cpu, cpu->registers.hl)); }
-int cpu_or_n(struct CPU * cpu, uint8_t operand) { return g_or(cpu, operand) + 1; }
+int cpu_or_hl(struct CPU * cpu) { g_or(cpu, read_byte(cpu, cpu->registers.hl)); return 2; }
+int cpu_or_n(struct CPU * cpu, uint8_t operand) { g_or(cpu, operand); return 2; }
 
 /*
  * Bitwise XOR between A and value. Result in A.
@@ -857,8 +857,8 @@ int cpu_xor_d(struct CPU * cpu)  { return g_xor(cpu, cpu->registers.d); }
 int cpu_xor_e(struct CPU * cpu)  { return g_xor(cpu, cpu->registers.e); }
 int cpu_xor_h(struct CPU * cpu)  { return g_xor(cpu, cpu->registers.h); }
 int cpu_xor_l(struct CPU * cpu)  { return g_xor(cpu, cpu->registers.l); }
-int cpu_xor_hl(struct CPU * cpu) { return g_xor(cpu, read_byte(cpu, cpu->registers.hl)); }
-int cpu_xor_n(struct CPU * cpu, uint8_t operand) { return g_xor(cpu, operand) + 1; }
+int cpu_xor_hl(struct CPU * cpu) { g_xor(cpu, read_byte(cpu, cpu->registers.hl)); return 2; }
+int cpu_xor_n(struct CPU * cpu, uint8_t operand) { g_xor(cpu, operand); return 2; }
 
 /*
  * cpu_scf:

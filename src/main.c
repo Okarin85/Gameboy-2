@@ -3,7 +3,7 @@
  * Filename: main.c
  * Author: Jules <archjules>
  * Created: Wed Dec  7 08:48:50 2016 (+0100)
- * Last-Updated: Wed Jan  4 20:32:26 2017 (+0100)
+ * Last-Updated: Sun Jan  8 21:40:48 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -53,10 +53,9 @@ int main(int argc, char ** argv) {
 
     while(!cpu.state) {
 	cpu_next_instruction(&cpu);
-	timer_handle(&cpu);
+	treat_interruptions(&cpu);
 	dma_oam_handle(&cpu);
 	gpu_next(&cpu);
-	treat_interruptions(&cpu);
     }
 
     screen_destroy(cpu.screen);

@@ -3,7 +3,7 @@
  * Filename: memory.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:40:29 2016 (+0100)
- * Last-Updated: Wed Jan  4 19:59:33 2017 (+0100)
+ * Last-Updated: Sun Jan  8 22:58:44 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -86,6 +86,7 @@ void write_byte(struct CPU * cpu, uint16_t address, uint8_t value) {
     case 0xA000:
     case 0xB000:
 	cpu->rom.write_ram(cpu, address, value);
+	return;
     case 0xC000:
     case 0xD000:
 	cpu->memory.wram[address & 0x1FFF] = value;

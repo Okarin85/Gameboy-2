@@ -3,7 +3,7 @@
  * Filename: cpu.h
  * Author: Jules <archjules>
  * Created: Wed Dec  7 09:03:16 2016 (+0100)
- * Last-Updated: Thu Jan  5 06:27:47 2017 (+0100)
+ * Last-Updated: Sun Jan  8 17:18:52 2017 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -100,11 +100,9 @@ struct CPU {
     uint16_t dma_dest;
     
     // Timer stuff
-    int timer_track_div;
-    int timer_track_tima;
+    int timer_track;
     
     uint8_t timer_tma;
-    uint8_t timer_div;
     uint8_t timer_tima;
     uint8_t timer_tima_enabled;
     int     timer_tima_speed;

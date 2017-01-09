@@ -3,12 +3,13 @@
  * Filename: oam.c
  * Author: Jules <archjules>
  * Created: Fri Dec 30 01:01:21 2016 (+0100)
- * Last-Updated: Sun Jan  8 08:58:01 2017 (+0100)
+ * Last-Updated: Mon Jan  9 10:08:21 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
 #include <string.h>
 #include "cpu/cpu.h"
+#include "gpu/gpu.h"
 #include "gpu/structs.h"
 #include "gpu/oam.h"
 #include "platform/input.h"
@@ -95,4 +96,44 @@ uint8_t oam_read_byte(struct CPU * cpu, uint16_t address) {
 	    cpu->gpu.oam[spr_nb].x_flip      << 5 |
 	    cpu->gpu.oam[spr_nb].palette     << 4;
     }
+}
+
+uint32_t oam_render_sprite(struct CPU * cpu, int x, int y, int bg_color) {
+    int sprite_x, sprite_y, height, tile_id, color;
+    
+    for (int i = 0; i < 10; i++) {
+	if (cpu->gpu.line_cache[y][i] == NULL) break;
+	
+	sprite_x = x - (cpu->gpu.line_cache[y][i]->x_pos - 8);
+	sprite_y = y - (cpu->gpu.line_cache[y][i]->y_pos - 16);
+	if (sprite_x >= 8) continue;
+	if (sprite_x <  0) break;
+	if (cpu->gpu.line_cache[y][i]->bg_priority && (bg_color != 0)) continue;
+	
+	// Now we have the sprite, we get the colour
+	if (cpu->gpu.spr_height) {
+	    height  = 15;
+	    tile_id = cpu->gpu.line_cache[y][i]->tile & 0xfe;
+	} else {
+	    height  = 7;
+	    tile_id = cpu->gpu.line_cache[y][i]->tile;
+	}
+
+	if (cpu->gpu.line_cache[y][i]->x_flip)
+	    sprite_x = 7 - sprite_x;
+
+	if (cpu->gpu.line_cache[y][i]->y_flip)
+	    sprite_y = height - sprite_y;
+
+	color = tile_get_pixel(cpu, tile_id, 1, sprite_x, sprite_y);
+	if (color != 0) {
+	    if (cpu->gpu.line_cache[y][i]->palette) {
+		return cpu->gpu.obp1[color];
+	    } else {
+		return cpu->gpu.obp0[color];
+	    }
+	}
+    }
+
+    return cpu->gpu.bg_palette[bg_color];
 }

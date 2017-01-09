@@ -3,9 +3,10 @@
  * Filename: interrupt.c
  * Author: Jules <archjules>
  * Created: Tue Dec 20 23:09:01 2016 (+0100)
- * Last-Updated: Thu Jan  5 21:28:57 2017 (+0100)
+ * Last-Updated: Sun Jan  8 21:43:48 2017 (+0100)
  *           By: Jules <archjules>
  */
+#include "cpu/timer.h"
 #include "cpu/interrupt.h"
 #include "memory/memory.h"
 #include "logger.h"
@@ -20,6 +21,7 @@ void treat_interruptions(struct CPU * cpu) {
 		// Calling the interruption vector
 		cpu->interrupts = false;
 		push_word(cpu, cpu->registers.pc);
+		timer_handle(cpu, 5);
 		cpu->registers.pc = (0x40 + i * 0x8);
 	    }
 	}

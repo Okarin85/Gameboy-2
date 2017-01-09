@@ -3,7 +3,7 @@
  * Filename: general.c
  * Author: Jules <archjules>
  * Created: Mon Jan  2 16:37:27 2017 (+0100)
- * Last-Updated: Sun Jan  8 14:37:48 2017 (+0100)
+ * Last-Updated: Sun Jan  8 15:41:25 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <SDL/SDL.h>
@@ -11,6 +11,8 @@
 #include "platform/input.h"
 #include "platform/screen.h"
 #include "logger.h"
+
+uint8_t io_handle_read(struct CPU *, uint8_t);
 
 void handle_new_frame(struct CPU * cpu) {
     static int last = 0;

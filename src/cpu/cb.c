@@ -3,7 +3,7 @@
  * Filename: cb.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 22:40:29 2016 (+0100)
- * Last-Updated: Thu Jan  5 18:20:57 2017 (+0100)
+ * Last-Updated: Sun Jan  8 19:00:51 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -112,6 +112,7 @@ int cb_srl_hl(struct CPU * cpu) {
     uint8_t value = read_byte(cpu, cpu->registers.hl);
     gcb_srl(cpu, &value);
     write_byte(cpu, cpu->registers.hl, value);
+    return 4;
 }
 
 /*
@@ -143,6 +144,7 @@ int cb_swap_hl(struct CPU * cpu) {
     uint8_t value = read_byte(cpu, cpu->registers.hl);
     gcb_swap(cpu, &value);
     write_byte(cpu, cpu->registers.hl, value);
+    return 4;
 }
 
 /*
@@ -427,6 +429,7 @@ int cb_rr_hl(struct CPU * cpu) {
     uint8_t value = read_byte(cpu, cpu->registers.hl);
     gcb_rr(cpu, &value);
     write_byte(cpu, cpu->registers.hl, value);
+    return 4;
 }
 
 /*
@@ -460,6 +463,7 @@ int cb_rrc_hl(struct CPU * cpu) {
     uint8_t value = read_byte(cpu, cpu->registers.hl);
     gcb_rrc(cpu, &value);
     write_byte(cpu, cpu->registers.hl, value);
+    return 4;
 }
 
 /*
@@ -495,6 +499,7 @@ int cb_rl_hl(struct CPU * cpu) {
     uint8_t value = read_byte(cpu, cpu->registers.hl);
     gcb_rl(cpu, &value);
     write_byte(cpu, cpu->registers.hl, value);
+    return 4;
 }
 
 /*
@@ -528,6 +533,7 @@ int cb_rlc_hl(struct CPU * cpu) {
     uint8_t value = read_byte(cpu, cpu->registers.hl);
     gcb_rlc(cpu, &value);
     write_byte(cpu, cpu->registers.hl, value);
+    return 4;
 }
 
 static struct Instruction cb_instructions[] = {
