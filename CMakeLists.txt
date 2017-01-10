@@ -16,6 +16,7 @@ add_executable(gameboy
   src/rom/load.c
   src/rom/mbc0.c
   src/rom/mbc1.c
+  src/rom/mbc3.c
   src/memory/memory.c
   src/memory/io.c
   src/gpu/gpu.c
@@ -28,5 +29,5 @@ add_executable(gameboy
 )
 
 add_definitions(-DLOGLEVEL=0)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wno-unused-parameter")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wno-unused-parameter -g")
 target_link_libraries(gameboy SDL)

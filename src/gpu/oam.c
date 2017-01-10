@@ -3,7 +3,7 @@
  * Filename: oam.c
  * Author: Jules <archjules>
  * Created: Fri Dec 30 01:01:21 2016 (+0100)
- * Last-Updated: Mon Jan  9 10:08:21 2017 (+0100)
+ * Last-Updated: Tue Jan 10 13:28:18 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -21,17 +21,19 @@ void cache_sprite(struct CPU * cpu, int index) {
     int pos_y_end   = pos_y_start + (cpu->gpu.spr_height ? 16 : 8);
     
     for (int line = pos_y_start; line < pos_y_end; line++) {
-	if ((line < 0) || (line > SCREEN_HEIGHT)) continue;
+	if ((line < 0) || (line >= SCREEN_HEIGHT)) continue;
 	if (cpu->gpu.line_cache[line][9] != NULL)  continue;
-
+	
 	for (int i = 0; i < 10; i++) {
 	    if (cpu->gpu.line_cache[line][i] == NULL) {
 		cpu->gpu.line_cache[line][i] = &cpu->gpu.oam[index];
 		break;
-	    } else if (pos_x < cpu->gpu.line_cache[line][i]->x_pos) {
-		memmove(&(cpu->gpu.line_cache[line][i + 1]), &(cpu->gpu.line_cache[line][i]), (9 - i) * sizeof(struct Sprite *));
-		cpu->gpu.line_cache[line][i] = &cpu->gpu.oam[index];
-		break;
+	    } else {
+		if (pos_x < cpu->gpu.line_cache[line][i]->x_pos) {
+		    memmove(&(cpu->gpu.line_cache[line][i + 1]), &(cpu->gpu.line_cache[line][i]), (9 - i) * sizeof(struct Sprite *));
+		    cpu->gpu.line_cache[line][i] = &cpu->gpu.oam[index];
+		    break;
+		}
 	    }
 	}
     }

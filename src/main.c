@@ -3,7 +3,7 @@
  * Filename: main.c
  * Author: Jules <archjules>
  * Created: Wed Dec  7 08:48:50 2016 (+0100)
- * Last-Updated: Mon Jan  9 19:28:00 2017 (+0100)
+ * Last-Updated: Mon Jan  9 20:58:21 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -29,7 +29,7 @@
 int main(int argc, char ** argv) {
     struct CPU cpu;
     char * rom_filename = NULL, c;
-
+    
     while((c = getopt(argc, argv, "d")) != -1) {
 	switch (c) {
 	case 'd':

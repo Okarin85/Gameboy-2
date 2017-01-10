@@ -3,7 +3,7 @@
  * Filename: load.c
  * Author: Jules <archjules>
  * Created: Mon Jan  2 18:21:01 2017 (+0100)
- * Last-Updated: Tue Jan  3 11:25:22 2017 (+0100)
+ * Last-Updated: Tue Jan 10 00:56:25 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -55,6 +55,11 @@ void rom_configure(struct CPU * cpu) {
     case 0x02:
     case 0x03:
 	mbc1_configure(cpu);
+	break;
+    case 0x11:
+    case 0x12:
+    case 0x13:
+	mbc3_configure(cpu);
 	break;
     default:
 	log_fatal("MBC chip not supported !");

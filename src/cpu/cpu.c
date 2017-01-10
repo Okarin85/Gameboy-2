@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Mon Jan  9 19:26:06 2017 (+0100)
+ * Last-Updated: Tue Jan 10 00:15:50 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -31,11 +31,6 @@ void print_registers(struct CPU * cpu) {
     log_debug("HL : 0x%04x", cpu->registers.hl);
     log_debug("PC : 0x%04x", cpu->registers.pc);
     log_debug("SP : 0x%04x", cpu->registers.sp);
-    log_debug("IF : 0x%02x", cpu->memory.io[0xF]);
-    log_debug("IE : 0x%02x", cpu->memory.io[0xFF]);
-    log_debug("TAC: 0x%02x", cpu->memory.io[0x07]);
-    log_debug("TIM: 0x%02x", cpu->timer_tima);
-    log_debug("Clock : %ld ticks", cpu->clock);
 }
 
 static inline uint16_t interpret_opcode(struct CPU * cpu, struct Instruction opcode) {
@@ -86,8 +81,8 @@ void cpu_destroy(struct CPU * cpu) {
 }
 
 void cpu_delay(struct CPU * cpu, int m_cycles) {
+    dma_oam_handle(cpu);
     for (int i = 0; i < (4 * m_cycles); i++) {
-	dma_oam_handle(cpu);
 	gpu_next(cpu);
 	timer_step(cpu);
     }
@@ -111,6 +106,8 @@ void cpu_next_instruction(struct CPU * cpu) {
 	    print_registers(cpu);
 	    sleep(10);
 	} else {
+	    // log_debug("%x : %s", cpu->registers.pc - 1 - instruction.operand, instruction.disasm);
+	    // print_registers(cpu);
 	    switch(instruction.operand) {
 	    case 0:
 		((void (*)(struct CPU *))instruction.function)(cpu);

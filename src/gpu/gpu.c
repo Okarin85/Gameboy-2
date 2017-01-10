@@ -3,7 +3,7 @@
  * Filename: gpu.c
  * Author: Jules <archjules>
  * Created: Tue Dec 13 00:45:56 2016 (+0100)
- * Last-Updated: Mon Jan  9 19:05:54 2017 (+0100)
+ * Last-Updated: Tue Jan 10 01:09:28 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -41,8 +41,10 @@ void gpu_render_line(struct CPU * cpu, int current_line) {
 	} else {
 	    bg_color = 0;
 	}
-
-	color = oam_render_sprite(cpu, i, current_line, bg_color);
+	if (cpu->gpu.spr_enabled)
+	    color = oam_render_sprite(cpu, i, current_line, bg_color);
+	else
+	    color = cpu->gpu.bg_palette[bg_color];
 	screen_put_pixel(cpu->screen, i, current_line, get_color(color));
     }
 }

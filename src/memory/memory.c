@@ -3,7 +3,7 @@
  * Filename: memory.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:40:29 2016 (+0100)
- * Last-Updated: Mon Jan  9 18:46:48 2017 (+0100)
+ * Last-Updated: Mon Jan  9 20:43:43 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -32,7 +32,6 @@ static uint8_t gb_bios[] = {
 };
 
 uint8_t read_byte(struct CPU * cpu, uint16_t address) {
-    //  log_debug("Reading byte 0x%04x", address);
     switch (address & 0xF000) {
     case 0x0000:
 	if (cpu->memory.bios_inplace && (address < 0x100)) return gb_bios[address];

@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Mon Jan  9 19:07:42 2017 (+0100)
+ * Last-Updated: Tue Jan 10 13:28:36 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -16,9 +16,9 @@ uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
     switch(port) {
     case 0x00:
 	if (cpu->memory.io[0x00] & 0x20) {
-	    return cpu->memory.io[0x00] | cpu->keys.direction;
+	    return 0xC0 | cpu->memory.io[0x00] | cpu->keys.direction;
 	} else {
-	    return cpu->memory.io[0x00] | cpu->keys.buttons;
+	    return 0xC0 | cpu->memory.io[0x00] | cpu->keys.buttons;
 	}
     case 0x04:
 	return (uint8_t)(cpu->timer_track >> 8);

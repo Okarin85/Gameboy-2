@@ -3,7 +3,7 @@
  * Filename: mbc.h
  * Author: Jules <archjules>
  * Created: Tue Jan  3 10:26:12 2017 (+0100)
- * Last-Updated: Mon Jan  9 09:22:36 2017 (+0100)
+ * Last-Updated: Tue Jan 10 00:54:21 2017 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -28,5 +28,19 @@ struct MBC1 {
 
 void mbc1_configure(struct CPU * cpu);
 void mbc1_free(struct CPU * cpu);
+
+/* MBC3 (incomplete) */
+struct MBC3 {
+    bool mode;
+    bool ram_enable;
+    
+    uint8_t rom_bank;
+    uint8_t ram_bank;
+
+    uint8_t * ram;
+};
+
+void mbc3_configure(struct CPU * cpu);
+void mbc3_free(struct CPU * cpu);
 
 #endif /* MBC_H */

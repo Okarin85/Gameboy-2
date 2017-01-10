@@ -3,7 +3,7 @@
  * Filename: mbc1.c
  * Author: Jules <archjules>
  * Created: Tue Jan  3 10:52:18 2017 (+0100)
- * Last-Updated: Mon Jan  9 19:33:19 2017 (+0100)
+ * Last-Updated: Tue Jan 10 13:39:18 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -39,6 +39,7 @@ uint8_t mbc1_read_ram(struct CPU * cpu, uint16_t address) {
 /* Write functions */
 
 void mbc1_write_rom(struct CPU * cpu, uint16_t address, uint8_t value) {
+    struct MBC1 * mbc_info = cpu->rom.mbc_info;
     switch(address & 0xF000) {
     case 0x0000:
     case 0x1000:
@@ -46,10 +47,10 @@ void mbc1_write_rom(struct CPU * cpu, uint16_t address, uint8_t value) {
 	break;
     case 0x2000:
     case 0x3000:
-	value &= 0x1F;
 	if ((value == 0x00) || (value == 0x20) || (value == 0x40) || (value == 0x60))
-	    value++;
-	((struct MBC1 *)cpu->rom.mbc_info)->rom_bank = value;
+	   value++;
+	mbc_info->rom_bank &= ~(0x1F);
+	mbc_info->rom_bank |= (value & 0x1f);
 	break;
     case 0x4000:
     case 0x5000:
