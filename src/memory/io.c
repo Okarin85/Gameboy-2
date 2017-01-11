@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Tue Jan 10 13:28:36 2017 (+0100)
+ * Last-Updated: Wed Jan 11 13:29:31 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -67,6 +67,7 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
     switch(port) {
     case 0x00:
 	cpu->memory.io[port] = value & 0x30;
+	break;
     case 0x04:
 	cpu->timer_track = 0;
 	break;

@@ -3,7 +3,7 @@
  * Filename: mbc3.c
  * Author: Jules <archjules>
  * Created: Tue Jan  3 10:52:18 2017 (+0100)
- * Last-Updated: Tue Jan 10 13:47:01 2017 (+0100)
+ * Last-Updated: Wed Jan 11 23:19:31 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -41,11 +41,18 @@ uint8_t mbc3_read_ram(struct CPU * cpu, uint16_t address) {
 
 void mbc3_write_rom(struct CPU * cpu, uint16_t address, uint8_t value) {
     struct MBC3 * mbc_info = cpu->rom.mbc_info;
+    int tmp;
     
     switch(address & 0xF000) {
     case 0x0000:
     case 0x1000:
-	mbc_info->ram_enable = ((value & 0xF) == 0xA);
+	tmp = ((value & 0xF) == 0xA);
+	((struct MBC1 *)cpu->rom.mbc_info)->ram_enable = tmp;
+	if (!tmp) {
+	    FILE * fp = fopen(((struct MBC1 *)cpu->rom.mbc_info)->save_filename, "w");
+	    fwrite(((struct MBC1 *)cpu->rom.mbc_info)->ram, 0x2000, 1, fp);
+	    fclose(fp);
+	}
 	break;
     case 0x2000:
     case 0x3000:
@@ -59,7 +66,6 @@ void mbc3_write_rom(struct CPU * cpu, uint16_t address, uint8_t value) {
 	break;
     case 0x6000:
     case 0x7000:
-	printf("Mode select : %x\n", value);
 	((struct MBC3 *)cpu->rom.mbc_info)->mode = value;
 	break;
     }
@@ -73,26 +79,46 @@ void mbc3_write_ram(struct CPU * cpu, uint16_t address, uint8_t value) {
 
 /* Configure function */
 
-void mbc3_configure(struct CPU * cpu) {
+void mbc3_configure(struct CPU * cpu, char * filename) {
     struct MBC3 * mbc = malloc(sizeof(struct MBC3));
+    int size;
+    FILE * fp;
+    
     if (mbc == NULL) {
 	log_fatal("Couldn't allocate memory for the MBC");
 	exit(EXIT_FAILURE);
     }
-    
-    cpu->rom.read_rom = mbc3_read_rom;
-    cpu->rom.read_ram = mbc3_read_ram;
-    cpu->rom.write_rom= mbc3_write_rom;
-    cpu->rom.write_ram= mbc3_write_ram;
-
-    mbc->mode = false;
-    mbc->ram_enable = false;
 
     mbc->ram = malloc(0x8000);
+
+    size = snprintf(NULL, 0, "%s.sav", filename);
+    mbc->save_filename = malloc(size);
+    if (mbc->save_filename == NULL) {
+	log_fatal("Couldn't allocate memory.");
+	exit(EXIT_FAILURE);
+    }
+
+    snprintf(mbc->save_filename, size + 1, "%s.sav", filename);
+
+    /* Tries to load the save */
+    fp = fopen(mbc->save_filename, "r");
+    if (fp != NULL) {
+	fread(mbc->ram, 0x2000, 1, fp);
+	fclose(fp);
+	log_info("Savefile loaded");
+    }
+    
+    mbc->mode = false;
+    mbc->ram_enable = false;
     
     mbc->rom_bank = 1;
     mbc->ram_bank = 0;
 
+    cpu->rom.read_rom = mbc3_read_rom;
+    cpu->rom.read_ram = mbc3_read_ram;
+    cpu->rom.write_rom= mbc3_write_rom;
+    cpu->rom.write_ram= mbc3_write_ram;
+    
     cpu->rom.mbc_info = mbc;
 }
 

@@ -3,7 +3,7 @@
  * Filename: load.c
  * Author: Jules <archjules>
  * Created: Mon Jan  2 18:21:01 2017 (+0100)
- * Last-Updated: Tue Jan 10 00:56:25 2017 (+0100)
+ * Last-Updated: Wed Jan 11 22:51:33 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -11,7 +11,7 @@
 #include "rom/mbc.h"
 #include "logger.h"
 
-void rom_configure(struct CPU * cpu) {
+void rom_configure(struct CPU * cpu, char * filename) {
     char title[17] = {0};
     int rom_size, ram_size, mbc_type;
 
@@ -49,17 +49,17 @@ void rom_configure(struct CPU * cpu) {
     /* Configure MBC */
     switch(mbc_type) {
     case 0x00: // MBC0
-	mbc0_configure(cpu);
+	mbc0_configure(cpu, filename);
 	break;
     case 0x01: // MBC1
     case 0x02:
     case 0x03:
-	mbc1_configure(cpu);
+	mbc1_configure(cpu, filename);
 	break;
     case 0x11:
     case 0x12:
     case 0x13:
-	mbc3_configure(cpu);
+	mbc3_configure(cpu, filename);
 	break;
     default:
 	log_fatal("MBC chip not supported !");
@@ -91,7 +91,7 @@ void rom_load(struct CPU * cpu, char * filename) {
     fclose(fp);
     
     log_debug("Loaded %s", filename);
-    rom_configure(cpu);
+    rom_configure(cpu, filename);
 }
 
 void rom_free(struct CPU * cpu) {

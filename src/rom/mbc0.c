@@ -3,7 +3,7 @@
  * Filename: mbc0.c
  * Author: Jules <archjules>
  * Created: Tue Jan  3 10:15:59 2017 (+0100)
- * Last-Updated: Tue Jan  3 10:29:27 2017 (+0100)
+ * Last-Updated: Wed Jan 11 22:58:43 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -30,7 +30,7 @@ void mbc0_write_ram(struct CPU * cpu, uint16_t address, uint8_t value) {
 
 /* Configure function */
 
-void mbc0_configure(struct CPU * cpu) {
+void mbc0_configure(struct CPU * cpu, char * filename) {
     cpu->rom.read_rom = mbc0_read_rom;
     cpu->rom.read_ram = mbc0_read_ram;
     cpu->rom.write_rom= mbc0_write_rom;

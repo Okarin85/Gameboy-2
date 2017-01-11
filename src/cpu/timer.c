@@ -3,7 +3,7 @@
  * Filename: timer.c
  * Author: Jules <archjules>
  * Created: Tue Jan  3 18:09:59 2017 (+0100)
- * Last-Updated: Mon Jan  9 17:34:24 2017 (+0100)
+ * Last-Updated: Wed Jan 11 10:43:53 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -13,7 +13,7 @@
 void timer_step(struct CPU * cpu) {
     int mask;
     cpu->timer_track++;
-
+    
     // Handle TIMA
     if (cpu->timer_tima_enabled) {
 	mask = (1 << cpu->timer_tima_speed) - 1;
@@ -25,12 +25,5 @@ void timer_step(struct CPU * cpu) {
 		cpu->timer_tima = cpu->timer_tma;
 	    }
 	}
-    }
-}
-
-void timer_handle(struct CPU * cpu, int cycles) {
-    // printf("Handle ! (%d)\n", cpu->time_last);
-    for (int i = 0; i < (cycles * 4); i++) {
-	timer_step(cpu);
     }
 }
