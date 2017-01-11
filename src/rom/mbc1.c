@@ -3,7 +3,7 @@
  * Filename: mbc1.c
  * Author: Jules <archjules>
  * Created: Tue Jan  3 10:52:18 2017 (+0100)
- * Last-Updated: Wed Jan 11 23:16:04 2017 (+0100)
+ * Last-Updated: Wed Jan 11 23:32:37 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -91,6 +91,10 @@ void mbc1_configure(struct CPU * cpu, char * filename) {
     }
 
     mbc->ram = malloc(0x2000);
+    if (mbc->ram == NULL) {
+	log_fatal("Couldn't allocate memory for the cartridge RAM");
+	exit(EXIT_FAILURE);
+    }
     
     size = snprintf(NULL, 0, "%s.sav", filename);
     mbc->save_filename = malloc(size);
@@ -119,6 +123,12 @@ void mbc1_configure(struct CPU * cpu, char * filename) {
     cpu->rom.read_ram = mbc1_read_ram;
     cpu->rom.write_rom= mbc1_write_rom;
     cpu->rom.write_ram= mbc1_write_ram;
+    cpu->rom.free     = mbc1_free;
     
     cpu->rom.mbc_info = mbc;
+}
+
+void mbc1_free(struct CPU * cpu) {
+    struct MBC1 * mbc = cpu->rom.mbc_info;
+    free(mbc->ram);
 }

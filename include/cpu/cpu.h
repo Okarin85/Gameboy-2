@@ -3,7 +3,7 @@
  * Filename: cpu.h
  * Author: Jules <archjules>
  * Created: Wed Dec  7 09:03:16 2016 (+0100)
- * Last-Updated: Sun Jan  8 17:18:52 2017 (+0100)
+ * Last-Updated: Wed Jan 11 23:56:39 2017 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -30,6 +30,7 @@ struct CPU {
     bool halted;
     bool interrupts;
     bool halt_bug;
+    bool fast_mode;
     
     struct {
 	union {
@@ -72,7 +73,8 @@ struct CPU {
 	uint8_t (*read_ram)(struct CPU *, uint16_t address);
 	void (*write_rom)(struct CPU *, uint16_t address, uint8_t value);
 	void (*write_ram)(struct CPU *, uint16_t address, uint8_t value);
-
+	void (*free)(struct CPU *);
+	
 	void * mbc_info;
     } rom;
     

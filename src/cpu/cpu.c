@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Tue Jan 10 00:15:50 2017 (+0100)
+ * Last-Updated: Wed Jan 11 23:41:14 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -78,6 +78,7 @@ void cpu_destroy(struct CPU * cpu) {
     free(cpu->memory.gram);
     free(cpu->memory.wram);
     free(cpu->memory.zram);
+    if (cpu->rom.free) cpu->rom.free(cpu);
 }
 
 void cpu_delay(struct CPU * cpu, int m_cycles) {

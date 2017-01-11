@@ -3,7 +3,7 @@
  * Filename: input.c
  * Author: Jules <archjules>
  * Created: Thu Dec 15 14:44:01 2016 (+0100)
- * Last-Updated: Mon Jan  2 11:11:26 2017 (+0100)
+ * Last-Updated: Wed Jan 11 23:59:08 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "platform/input.h"
@@ -55,11 +55,10 @@ void treat_events(struct CPU * cpu) {
 		cpu->keys.direction &= ~(0x08);
 		break;
 		// Debug keys
-	    case 67: // Dump gram (F1)
-		fp = fopen("gram_dump", "w");
-		fwrite(cpu->memory.gram, 1, 0x2000, fp);
-		fclose(fp);
-		log_debug("GRAM dumped to gram_dump");
+	    case 67: // Fast mode
+		log_debug("Fast mode toggled");
+		cpu->fast_mode = !cpu->fast_mode;
+		break;
 	    }
 	    break;
 	case SDL_KEYUP:

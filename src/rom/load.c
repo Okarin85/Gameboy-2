@@ -3,7 +3,7 @@
  * Filename: load.c
  * Author: Jules <archjules>
  * Created: Mon Jan  2 18:21:01 2017 (+0100)
- * Last-Updated: Wed Jan 11 22:51:33 2017 (+0100)
+ * Last-Updated: Wed Jan 11 23:40:54 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -56,6 +56,7 @@ void rom_configure(struct CPU * cpu, char * filename) {
     case 0x03:
 	mbc1_configure(cpu, filename);
 	break;
+    case 0x10:
     case 0x11:
     case 0x12:
     case 0x13:

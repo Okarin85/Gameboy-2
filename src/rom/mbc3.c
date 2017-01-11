@@ -3,7 +3,7 @@
  * Filename: mbc3.c
  * Author: Jules <archjules>
  * Created: Tue Jan  3 10:52:18 2017 (+0100)
- * Last-Updated: Wed Jan 11 23:19:31 2017 (+0100)
+ * Last-Updated: Wed Jan 11 23:44:34 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -50,7 +50,7 @@ void mbc3_write_rom(struct CPU * cpu, uint16_t address, uint8_t value) {
 	((struct MBC1 *)cpu->rom.mbc_info)->ram_enable = tmp;
 	if (!tmp) {
 	    FILE * fp = fopen(((struct MBC1 *)cpu->rom.mbc_info)->save_filename, "w");
-	    fwrite(((struct MBC1 *)cpu->rom.mbc_info)->ram, 0x2000, 1, fp);
+	    fwrite(((struct MBC1 *)cpu->rom.mbc_info)->ram, 0x8000, 1, fp);
 	    fclose(fp);
 	}
 	break;
@@ -61,7 +61,7 @@ void mbc3_write_rom(struct CPU * cpu, uint16_t address, uint8_t value) {
 	break;
     case 0x4000:
     case 0x5000:
-	if (value >= 0x3)
+	if (value <= 0x3)
 	    mbc_info->ram_bank = value;
 	break;
     case 0x6000:
@@ -90,7 +90,11 @@ void mbc3_configure(struct CPU * cpu, char * filename) {
     }
 
     mbc->ram = malloc(0x8000);
-
+    if (mbc->ram == NULL) {
+	log_fatal("Couldn't allocate memory for the cartridge RAM");
+	exit(EXIT_FAILURE);
+    }
+    
     size = snprintf(NULL, 0, "%s.sav", filename);
     mbc->save_filename = malloc(size);
     if (mbc->save_filename == NULL) {
@@ -103,7 +107,7 @@ void mbc3_configure(struct CPU * cpu, char * filename) {
     /* Tries to load the save */
     fp = fopen(mbc->save_filename, "r");
     if (fp != NULL) {
-	fread(mbc->ram, 0x2000, 1, fp);
+	fread(mbc->ram, 0x8000, 1, fp);
 	fclose(fp);
 	log_info("Savefile loaded");
     }
@@ -118,6 +122,7 @@ void mbc3_configure(struct CPU * cpu, char * filename) {
     cpu->rom.read_ram = mbc3_read_ram;
     cpu->rom.write_rom= mbc3_write_rom;
     cpu->rom.write_ram= mbc3_write_ram;
+    cpu->rom.free     = mbc3_free;
     
     cpu->rom.mbc_info = mbc;
 }
