@@ -3,15 +3,18 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Wed Jan 11 23:41:14 2017 (+0100)
+ * Last-Updated: Thu Jan 12 18:13:09 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include "cpu/cpu.h"
+#include "cpu/dma.h"
 #include "cpu/timer.h"
+#include "cpu/interrupt.h"
 #include "cpu/instruction.h"
+#include "gpu/gpu.h"
 #include "memory/memory.h"
 #include "logger.h"
 

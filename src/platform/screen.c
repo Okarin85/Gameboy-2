@@ -3,7 +3,7 @@
  * Filename: screen.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 18:19:15 2016 (+0100)
- * Last-Updated: Mon Jan  9 14:38:44 2017 (+0100)
+ * Last-Updated: Thu Jan 12 18:17:08 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <SDL/SDL.h>
@@ -28,20 +28,6 @@ Screen * new_screen() {
 void screen_destroy(SDL_Surface * window) {
     SDL_FreeSurface(window);
     SDL_Quit();
-}
-
-/*
- * screen_turnoff:
- * Fills the screen with white, and flip
- */
-void screen_turnoff(SDL_Surface * window) {
-    printf("Turning off screen !\n");
-    SDL_Rect rect = {.w = PIXEL_SIZE * SCREEN_WIDTH,
-		     .h = PIXEL_SIZE * SCREEN_HEIGHT,
-		     .x = 0,
-		     .y = 0};
-    SDL_FillRect(window, &rect, SCREEN_WHITE);
-    SDL_Flip(window);
 }
 	
 /*

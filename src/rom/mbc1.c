@@ -3,7 +3,7 @@
  * Filename: mbc1.c
  * Author: Jules <archjules>
  * Created: Tue Jan  3 10:52:18 2017 (+0100)
- * Last-Updated: Wed Jan 11 23:32:37 2017 (+0100)
+ * Last-Updated: Thu Jan 12 18:15:35 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -62,12 +62,10 @@ void mbc1_write_rom(struct CPU * cpu, uint16_t address, uint8_t value) {
 	break;
     case 0x4000:
     case 0x5000:
-	printf("%x\n", value);
-	sleep(2);
+	log_warn("This register is not implemented (MBC1:0x4000-0x5000) : %x\n", value);
 	break;
     case 0x6000:
     case 0x7000:
-	printf("Mode select : %x\n", value);
 	((struct MBC1 *)cpu->rom.mbc_info)->mode = value;
 	break;
     }

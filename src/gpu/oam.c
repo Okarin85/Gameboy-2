@@ -3,7 +3,7 @@
  * Filename: oam.c
  * Author: Jules <archjules>
  * Created: Fri Dec 30 01:01:21 2016 (+0100)
- * Last-Updated: Tue Jan 10 13:28:18 2017 (+0100)
+ * Last-Updated: Thu Jan 12 18:16:03 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -97,6 +97,7 @@ uint8_t oam_read_byte(struct CPU * cpu, uint16_t address) {
 	    cpu->gpu.oam[spr_nb].y_flip      << 6 |
 	    cpu->gpu.oam[spr_nb].x_flip      << 5 |
 	    cpu->gpu.oam[spr_nb].palette     << 4;
+    default: return 0xFF;
     }
 }
 

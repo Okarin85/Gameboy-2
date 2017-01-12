@@ -3,7 +3,7 @@
  * Filename: cpu.h
  * Author: Jules <archjules>
  * Created: Wed Dec  7 09:03:16 2016 (+0100)
- * Last-Updated: Wed Jan 11 23:56:39 2017 (+0100)
+ * Last-Updated: Thu Jan 12 18:13:34 2017 (+0100)
  *           By: Jules <archjules>
  */
 
@@ -113,7 +113,8 @@ struct CPU {
     uint_fast8_t  time_last;
 };
 
-void cpu_next_instruction(struct CPU * cpu);
-void cpu_init(struct CPU * cpu);
-void cpu_destroy(struct CPU * cpu);
+void cpu_next_instruction(struct CPU *);
+void cpu_init(struct CPU *);
+void cpu_delay(struct CPU *, int);
+void cpu_destroy(struct CPU *);
 #endif /* CPU_H */

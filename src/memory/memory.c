@@ -3,7 +3,7 @@
  * Filename: memory.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:40:29 2016 (+0100)
- * Last-Updated: Mon Jan  9 20:43:43 2017 (+0100)
+ * Last-Updated: Thu Jan 12 18:16:21 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -63,6 +63,8 @@ uint8_t read_byte(struct CPU * cpu, uint16_t address) {
 	} else if ((address >= 0xFF80)) {
 	    return cpu->memory.zram[address & 0xFF];
 	} else return 0;
+    default:
+	return 0xFF;
     }
 }
 

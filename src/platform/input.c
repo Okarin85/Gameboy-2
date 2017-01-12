@@ -3,7 +3,7 @@
  * Filename: input.c
  * Author: Jules <archjules>
  * Created: Thu Dec 15 14:44:01 2016 (+0100)
- * Last-Updated: Wed Jan 11 23:59:08 2017 (+0100)
+ * Last-Updated: Thu Jan 12 18:13:54 2017 (+0100)
  *           By: Jules <archjules>
  */
 #include "platform/input.h"
@@ -20,7 +20,6 @@
 extern uint8_t oam[0xA0];
 
 void treat_events(struct CPU * cpu) {
-    FILE * fp = NULL;
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
