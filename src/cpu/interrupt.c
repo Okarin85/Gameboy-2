@@ -3,7 +3,7 @@
  * Filename: interrupt.c
  * Author: Jules <archjules>
  * Created: Tue Dec 20 23:09:01 2016 (+0100)
- * Last-Updated: Tue Jan 10 00:05:31 2017 (+0100)
+ * Last-Updated: Tue Jun  6 21:14:46 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include "cpu/timer.h"
@@ -22,7 +22,9 @@ void treat_interruptions(struct CPU * cpu) {
 		cpu->interrupts = false;
 		push_word(cpu, cpu->registers.pc);
 		cpu_delay(cpu, 3);
-		cpu->registers.pc = (0x40 + i * 0x8);
+		cpu->registers.pc = (0x40 + (i << 3));
+
+		return;
 	    }
 	}
     }

@@ -3,7 +3,7 @@
  * Filename: mbc3.c
  * Author: Jules <archjules>
  * Created: Tue Jan  3 10:52:18 2017 (+0100)
- * Last-Updated: Wed Jan 11 23:44:34 2017 (+0100)
+ * Last-Updated: Tue Jun  6 20:48:48 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -25,7 +25,7 @@ uint8_t mbc3_read_rom(struct CPU * cpu, uint16_t address) {
     case 0x5000:
     case 0x6000:
     case 0x7000:
-	bank_base = (((struct MBC3 *)cpu->rom.mbc_info)->rom_bank) * 0x4000;
+	bank_base = (((struct MBC3 *)cpu->rom.mbc_info)->rom_bank) << 14;
 	return cpu->rom.rom_data[bank_base + (address & 0x3FFF)];
     }
 
