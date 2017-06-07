@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Wed Jan 11 13:29:31 2017 (+0100)
+ * Last-Updated: Tue Jun  6 21:44:34 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -24,6 +24,9 @@ uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
 	return (uint8_t)(cpu->timer_track >> 8);
     case 0x05:
 	return cpu->timer_tima;
+    case 0x0F:
+	printf("%x, %x\n", cpu->memory.io[0x41], cpu->memory.io[port]);
+	return cpu->memory.io[port];
     case 0x40:
 	return 0x80 |
 	    cpu->gpu.wd_map     << 6 |

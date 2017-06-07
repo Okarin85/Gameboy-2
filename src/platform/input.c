@@ -3,7 +3,7 @@
  * Filename: input.c
  * Author: Jules <archjules>
  * Created: Thu Dec 15 14:44:01 2016 (+0100)
- * Last-Updated: Thu Jan 12 18:13:54 2017 (+0100)
+ * Last-Updated: Tue Jun  6 21:32:56 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include "platform/input.h"
@@ -57,6 +57,9 @@ void treat_events(struct CPU * cpu) {
 	    case 67: // Fast mode
 		log_debug("Fast mode toggled");
 		cpu->fast_mode = !cpu->fast_mode;
+		break;
+	    case 68: // Dump
+		log_debug("Dumping VRAM");
 		break;
 	    }
 	    break;

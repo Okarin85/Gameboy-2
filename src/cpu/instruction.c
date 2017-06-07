@@ -3,7 +3,7 @@
  * Filename: instruction.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 12:36:49 2016 (+0100)
- * Last-Updated: Mon Jan  9 19:18:01 2017 (+0100)
+ * Last-Updated: Wed Jun  7 06:51:07 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -13,7 +13,7 @@
 #include "logger.h"
 
 /*
- * Every "normal" (unprefixed) instruction. Every instruction returns the number of cycles it took to complete.
+ * Every "normal" (unprefixed) instruction.
  */
 
 /*
@@ -26,7 +26,7 @@ void cpu_nop(struct CPU * cpu) {}
  * cpu_halt:
  * Halts the CPU until an interrupt occurs
  */
-void cpu_halt(struct CPU * cpu) { cpu->halted = true; }
+void cpu_halt(struct CPU * cpu) { printf("%x\n", read_byte(cpu, 0xff04)); cpu->halted = true; }
 
 
 /*
@@ -660,6 +660,7 @@ void cpu_jr_nc(struct CPU * cpu, uint8_t operand) { g_cnjr(cpu, operand, CPU_FLA
  * Pushes current PC on the stack, then jump to given address
  */
 static inline void g_call(struct CPU * cpu, uint16_t address) {
+    cpu_delay(cpu, 3);
     push_word(cpu, cpu->registers.pc);
     cpu->registers.pc = address;
 }
@@ -672,7 +673,7 @@ void cpu_call(struct CPU * cpu, uint16_t operand) { g_call(cpu, operand); }
  */
 static inline void g_ccall(struct CPU * cpu, uint16_t address, uint8_t flag) {
     if (cpu->registers.f & flag) g_call(cpu, address);
-    else                         {}
+    else                         cpu_delay(cpu, 2);
 }
 
 void cpu_call_c(struct CPU * cpu, uint16_t operand) { g_ccall(cpu, operand, CPU_FLAG_C); }
@@ -683,7 +684,7 @@ void cpu_call_z(struct CPU * cpu, uint16_t operand) { g_ccall(cpu, operand, CPU_
  * Call given address if * flag is unset
  */
 static inline void g_cncall(struct CPU * cpu, uint16_t address, uint8_t flag) {
-    if (cpu->registers.f & flag) ;
+    if (cpu->registers.f & flag) cpu_delay(cpu, 2);
     else                         g_call(cpu, address);
 }
 
@@ -877,3 +878,262 @@ void cpu_daa(struct CPU * cpu) {
     if (a == 0) { FLAG_SET(cpu->registers.f, CPU_FLAG_Z); }
     cpu->registers.a = a;
 }
+
+struct Instruction instructions[] = {
+    {"NOP",             0, cpu_nop}, // 0x0X
+    {"LD BC, 0x%04x",   2, cpu_ld_bc_nn},
+    {"LD (BC), A",      0, cpu_ld_bc_a},
+    {"INC BC",          0, cpu_inc_bc},
+    {"INC B",           0, cpu_inc_b},
+    {"DEC B",           0, cpu_dec_b},
+    {"LD B, 0x%02x",    1, cpu_ld_b_n},
+    {"RLCA",            0, cpu_rlca},
+    {"LD (0x%04x), SP", 2, cpu_ld_nn_sp},
+    {"ADD HL, BC",      0, cpu_add_hl_bc},
+    {"LD A, (BC)",      0, cpu_ld_a_bc},
+    {"DEC BC",          0, cpu_dec_bc},
+    {"INC C",           0, cpu_inc_c},
+    {"DEC C",           0, cpu_dec_c},
+    {"LD C, 0x%02x",    1, cpu_ld_c_n},
+    {"RRCA",            0, cpu_rrca},
+    {"STOP",            1, cpu_stop},    // 0x1X
+    {"LD DE, 0x%04x",   2, cpu_ld_de_nn},
+    {"LD (DE), A",      0, cpu_ld_de_a},
+    {"INC DE",          0, cpu_inc_de},
+    {"INC D",           0, cpu_inc_d},
+    {"DEC D",           0, cpu_dec_d},
+    {"LD D, 0x%02x",    1, cpu_ld_d_n},
+    {"RLA",             0, cpu_rla},
+    {"JR 0x%02x",       1, cpu_jr},
+    {"ADD HL, DE",      0, cpu_add_hl_de},
+    {"LD A, (DE)",      0, cpu_ld_a_de},
+    {"DEC DE",          0, cpu_dec_de},
+    {"INC E",           0, cpu_inc_e},
+    {"DEC E",           0, cpu_dec_e},
+    {"LD E, 0x%02x",    1, cpu_ld_e_n},
+    {"RRA",             0, cpu_rra},
+    {"JR NZ, 0x%02x",   1, cpu_jr_nz},    // 0x2X
+    {"LD HL, 0x%04x",   2, cpu_ld_hl_nn},
+    {"LD (HL+), A",     0, cpu_ldi_hl_a},
+    {"INC HL",          0, cpu_inc_hl},
+    {"INC H",           0, cpu_inc_h},
+    {"DEC H",           0, cpu_dec_h},
+    {"LD H, 0x%02x",    1, cpu_ld_h_n},
+    {"DAA",             0, cpu_daa},
+    {"JR Z, 0x%02x",    1, cpu_jr_z},
+    {"ADD HL, HL",      0, cpu_add_hl_hl},
+    {"LD A, (HL+)",     0, cpu_ldi_a_hl},
+    {"DEC HL",          0, cpu_dec_hl},
+    {"INC L",           0, cpu_inc_l},
+    {"DEC L",           0, cpu_dec_l},
+    {"LD L, 0x%02x",    1, cpu_ld_l_n},
+    {"CPL",             0, cpu_cpl},
+    {"JR NC, 0x%02x",   1, cpu_jr_nc},    // 0x3X
+    {"LD SP, 0x%04x",   2, cpu_ld_sp_nn},
+    {"LD (HL-), A",     0, cpu_ldd_hl_a},
+    {"INC SP",          0, cpu_inc_sp},
+    {"INC (HL)",        0, cpu_incm_hl},
+    {"DEC (HL)",        0, cpu_decm_hl},
+    {"LD (HL), 0x%02x", 1, cpu_ld_hl_n},
+    {"SCF",             0, cpu_scf},
+    {"JR C, 0x%02x",    1, cpu_jr_c},
+    {"ADD HL, SP",      0, cpu_add_hl_sp},
+    {"LD A, (HL-)",     0, cpu_ldd_a_hl},
+    {"DEC SP",          0, cpu_dec_sp},
+    {"INC A",           0, cpu_inc_a},
+    {"DEC A",           0, cpu_dec_a},
+    {"LD A, 0x%02x",    1, cpu_ld_a_n},
+    {"CCF",             0, cpu_ccf},
+    {"LD B, B",         0, cpu_ld_b_b},    // 0x4X
+    {"LD B, C",         0, cpu_ld_b_c},
+    {"LD B, D",         0, cpu_ld_b_d},
+    {"LD B, E",         0, cpu_ld_b_e},
+    {"LD B, H",         0, cpu_ld_b_h},
+    {"LD B, L",         0, cpu_ld_b_l},
+    {"LD B, (HL)",      0, cpu_ld_b_hl},
+    {"LD B, A",         0, cpu_ld_b_a},
+    {"LD C, B",         0, cpu_ld_c_b},
+    {"LD C, C",         0, cpu_ld_c_c},
+    {"LD C, D",         0, cpu_ld_c_d},
+    {"LD C, E",         0, cpu_ld_c_e},
+    {"LD C, H",         0, cpu_ld_c_h},
+    {"LD C, L",         0, cpu_ld_c_l},
+    {"LD C, (HL)",      0, cpu_ld_c_hl},
+    {"LD C, A",         0, cpu_ld_c_a},
+    {"LD D, B",         0, cpu_ld_d_b},    // 0x5X
+    {"LD D, C",         0, cpu_ld_d_c},
+    {"LD D, D",         0, cpu_ld_d_d},
+    {"LD D, E",         0, cpu_ld_d_e},
+    {"LD D, H",         0, cpu_ld_d_h},
+    {"LD D, L",         0, cpu_ld_d_l},
+    {"LD D, (HL)",      0, cpu_ld_d_hl},
+    {"LD D, A",         0, cpu_ld_d_a},
+    {"LD E, B",         0, cpu_ld_e_b},
+    {"LD E, C",         0, cpu_ld_e_c},
+    {"LD E, D",         0, cpu_ld_e_d},
+    {"LD E, E",         0, cpu_ld_e_e},
+    {"LD E, H",         0, cpu_ld_e_h},
+    {"LD E, L",         0, cpu_ld_e_l},
+    {"LD E, (HL)",      0, cpu_ld_e_hl},
+    {"LD E, A",         0, cpu_ld_e_a},
+    {"LD H, B",         0, cpu_ld_h_b},    // 0x6X
+    {"LD H, C",         0, cpu_ld_h_c},
+    {"LD H, D",         0, cpu_ld_h_d},
+    {"LD H, E",         0, cpu_ld_h_e},
+    {"LD H, H",         0, cpu_ld_h_h},
+    {"LD H, L",         0, cpu_ld_h_l},
+    {"LD H, (HL)",      0, cpu_ld_h_hl},
+    {"LD H, A",         0, cpu_ld_h_a},
+    {"LD L, B",         0, cpu_ld_l_b},
+    {"LD L, C",         0, cpu_ld_l_c},
+    {"LD L, D",         0, cpu_ld_l_d},
+    {"LD L, E",         0, cpu_ld_l_e},
+    {"LD L, H",         0, cpu_ld_l_h},
+    {"LD L, L",         0, cpu_ld_l_l},
+    {"LD L, (HL)",      0, cpu_ld_l_hl},
+    {"LD L, A",         0, cpu_ld_l_a},
+    {"LD (HL), B",      0, cpu_ld_hl_b},    // 0x7X
+    {"LD (HL), C",      0, cpu_ld_hl_c},
+    {"LD (HL), D",      0, cpu_ld_hl_d},
+    {"LD (HL), E",      0, cpu_ld_hl_e},
+    {"LD (HL), H",      0, cpu_ld_hl_h},
+    {"LD (HL), L",      0, cpu_ld_hl_l},
+    {"HALT",            0, cpu_halt},
+    {"LD (HL), A",      0, cpu_ld_hl_a},
+    {"LD A, B",         0, cpu_ld_a_b},
+    {"LD A, C",         0, cpu_ld_a_c},
+    {"LD A, D",         0, cpu_ld_a_d},
+    {"LD A, E",         0, cpu_ld_a_e},
+    {"LD A, H",         0, cpu_ld_a_h},
+    {"LD A, L",         0, cpu_ld_a_l},
+    {"LD A, (HL)",      0, cpu_ld_a_hl},
+    {"LD A, A",         0, cpu_ld_a_a},
+    {"ADD A, B",        0, cpu_add_b},    // 0x8X
+    {"ADD A, C",        0, cpu_add_c},
+    {"ADD A, D",        0, cpu_add_d},
+    {"ADD A, E",        0, cpu_add_e},
+    {"ADD A, H",        0, cpu_add_h},
+    {"ADD A, L",        0, cpu_add_l},
+    {"ADD A, (HL)",     0, cpu_add_hl},
+    {"ADD A, A",        0, cpu_add_a},
+    {"ADC A, B",        0, cpu_adc_b},
+    {"ADC A, C",        0, cpu_adc_c},
+    {"ADC A, D",        0, cpu_adc_d},
+    {"ADC A, E",        0, cpu_adc_e},
+    {"ADC A, H",        0, cpu_adc_h},
+    {"ADC A, L",        0, cpu_adc_l},
+    {"ADC A, (HL)",     0, cpu_adc_hl},
+    {"ADC A, A",        0, cpu_adc_a},
+    {"SUB A, B",        0, cpu_sub_b},    // 0x9X
+    {"SUB A, C",        0, cpu_sub_c},
+    {"SUB A, D",        0, cpu_sub_d},
+    {"SUB A, E",        0, cpu_sub_e},
+    {"SUB A, H",        0, cpu_sub_h},
+    {"SUB A, L",        0, cpu_sub_l},
+    {"SUB A, (HL)",     0, cpu_sub_hl},
+    {"SUB A, A",        0, cpu_sub_a},
+    {"SBC A, B",        0, cpu_sbc_b},
+    {"SBC A, C",        0, cpu_sbc_c},
+    {"SBC A, D",        0, cpu_sbc_d},
+    {"SBC A, E",        0, cpu_sbc_e},
+    {"SBC A, H",        0, cpu_sbc_h},
+    {"SBC A, L",        0, cpu_sbc_l},
+    {"SBC A, (HL)",     0, cpu_sbc_hl},
+    {"SBC A, A",        0, cpu_sbc_a},
+    {"AND B",           0, cpu_and_b},    // 0xAX
+    {"AND C",           0, cpu_and_c},
+    {"AND D",           0, cpu_and_d},
+    {"AND E",           0, cpu_and_e},
+    {"AND H",           0, cpu_and_h},
+    {"AND L",           0, cpu_and_l},
+    {"AND (HL)",        0, cpu_and_hl},
+    {"AND A",           0, cpu_and_a},
+    {"XOR B",           0, cpu_xor_b},
+    {"XOR C",           0, cpu_xor_c},
+    {"XOR D",           0, cpu_xor_d},
+    {"XOR E",           0, cpu_xor_e},
+    {"XOR H",           0, cpu_xor_h},
+    {"XOR L",           0, cpu_xor_l},
+    {"XOR (HL)",        0, cpu_xor_hl},
+    {"XOR A",           0, cpu_xor_a},
+    {"OR B",            0, cpu_or_b},    // 0xBX
+    {"OR C",            0, cpu_or_c},
+    {"OR D",            0, cpu_or_d},
+    {"OR E",            0, cpu_or_e},
+    {"OR H",            0, cpu_or_h},
+    {"OR L",            0, cpu_or_l},
+    {"OR (HL)",         0, cpu_or_hl},
+    {"OR A",            0, cpu_or_a},
+    {"CP B",            0, cpu_cp_b},
+    {"CP C",            0, cpu_cp_c},
+    {"CP D",            0, cpu_cp_d},
+    {"CP E",            0, cpu_cp_e},
+    {"CP H",            0, cpu_cp_h},
+    {"CP L",            0, cpu_cp_l},
+    {"CP (HL)",         0, cpu_cp_hl},
+    {"CP A",            0, cpu_cp_a},
+    {"RET NZ",          0, cpu_ret_nz},    // 0xCX
+    {"POP BC",          0, cpu_pop_bc},
+    {"JP NZ, 0x%04x",   2, cpu_jp_nz},
+    {"JP 0x%04x",       2, cpu_jp},
+    {"CALL NZ, 0x%04x", 2, cpu_call_nz},
+    {"PUSH BC",         0, cpu_push_bc},
+    {"ADD A, 0x%02x",   1, cpu_add_n},
+    {"RST 0x00",        0, cpu_rst_00},
+    {"RET Z",           0, cpu_ret_z},
+    {"RET",             0, cpu_ret},
+    {"JP Z, 0x%04x",    2, cpu_jp_z},
+    {"CB %2X",          1, cb_prefix},
+    {"CALL Z, 0x%04x",  2, cpu_call_z},
+    {"CALL 0x%04x",     2, cpu_call},
+    {"ADC A, 0x%02x",   1, cpu_adc_n},
+    {"RST 0x08",        0, cpu_rst_08},
+    {"RET NC",          0, cpu_ret_nc},    // 0xDX
+    {"POP DE",          0, cpu_pop_de},
+    {"JP NC, 0x%04x",   2, cpu_jp_nc},
+    {"NONE",            0, NULL},
+    {"CALL NC, 0x%04x", 2, cpu_call_nc},
+    {"PUSH DE",         0, cpu_push_de},
+    {"SUB A, 0x%02x",   1, cpu_sub_n},
+    {"RST 0x10",        0, cpu_rst_10},
+    {"RET C",           0, cpu_ret_c},
+    {"RETI",            0, cpu_reti},
+    {"JP C, 0x%04x",    2, cpu_jp_c},
+    {"NONE",            0, NULL},
+    {"CALL C, 0x%04x",  2, cpu_call_c},
+    {"NONE",            0, NULL},
+    {"SBC A, 0x%02x",   1, cpu_sbc_n},
+    {"RST 0x18",        0, cpu_rst_18},
+    {"LDH (0x%02x), A", 1, cpu_ldh_n_a},    // 0xEX
+    {"POP HL",          0, cpu_pop_hl},
+    {"LD (C), A",       0, cpu_ldh_c_a},
+    {"NONE",            0, NULL},
+    {"NONE",            0, NULL},
+    {"PUSH HL",         0, cpu_push_hl},
+    {"AND 0x%02x",      1, cpu_and_n},
+    {"RST 0x20",        0, cpu_rst_20},
+    {"ADD SP, 0x%02x",  1, cpu_add_sp_nn},
+    {"JP (HL)",         0, cpu_jp_hl},
+    {"LD (0x%04x), A",  2, cpu_ld_n_a},
+    {"NONE",            0, NULL},
+    {"NONE",            0, NULL},
+    {"NONE",            0, NULL},
+    {"XOR 0x%02x",      1, cpu_xor_n},
+    {"RST 0x28",        0, cpu_rst_28},
+    {"LDH A, (0x%02x)", 1, cpu_ldh_a_n},    // 0xFX
+    {"POP AF",          0, cpu_pop_af},
+    {"LD A, (C)",       0, cpu_ldh_a_c},
+    {"DI",              0, cpu_di},
+    {"NONE",            0, NULL},
+    {"PUSH AF",         0, cpu_push_af},
+    {"OR 0x%02x",       1, cpu_or_n},
+    {"RST 0x30",        0, cpu_rst_30},
+    {"LD HL, SP+0x%02x",1, cpu_ld_hl_spnn},
+    {"LD SP, HL",       0, cpu_ld_sp_hl},
+    {"LD A, (0x%04x)",  2, cpu_ld_a_nn},
+    {"EI",              0, cpu_ei},
+    {"NONE",            0, NULL},
+    {"NONE",            0, NULL},
+    {"CP 0x%02x",       1, cpu_cp_n},
+    {"RST 0x38",        0, cpu_rst_38},
+};

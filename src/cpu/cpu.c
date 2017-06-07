@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Thu Jan 12 18:13:09 2017 (+0100)
+ * Last-Updated: Wed Jun  7 07:00:39 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -21,21 +21,6 @@
 /*
  * General functions
  */
-void print_registers(struct CPU * cpu) {
-    log_debug("AF : 0x%04x (Z : %x, N : %x, H : %x, C : %x)",
-	      cpu->registers.af,
-	      cpu->registers.f & CPU_FLAG_Z,
-	      cpu->registers.f & CPU_FLAG_N,
-	      cpu->registers.f & CPU_FLAG_H,
-	      cpu->registers.f & CPU_FLAG_C
-	);
-    log_debug("BC : 0x%04x", cpu->registers.bc);
-    log_debug("DE : 0x%04x", cpu->registers.de);
-    log_debug("HL : 0x%04x", cpu->registers.hl);
-    log_debug("PC : 0x%04x", cpu->registers.pc);
-    log_debug("SP : 0x%04x", cpu->registers.sp);
-}
-
 static inline uint16_t interpret_opcode(struct CPU * cpu, struct Instruction opcode) {
     uint16_t operand;
     if (opcode.operand == 1) {
@@ -75,6 +60,7 @@ void cpu_init(struct CPU * cpu) {
     cpu->gpu.mode = 3;
 
     cpu->registers.pc = 0;
+    cpu->debug.next = true;
 }
 
 void cpu_destroy(struct CPU * cpu) {
@@ -101,13 +87,14 @@ void cpu_next_instruction(struct CPU * cpu) {
     if (cpu->halted) {
 	cpu_delay(cpu, 1);
     } else {
+	handle_debug_run(cpu);
+	
 	op = read_byte(cpu, cpu->registers.pc++);
 	instruction = instructions[op];
 	operand = interpret_opcode(cpu, instruction);
 	
 	if (instruction.function == NULL) {
 	    log_warn("%#04x : Instruction invalid ! (%#02x)", cpu->registers.pc - 1 - instruction.operand, op);
-	    print_registers(cpu);
 	    sleep(10);
 	} else {
 	    // log_debug("%x : %s", cpu->registers.pc - 1 - instruction.operand, instruction.disasm);

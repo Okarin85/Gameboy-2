@@ -3,7 +3,7 @@
  * Filename: cpu.h
  * Author: Jules <archjules>
  * Created: Wed Dec  7 09:03:16 2016 (+0100)
- * Last-Updated: Thu Jan 12 18:13:34 2017 (+0100)
+ * Last-Updated: Wed Jun  7 06:28:40 2017 (+0200)
  *           By: Jules <archjules>
  */
 
@@ -100,6 +100,13 @@ struct CPU {
     bool dma_ongoing;
     uint16_t dma_source;
     uint16_t dma_dest;
+
+    // Debug
+    struct {
+	bool next;
+	int breakpoints[0xff];
+	int break_n;
+    } debug;
     
     // Timer stuff
     int timer_track;
