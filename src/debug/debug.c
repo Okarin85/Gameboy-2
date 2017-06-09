@@ -4,11 +4,12 @@
  * Filename: debug.c
  * Author: Jules <archjules>
  * Created: Wed Jun  7 06:03:04 2017 (+0200)
- * Last-Updated: Wed Jun  7 07:01:30 2017 (+0200)
+ * Last-Updated: Fri Jun  9 12:05:09 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
 #include <string.h>
+#include "memory/memory.h"
 #include "debug/debug.h"
 #include "logger.h"
 
@@ -25,6 +26,7 @@ void print_registers(struct CPU * cpu) {
     log_debug("HL : 0x%04x", cpu->registers.hl);
     log_debug("PC : 0x%04x", cpu->registers.pc);
     log_debug("SP : 0x%04x", cpu->registers.sp);
+    log_debug("Timer track : %x", cpu->timer_track / 2);
 }
 
 void handle_debug_run(struct CPU * cpu) {
@@ -36,7 +38,7 @@ void handle_debug_run(struct CPU * cpu) {
     
     if (cpu->debug.next || is_break) {
 	cpu->debug.next = false;
-	
+	handle_debug(cpu);
     }
 }
 
@@ -53,7 +55,9 @@ void handle_debug(struct CPU * cpu) {
 	    
 	command = strtok(buffer, "\n ");
 
-	if (strcmp(command, "q") == 0) {
+	if (command == NULL) {
+	    
+	} else if (strcmp(command, "q") == 0) {
 	    // Quit
 	    cpu->state = true;
 	    return;
@@ -64,6 +68,20 @@ void handle_debug(struct CPU * cpu) {
 	    // Next
 	    cpu->debug.next = true;
 	    return;
+	} else if (strcmp(command, "x") == 0) {
+	    // Print memory
+	    int addr;
+	    arg = strtok(NULL, "\n ");
+	    sscanf(arg, "%x", &addr);
+	    
+	    for (int i = 0; i < 3; i++) {
+		printf("%04x: ", addr + (i << 4));
+		for (int j = 0; j < 16; j++) {
+		    printf("%02x ", read_byte(cpu, addr + (i << 4) + j));
+		}
+
+		printf("\n");
+	    }
 	} else if (strcmp(command, "b") == 0) {
 	    // Set breakpoint
 	    int addr;

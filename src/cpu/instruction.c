@@ -3,7 +3,7 @@
  * Filename: instruction.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 12:36:49 2016 (+0100)
- * Last-Updated: Wed Jun  7 06:51:07 2017 (+0200)
+ * Last-Updated: Fri Jun  9 02:02:28 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -26,7 +26,7 @@ void cpu_nop(struct CPU * cpu) {}
  * cpu_halt:
  * Halts the CPU until an interrupt occurs
  */
-void cpu_halt(struct CPU * cpu) { printf("%x\n", read_byte(cpu, 0xff04)); cpu->halted = true; }
+void cpu_halt(struct CPU * cpu) { cpu->halted = true; }
 
 
 /*

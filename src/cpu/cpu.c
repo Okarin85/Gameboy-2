@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Wed Jun  7 07:00:39 2017 (+0200)
+ * Last-Updated: Fri Jun  9 11:16:53 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -16,6 +16,7 @@
 #include "cpu/instruction.h"
 #include "gpu/gpu.h"
 #include "memory/memory.h"
+#include "debug/debug.h"
 #include "logger.h"
 
 /*
@@ -89,6 +90,7 @@ void cpu_next_instruction(struct CPU * cpu) {
     } else {
 	handle_debug_run(cpu);
 	
+	cpu->old_pc = cpu->registers.pc;
 	op = read_byte(cpu, cpu->registers.pc++);
 	instruction = instructions[op];
 	operand = interpret_opcode(cpu, instruction);

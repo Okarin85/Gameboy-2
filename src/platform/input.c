@@ -3,9 +3,10 @@
  * Filename: input.c
  * Author: Jules <archjules>
  * Created: Thu Dec 15 14:44:01 2016 (+0100)
- * Last-Updated: Tue Jun  6 21:32:56 2017 (+0200)
+ * Last-Updated: Fri Jun  9 02:09:33 2017 (+0200)
  *           By: Jules <archjules>
  */
+#include "debug/debug.h"
 #include "platform/input.h"
 #include "logger.h"
 #define KEY_A 24
@@ -58,9 +59,11 @@ void treat_events(struct CPU * cpu) {
 		log_debug("Fast mode toggled");
 		cpu->fast_mode = !cpu->fast_mode;
 		break;
-	    case 68: // Dump
-		log_debug("Dumping VRAM");
+	    case 95: // Debugger
+	        handle_debug(cpu);
 		break;
+	    default:
+		printf("%d\n", event.key.keysym.scancode);
 	    }
 	    break;
 	case SDL_KEYUP:

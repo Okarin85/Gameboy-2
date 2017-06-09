@@ -3,7 +3,7 @@
  * Filename: cb.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 22:40:29 2016 (+0100)
- * Last-Updated: Mon Jan  9 19:31:55 2017 (+0100)
+ * Last-Updated: Wed Jun  7 07:38:59 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -148,6 +148,8 @@ void cb_swap_hl(struct CPU * cpu) {
  * Carry: Untouched
  */
 static inline void gcb_bit(struct CPU * cpu, uint8_t value, uint8_t bit) {
+    cpu_delay(cpu, 1);
+    
     FLAG_CLEARIF(value & (1 << bit), cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_SET(cpu->registers.f, CPU_FLAG_H);
