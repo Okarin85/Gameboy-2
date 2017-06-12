@@ -3,7 +3,7 @@
  * Filename: structs.h
  * Author: Jules <archjules>
  * Created: Mon Jan  2 07:59:19 2017 (+0100)
- * Last-Updated: Mon Jan  9 10:22:37 2017 (+0100)
+ * Last-Updated: Mon Jun 12 18:53:36 2017 (+0200)
  *           By: Jules <archjules>
  */
 
@@ -26,7 +26,7 @@ struct Sprite {
 
 struct GPU {
     bool state;
-    bool lcd_off;
+    bool lcd_on;
     uint_fast8_t mode;
     uint_fast8_t current_line;
     uint_fast8_t scroll_x, scroll_y;

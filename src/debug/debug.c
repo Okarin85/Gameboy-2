@@ -4,16 +4,20 @@
  * Filename: debug.c
  * Author: Jules <archjules>
  * Created: Wed Jun  7 06:03:04 2017 (+0200)
- * Last-Updated: Fri Jun  9 12:05:09 2017 (+0200)
+ * Last-Updated: Tue Jun 13 01:35:44 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
 #include <string.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 #include "memory/memory.h"
 #include "debug/debug.h"
 #include "logger.h"
 
 void print_registers(struct CPU * cpu) {
+    char * dis = disasm(cpu, cpu->registers.pc);
+    
     log_debug("AF : 0x%04x (Z : %x, N : %x, H : %x, C : %x)",
 	      cpu->registers.af,
 	      cpu->registers.f & CPU_FLAG_Z,
@@ -26,112 +30,57 @@ void print_registers(struct CPU * cpu) {
     log_debug("HL : 0x%04x", cpu->registers.hl);
     log_debug("PC : 0x%04x", cpu->registers.pc);
     log_debug("SP : 0x%04x", cpu->registers.sp);
-    log_debug("Timer track : %x", cpu->timer_track / 2);
+    log_debug("Timer track : %d", cpu->timer_track);
+    log_debug("");
+    log_debug("0x%04x: %s", cpu->registers.pc, dis);
+
+    free(dis);
 }
 
 void handle_debug_run(struct CPU * cpu) {
-    bool is_break;
+    bool is_break = false;
     
     for (int i = 0; i < cpu->debug.break_n; i++) {
 	if (cpu->registers.pc == cpu->debug.breakpoints[i]) is_break = true;
     }
     
-    if (cpu->debug.next || is_break) {
-	cpu->debug.next = false;
+    if (cpu->debug.next >= 0) cpu->debug.next--;
+    
+    if ((cpu->debug.next == 0) || is_break) {
 	handle_debug(cpu);
     }
 }
 
 void handle_debug(struct CPU * cpu) {
-    bool is_break;
-    char buffer[255];
+    char * re;
+    char * buffer;
     char * command;
-    char * arg;
+    bool c = true, f;
     print_registers(cpu);
 
-    while(1) {
-	printf("> ");
-	fgets(buffer, 255, stdin);
-	    
-	command = strtok(buffer, "\n ");
+    while(c) {
+        buffer = readline("> ");
 
-	if (command == NULL) {
-	    
-	} else if (strcmp(command, "q") == 0) {
-	    // Quit
-	    cpu->state = true;
-	    return;
-	} else if (strcmp(command, "c") == 0) {
-	    // Continue
-	    return;
-	} else if (strcmp(command, "n") == 0) {
-	    // Next
-	    cpu->debug.next = true;
-	    return;
-	} else if (strcmp(command, "x") == 0) {
-	    // Print memory
-	    int addr;
-	    arg = strtok(NULL, "\n ");
-	    sscanf(arg, "%x", &addr);
-	    
-	    for (int i = 0; i < 3; i++) {
-		printf("%04x: ", addr + (i << 4));
-		for (int j = 0; j < 16; j++) {
-		    printf("%02x ", read_byte(cpu, addr + (i << 4) + j));
-		}
-
-		printf("\n");
+	if ((buffer == NULL) || (*buffer == 0)) continue;
+	add_history(buffer);
+	
+	command = strtok_r(buffer, "\n ", &re);
+	f = false;
+	
+	for(int i = 0; commands[i].function != NULL; i++) {
+	    if ((commands[i].short_c &&
+		 (strcmp(command, commands[i].short_c) == 0)) ||
+		(commands[i].long_c &&
+		 (strcmp(command, commands[i].long_c) == 0))) {
+		c = commands[i].function(cpu, &re);
+		f = true;
 	    }
-	} else if (strcmp(command, "b") == 0) {
-	    // Set breakpoint
-	    int addr;
-	    arg = strtok(NULL, "\n ");
-	    sscanf(arg, "%x", &addr);
-	    printf("Setting breakpoint at %#x\n", addr);
+	}
 
-	    is_break = false;
-	    for (int i = 0; i < cpu->debug.break_n; i++) {
-		if (addr == cpu->debug.breakpoints[i]) is_break = true;
-	    }
-
-	    if ((cpu->debug.break_n < 0xff) && !is_break) {
-		cpu->debug.breakpoints[cpu->debug.break_n] = addr;
-		cpu->debug.break_n++;
-	    } else if (is_break) {
-		log_info("Breakpoint already set");
-	    } else {
-		log_warn("Too many breakpoints set");
-	    }
-	} else if (strcmp(command, "r") == 0) {
-	    // Remove breakpoint
-	    int id = -1, addr;
-	    arg = strtok(NULL, "\n ");
-	    sscanf(arg, "%x", &addr);
-		
-	    for (int i = 0; i < cpu->debug.break_n; i++) {
-		if (addr == cpu->debug.breakpoints[i]) id = i;
-	    }
-
-	    if (id == -1) {
-		log_warn("Breakpoint not set");
-	    } else {
-		printf("Removing breakpoint at %#x\n", addr);
-		for (int i = id; i < (cpu->debug.break_n - 1); i++) {
-		    cpu->debug.breakpoints[i] = cpu->debug.breakpoints[i + 1];
-		}
-
-		cpu->debug.break_n--;
-	    }
-	} else if (strcmp(command, "i") == 0) {
-	    // Print all breakpoints
-	    printf("%d : ", cpu->debug.break_n);
-	    for (int i = 0; i < cpu->debug.break_n; i++) {
-		printf("%#x", cpu->debug.breakpoints[i]);
-		    
-		if (i != (cpu->debug.break_n - 1)) printf(", ");
-	    }
-
-	    printf("\n");
-	} 
+	if (!f) {
+	    printf("Command not found\n");
+	}
+	
+	free(buffer);
     }
 }

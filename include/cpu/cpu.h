@@ -3,7 +3,7 @@
  * Filename: cpu.h
  * Author: Jules <archjules>
  * Created: Wed Dec  7 09:03:16 2016 (+0100)
- * Last-Updated: Fri Jun  9 11:13:42 2017 (+0200)
+ * Last-Updated: Sat Jun 10 21:57:48 2017 (+0200)
  *           By: Jules <archjules>
  */
 
@@ -31,7 +31,9 @@ struct CPU {
     bool interrupts;
     bool halt_bug;
     bool fast_mode;
-    int old_pc;
+    uint16_t history_pc[0x100];
+    uint16_t history_sp[0x100];
+    uint8_t history_bk[0x100];
     
     struct {
 	union {
@@ -104,7 +106,7 @@ struct CPU {
 
     // Debug
     struct {
-	bool next;
+	int next;
 	int breakpoints[0xff];
 	int break_n;
     } debug;

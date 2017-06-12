@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Wed Jun  7 07:46:25 2017 (+0200)
+ * Last-Updated: Tue Jun 13 01:40:41 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -24,11 +24,9 @@ uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
 	return (uint8_t)(cpu->timer_track >> 8);
     case 0x05:
 	return cpu->timer_tima;
-    case 0x0F:
-	printf("%x, %x\n", cpu->memory.io[0x41], cpu->memory.io[port]);
-	return cpu->memory.io[port];
     case 0x40:
-	return 0x80 |
+	return
+	    cpu->gpu.lcd_on     << 7 |
 	    cpu->gpu.wd_map     << 6 |
 	    cpu->gpu.wd_enabled << 5 |
 	    cpu->gpu.bg_tile    << 4 |
@@ -106,7 +104,14 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
 	cpu->gpu.bg_tile    = ((value & (1 << 4)) != 0);
 	cpu->gpu.wd_enabled = ((value & (1 << 5)) != 0);
 	cpu->gpu.wd_map     = ((value & (1 << 6)) != 0);
+	cpu->gpu.lcd_on     = ((value & (1 << 7)) != 0);
 
+	if (!cpu->gpu.lcd_on) {
+	    cpu->gpu.mode = 2;
+	    cpu->gpu.clock = 0;
+	    cpu->gpu.current_line = 0;
+	}
+	
 	if (old != cpu->gpu.spr_enabled) update_cache(cpu);
 	break;
     case 0x41:

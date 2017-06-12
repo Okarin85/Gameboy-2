@@ -3,7 +3,7 @@
  * Filename: main.c
  * Author: Jules <archjules>
  * Created: Wed Dec  7 08:48:50 2016 (+0100)
- * Last-Updated: Mon Jan  9 20:58:21 2017 (+0100)
+ * Last-Updated: Sat Jun 10 22:25:40 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -29,10 +29,13 @@
 int main(int argc, char ** argv) {
     struct CPU cpu;
     char * rom_filename = NULL, c;
+
+    cpu_init(&cpu);
     
     while((c = getopt(argc, argv, "d")) != -1) {
 	switch (c) {
 	case 'd':
+	    cpu.debug.next = 1;
 	    break;
 	default:
 	    log_warn("The %c option doesn't exist.", c);
@@ -46,10 +49,9 @@ int main(int argc, char ** argv) {
 	return 1;
     }
 
-    cpu_init(&cpu);
     rom_load(&cpu, rom_filename);
     cpu.screen = new_screen();
-
+    
     while(!cpu.state) {
 	cpu_next_instruction(&cpu);
     }

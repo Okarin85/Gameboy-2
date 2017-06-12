@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Fri Jun  9 11:16:53 2017 (+0200)
+ * Last-Updated: Tue Jun 13 01:34:16 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -14,6 +14,7 @@
 #include "cpu/timer.h"
 #include "cpu/interrupt.h"
 #include "cpu/instruction.h"
+#include "rom/mbc.h"
 #include "gpu/gpu.h"
 #include "memory/memory.h"
 #include "debug/debug.h"
@@ -58,10 +59,10 @@ void cpu_init(struct CPU * cpu) {
     cpu->timer_tima_speed = 10;
     cpu->keys.buttons   = 0x0F;
     cpu->keys.direction = 0x0F;
-    cpu->gpu.mode = 3;
+    cpu->gpu.mode = 2;
 
     cpu->registers.pc = 0;
-    cpu->debug.next = true;
+    cpu->debug.next = -1;
 }
 
 void cpu_destroy(struct CPU * cpu) {
@@ -72,8 +73,8 @@ void cpu_destroy(struct CPU * cpu) {
 }
 
 void cpu_delay(struct CPU * cpu, int m_cycles) {
-    dma_oam_handle(cpu);
-    for (int i = 0; i < (4 * m_cycles); i++) {
+    for (int i = 0; i < (m_cycles << 2); i++) {
+	dma_oam_handle(cpu);
 	gpu_next(cpu);
 	timer_step(cpu);
     }
@@ -81,7 +82,7 @@ void cpu_delay(struct CPU * cpu, int m_cycles) {
 
 void cpu_next_instruction(struct CPU * cpu) {
     uint8_t op;
-    uint16_t operand;
+    uint16_t operand; int old_t;
     
     struct Instruction instruction;
     
@@ -89,18 +90,17 @@ void cpu_next_instruction(struct CPU * cpu) {
 	cpu_delay(cpu, 1);
     } else {
 	handle_debug_run(cpu);
+
+	old_t = cpu->timer_track;
 	
-	cpu->old_pc = cpu->registers.pc;
-	op = read_byte(cpu, cpu->registers.pc++);
+	op = fetch_byte(cpu, cpu->registers.pc++);
 	instruction = instructions[op];
 	operand = interpret_opcode(cpu, instruction);
-	
+
 	if (instruction.function == NULL) {
 	    log_warn("%#04x : Instruction invalid ! (%#02x)", cpu->registers.pc - 1 - instruction.operand, op);
 	    sleep(10);
 	} else {
-	    // log_debug("%x : %s", cpu->registers.pc - 1 - instruction.operand, instruction.disasm);
-	    // print_registers(cpu);
 	    switch(instruction.operand) {
 	    case 0:
 		((void (*)(struct CPU *))instruction.function)(cpu);
@@ -113,7 +113,11 @@ void cpu_next_instruction(struct CPU * cpu) {
 		break;
 	    }
 
-	    cpu_delay(cpu, 1);
+	    /* printf("0x%04x: %d %d\n",
+		   cpu->registers.pc,
+		   cpu->timer_track,
+		   cpu->timer_track - old_t); */
+	    
 	    treat_interruptions(cpu);
 	}
     }

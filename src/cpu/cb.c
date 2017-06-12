@@ -3,7 +3,7 @@
  * Filename: cb.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 22:40:29 2016 (+0100)
- * Last-Updated: Wed Jun  7 07:38:59 2017 (+0200)
+ * Last-Updated: Tue Jun 13 00:05:46 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -42,7 +42,7 @@ void cb_sla_l(struct CPU * cpu) { gcb_sla(cpu, &cpu->registers.l); }
 void cb_sla_hl(struct CPU * cpu) {
     uint8_t value = fetch_byte(cpu, cpu->registers.hl);
     gcb_sla(cpu, &value);
-    write_byte(cpu, cpu->registers.hl, value);
+    store_byte(cpu, cpu->registers.hl, value);
 }
 
 /*
@@ -74,7 +74,7 @@ void cb_sra_l(struct CPU * cpu) { gcb_sra(cpu, &cpu->registers.l); }
 void cb_sra_hl(struct CPU * cpu) {
     uint8_t value = fetch_byte(cpu, cpu->registers.hl);
     gcb_sra(cpu, &value);
-    write_byte(cpu, cpu->registers.hl, value);
+    store_byte(cpu, cpu->registers.hl, value);
 }
 
 /*
@@ -106,7 +106,7 @@ void cb_srl_l(struct CPU * cpu) { gcb_srl(cpu, &cpu->registers.l); }
 void cb_srl_hl(struct CPU * cpu) {
     uint8_t value = fetch_byte(cpu, cpu->registers.hl);
     gcb_srl(cpu, &value);
-    write_byte(cpu, cpu->registers.hl, value);
+    store_byte(cpu, cpu->registers.hl, value);
 }
 
 /*
@@ -136,7 +136,7 @@ void cb_swap_l(struct CPU * cpu) { gcb_swap(cpu, &cpu->registers.l); }
 void cb_swap_hl(struct CPU * cpu) {
     uint8_t value = fetch_byte(cpu, cpu->registers.hl);
     gcb_swap(cpu, &value);
-    write_byte(cpu, cpu->registers.hl, value);
+    store_byte(cpu, cpu->registers.hl, value);
 }
 
 /*
@@ -148,8 +148,6 @@ void cb_swap_hl(struct CPU * cpu) {
  * Carry: Untouched
  */
 static inline void gcb_bit(struct CPU * cpu, uint8_t value, uint8_t bit) {
-    cpu_delay(cpu, 1);
-    
     FLAG_CLEARIF(value & (1 << bit), cpu->registers.f, CPU_FLAG_Z);
     FLAG_UNSET(cpu->registers.f, CPU_FLAG_N);
     FLAG_SET(cpu->registers.f, CPU_FLAG_H);
@@ -236,7 +234,7 @@ static inline void gcb_res(struct CPU * cpu, uint8_t * value, uint8_t bit) {
 
 static inline void gcb_res_hl(struct CPU * cpu, uint8_t bit) {
     uint8_t value = fetch_byte(cpu, cpu->registers.hl) & ~(1 << bit);
-    write_byte(cpu, cpu->registers.hl, value);
+    store_byte(cpu, cpu->registers.hl, value);
 }
 
 void cb_res_0_b(struct CPU * cpu) { gcb_res(cpu, &cpu->registers.b, 0); }
@@ -414,7 +412,7 @@ void cb_rr_l(struct CPU * cpu) { gcb_rr(cpu, &cpu->registers.l); }
 void cb_rr_hl(struct CPU * cpu) {
     uint8_t value = fetch_byte(cpu, cpu->registers.hl);
     gcb_rr(cpu, &value);
-    write_byte(cpu, cpu->registers.hl, value);
+    store_byte(cpu, cpu->registers.hl, value);
 }
 
 /*
@@ -445,7 +443,7 @@ void cb_rrc_l(struct CPU * cpu) { gcb_rrc(cpu, &cpu->registers.l); }
 void cb_rrc_hl(struct CPU * cpu) {
     uint8_t value = fetch_byte(cpu, cpu->registers.hl);
     gcb_rrc(cpu, &value);
-    write_byte(cpu, cpu->registers.hl, value);
+    store_byte(cpu, cpu->registers.hl, value);
 }
 
 /*
@@ -478,7 +476,7 @@ void cb_rl_l(struct CPU * cpu) { gcb_rl(cpu, &cpu->registers.l); }
 void cb_rl_hl(struct CPU * cpu) {
     uint8_t value = fetch_byte(cpu, cpu->registers.hl);
     gcb_rl(cpu, &value);
-    write_byte(cpu, cpu->registers.hl, value);
+    store_byte(cpu, cpu->registers.hl, value);
 }
 
 /*
@@ -509,7 +507,7 @@ void cb_rlc_l(struct CPU * cpu) { gcb_rlc(cpu, &cpu->registers.l); }
 void cb_rlc_hl(struct CPU * cpu) {
     uint8_t value = fetch_byte(cpu, cpu->registers.hl);
     gcb_rlc(cpu, &value);
-    write_byte(cpu, cpu->registers.hl, value);
+    store_byte(cpu, cpu->registers.hl, value);
 }
 
 static struct Instruction cb_instructions[] = {

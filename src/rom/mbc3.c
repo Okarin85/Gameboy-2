@@ -3,7 +3,7 @@
  * Filename: mbc3.c
  * Author: Jules <archjules>
  * Created: Tue Jan  3 10:52:18 2017 (+0100)
- * Last-Updated: Tue Jun  6 20:48:48 2017 (+0200)
+ * Last-Updated: Sat Jun 10 18:18:43 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -47,7 +47,7 @@ void mbc3_write_rom(struct CPU * cpu, uint16_t address, uint8_t value) {
     case 0x0000:
     case 0x1000:
 	tmp = ((value & 0xF) == 0xA);
-	((struct MBC1 *)cpu->rom.mbc_info)->ram_enable = tmp;
+	((struct MBC3 *)cpu->rom.mbc_info)->ram_enable = tmp;
 	if (!tmp) {
 	    FILE * fp = fopen(((struct MBC1 *)cpu->rom.mbc_info)->save_filename, "w");
 	    fwrite(((struct MBC1 *)cpu->rom.mbc_info)->ram, 0x8000, 1, fp);

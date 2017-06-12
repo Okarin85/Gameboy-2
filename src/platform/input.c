@@ -3,7 +3,7 @@
  * Filename: input.c
  * Author: Jules <archjules>
  * Created: Thu Dec 15 14:44:01 2016 (+0100)
- * Last-Updated: Fri Jun  9 02:09:33 2017 (+0200)
+ * Last-Updated: Sat Jun 10 17:02:57 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include "debug/debug.h"
@@ -62,8 +62,6 @@ void treat_events(struct CPU * cpu) {
 	    case 95: // Debugger
 	        handle_debug(cpu);
 		break;
-	    default:
-		printf("%d\n", event.key.keysym.scancode);
 	    }
 	    break;
 	case SDL_KEYUP:

@@ -3,7 +3,7 @@
  * Filename: gpu.c
  * Author: Jules <archjules>
  * Created: Tue Dec 13 00:45:56 2016 (+0100)
- * Last-Updated: Tue Jun  6 21:34:33 2017 (+0200)
+ * Last-Updated: Tue Jun 13 01:42:30 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -76,21 +76,23 @@ static inline void change_current_line(struct CPU * cpu, int new_line) {
  * Execute a step for the GPU.
  */
 void gpu_next(struct CPU * cpu) {
-    if (cpu->gpu.lcd_off) return;
+    if (!cpu->gpu.lcd_on) {
+	return;
+    }
     
     cpu->gpu.clock++;
     
     switch(cpu->gpu.mode) {
     case 0: // Hblank
-	if (cpu->gpu.clock >= 204) {
+	if (cpu->gpu.clock >= 456) {
 	    gpu_render_line(cpu, cpu->gpu.current_line);
+	    change_current_line(cpu, cpu->gpu.current_line + 1);
 	    
-	    if (cpu->gpu.current_line == 143) {
+	    if (cpu->gpu.current_line == 144) {
 		gpu_stat_interrupt(cpu, cpu->gpu.mode1_enabled);
 		provoke_interruption(cpu, INT_VBLANK);
 		cpu->gpu.mode = 1;
 	    } else {
-		change_current_line(cpu, cpu->gpu.current_line + 1);
 		cpu->gpu.mode = 2;
 		gpu_stat_interrupt(cpu, cpu->gpu.mode2_enabled);
 	    }
@@ -101,7 +103,8 @@ void gpu_next(struct CPU * cpu) {
     case 1: // Vblank
 	if (cpu->gpu.clock >= 456) {
 	    change_current_line(cpu, cpu->gpu.current_line + 1);
-	    if (cpu->gpu.current_line == 153) {
+	    
+	    if (cpu->gpu.current_line == 154) {
 		// Now that a frame is complete, we do all we have to do
 		handle_new_frame(cpu);
 	        change_current_line(cpu, 0);
@@ -113,14 +116,12 @@ void gpu_next(struct CPU * cpu) {
 	break;
     case 2: // Reading OAM
 	if (cpu->gpu.clock >= 80) {
-	    cpu->gpu.clock = 0;
 	    cpu->gpu.mode = 3;
 	    gpu_stat_interrupt(cpu, cpu->gpu.mode1_enabled);
 	}
 	break;
     case 3: // Reading VRAM
-	if (cpu->gpu.clock >= 172) {
-	    cpu->gpu.clock = 0;
+	if (cpu->gpu.clock >= 252) {
 	    cpu->gpu.mode = 0;
 	    gpu_stat_interrupt(cpu, cpu->gpu.mode0_enabled);
 	}

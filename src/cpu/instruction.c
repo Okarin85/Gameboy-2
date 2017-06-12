@@ -3,7 +3,7 @@
  * Filename: instruction.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 12:36:49 2016 (+0100)
- * Last-Updated: Fri Jun  9 02:02:28 2017 (+0200)
+ * Last-Updated: Tue Jun 13 00:03:50 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -210,7 +210,7 @@ void cpu_ld_hl_spnn(struct CPU * cpu, uint8_t operand) {
     FLAG_SETIF((cpu->registers.sp ^ value ^ res) & 0x100, cpu->registers.f, CPU_FLAG_C);
 
     cpu->registers.hl = cpu->registers.sp + value;
-    cpu_delay(cpu, 2);
+    cpu_delay(cpu, 1);
 }
 
 /*
@@ -660,7 +660,7 @@ void cpu_jr_nc(struct CPU * cpu, uint8_t operand) { g_cnjr(cpu, operand, CPU_FLA
  * Pushes current PC on the stack, then jump to given address
  */
 static inline void g_call(struct CPU * cpu, uint16_t address) {
-    cpu_delay(cpu, 3);
+    cpu_delay(cpu, 1);
     push_word(cpu, cpu->registers.pc);
     cpu->registers.pc = address;
 }
@@ -673,7 +673,7 @@ void cpu_call(struct CPU * cpu, uint16_t operand) { g_call(cpu, operand); }
  */
 static inline void g_ccall(struct CPU * cpu, uint16_t address, uint8_t flag) {
     if (cpu->registers.f & flag) g_call(cpu, address);
-    else                         cpu_delay(cpu, 2);
+    else                         {};
 }
 
 void cpu_call_c(struct CPU * cpu, uint16_t operand) { g_ccall(cpu, operand, CPU_FLAG_C); }
@@ -684,7 +684,7 @@ void cpu_call_z(struct CPU * cpu, uint16_t operand) { g_ccall(cpu, operand, CPU_
  * Call given address if * flag is unset
  */
 static inline void g_cncall(struct CPU * cpu, uint16_t address, uint8_t flag) {
-    if (cpu->registers.f & flag) cpu_delay(cpu, 2);
+    if (cpu->registers.f & flag) {}
     else                         g_call(cpu, address);
 }
 
@@ -730,6 +730,7 @@ void cpu_ret_c(struct CPU * cpu) { g_cret(cpu, CPU_FLAG_C); }
  * Returns if * flag is unset
  */
 static inline void g_cnret(struct CPU * cpu, uint8_t flag) {
+    cpu_delay(cpu, 1);
     if (cpu->registers.f & flag) { }
     else                         { g_ret(cpu); }
 }
