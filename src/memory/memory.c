@@ -3,7 +3,7 @@
  * Filename: memory.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:40:29 2016 (+0100)
- * Last-Updated: Thu Jan 12 18:16:21 2017 (+0100)
+ * Last-Updated: Wed Jun 14 00:40:34 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -58,11 +58,11 @@ uint8_t read_byte(struct CPU * cpu, uint16_t address) {
 	    return cpu->memory.wram[address & 0x1FFF];
 	} else if (address < 0xFEA0) {
 	    return oam_read_byte(cpu, address & 0xFF);
-	} else if (((address< 0xFF80) && (address >= 0xFF00)) || (address == 0xFFFF)) {
+	} else if (((address < 0xFF80) && (address >= 0xFF00)) || (address == 0xFFFF)) {
 	    return io_handle_read(cpu, address & 0xFF);
 	} else if ((address >= 0xFF80)) {
 	    return cpu->memory.zram[address & 0xFF];
-	} else return 0;
+	}
     default:
 	return 0xFF;
     }

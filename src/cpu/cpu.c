@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Tue Jun 13 01:34:16 2017 (+0200)
+ * Last-Updated: Tue Jun 13 01:59:12 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -90,8 +90,6 @@ void cpu_next_instruction(struct CPU * cpu) {
 	cpu_delay(cpu, 1);
     } else {
 	handle_debug_run(cpu);
-
-	old_t = cpu->timer_track;
 	
 	op = fetch_byte(cpu, cpu->registers.pc++);
 	instruction = instructions[op];
@@ -112,11 +110,6 @@ void cpu_next_instruction(struct CPU * cpu) {
 	        ((void (*)(struct CPU *, uint16_t))instruction.function)(cpu, operand);
 		break;
 	    }
-
-	    /* printf("0x%04x: %d %d\n",
-		   cpu->registers.pc,
-		   cpu->timer_track,
-		   cpu->timer_track - old_t); */
 	    
 	    treat_interruptions(cpu);
 	}

@@ -3,7 +3,7 @@
  * Filename: cpu.h
  * Author: Jules <archjules>
  * Created: Wed Dec  7 09:03:16 2016 (+0100)
- * Last-Updated: Sat Jun 10 21:57:48 2017 (+0200)
+ * Last-Updated: Tue Jun 13 01:58:39 2017 (+0200)
  *           By: Jules <archjules>
  */
 
@@ -31,9 +31,6 @@ struct CPU {
     bool interrupts;
     bool halt_bug;
     bool fast_mode;
-    uint16_t history_pc[0x100];
-    uint16_t history_sp[0x100];
-    uint8_t history_bk[0x100];
     
     struct {
 	union {
@@ -112,7 +109,7 @@ struct CPU {
     } debug;
     
     // Timer stuff
-    int timer_track;
+    uint16_t timer_track;
     
     uint8_t timer_tma;
     uint8_t timer_tima;

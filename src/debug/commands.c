@@ -3,7 +3,7 @@
  * Filename: commands.c
  * Author: Jules <archjules>
  * Created: Sat Jun 10 00:32:19 2017 (+0200)
- * Last-Updated: Sat Jun 10 23:21:52 2017 (+0200)
+ * Last-Updated: Tue Jun 13 01:59:41 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -36,17 +36,6 @@ bool command_help(struct CPU * cpu, char ** tokens) {
 	i++;
     }
 
-    return true;
-}
-
-bool command_info(struct CPU * cpu, char ** tokens) {
-    bool is_break; char * arg; int addr;
-    arg = strtok_r(NULL, "\n ", tokens);
-    sscanf(arg, "%x", &addr);
-
-    printf("PC : 0x%04x\n", cpu->history_pc[0xff - addr]);
-    printf("SP : 0x%04x\n", cpu->history_sp[0xff - addr]);
-    
     return true;
 }
 
@@ -158,7 +147,6 @@ struct DCommand commands[] = {
     {"q", "quit", "Quit the emulator", command_quit},
     {"c",  NULL, "Continue the emulation", command_continue},
     {"n", "next", "Execute one instruction", command_next},
-    {"i", "info", "Print history", command_info},
     {"f", "flip", "Flip the screen", command_flip},
     
     {"b",  NULL, "Set a breakpoint", command_set_break},

@@ -3,7 +3,7 @@
  * Filename: instruction.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 12:36:49 2016 (+0100)
- * Last-Updated: Tue Jun 13 00:03:50 2017 (+0200)
+ * Last-Updated: Tue Jun 13 14:06:04 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -41,12 +41,16 @@ void cpu_stop(struct CPU * cpu, uint8_t nothing) { cpu->halted = true; }
  *
  * All flags untouched
  */
-void cpu_ei(struct CPU * cpu) { cpu->interrupts   = true; }
-void cpu_di(struct CPU * cpu) { cpu->interrupts   = false; }
+void cpu_ei(struct CPU * cpu) { cpu->interrupts = true; }
+void cpu_di(struct CPU * cpu) { cpu->interrupts = false; }
 
 /* 8-bit simple loads */
-static inline void g_ld8_register(struct CPU * cpu, uint8_t * dest, uint8_t value) { (*dest) = value; }
-static inline void g_ld8_memory(struct CPU * cpu, uint16_t dest, uint8_t value) { store_byte(cpu, dest, value); }
+static inline void g_ld8_register(struct CPU * cpu,
+				  uint8_t * dest,
+				  uint8_t value) { (*dest) = value; }
+static inline void g_ld8_memory(struct CPU * cpu,
+				uint16_t dest,
+				uint8_t value) { store_byte(cpu, dest, value); }
 
 /*
  * cpu_ld_*_*

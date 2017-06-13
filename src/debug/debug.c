@@ -4,7 +4,7 @@
  * Filename: debug.c
  * Author: Jules <archjules>
  * Created: Wed Jun  7 06:03:04 2017 (+0200)
- * Last-Updated: Tue Jun 13 01:35:44 2017 (+0200)
+ * Last-Updated: Tue Jun 13 14:50:59 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -18,12 +18,12 @@
 void print_registers(struct CPU * cpu) {
     char * dis = disasm(cpu, cpu->registers.pc);
     
-    log_debug("AF : 0x%04x (Z : %x, N : %x, H : %x, C : %x)",
+    log_debug("AF : 0x%04x [%c%c%c%c]",
 	      cpu->registers.af,
-	      cpu->registers.f & CPU_FLAG_Z,
-	      cpu->registers.f & CPU_FLAG_N,
-	      cpu->registers.f & CPU_FLAG_H,
-	      cpu->registers.f & CPU_FLAG_C
+	      (cpu->registers.f & CPU_FLAG_Z) ? 'Z' : '-',
+	      (cpu->registers.f & CPU_FLAG_N) ? 'N' : '-',
+	      (cpu->registers.f & CPU_FLAG_H) ? 'H' : '-',
+	      (cpu->registers.f & CPU_FLAG_C) ? 'C' : '-'
 	);
     log_debug("BC : 0x%04x", cpu->registers.bc);
     log_debug("DE : 0x%04x", cpu->registers.de);
