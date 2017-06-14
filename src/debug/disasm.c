@@ -3,7 +3,7 @@
  * Filename: disasm.c
  * Author: Jules <archjules>
  * Created: Fri Jun  9 22:14:25 2017 (+0200)
- * Last-Updated: Fri Jun  9 22:41:19 2017 (+0200)
+ * Last-Updated: Wed Jun 14 18:26:29 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -18,7 +18,10 @@ char * disasm(struct CPU * cpu, uint16_t addr) {
     uint16_t operand;
     
     if (opcode == 0xcb) {
-	printf("CB");
+	opcode = read_byte(cpu, addr + 1);
+	
+	struct Instruction instr = cb_instructions[opcode];
+	asprintf(&dis, instr.disasm);
     } else {
 	struct Instruction instr = instructions[opcode];
 	switch(instr.operand) {

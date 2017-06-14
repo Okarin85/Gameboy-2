@@ -23,9 +23,11 @@ add_executable(gameboy
   src/gpu/tile.c
   src/gpu/background.c
   src/gpu/oam.c
+  src/util/vector.c
   src/debug/debug.c
   src/debug/commands.c
   src/debug/disasm.c
+  src/debug/arguments.c
   src/platform/screen.c
   src/platform/input.c
   src/platform/general.c

@@ -4,7 +4,7 @@
  * Filename: debug.c
  * Author: Jules <archjules>
  * Created: Wed Jun  7 06:03:04 2017 (+0200)
- * Last-Updated: Tue Jun 13 14:50:59 2017 (+0200)
+ * Last-Updated: Thu Jun 15 01:26:10 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -38,15 +38,10 @@ void print_registers(struct CPU * cpu) {
 }
 
 void handle_debug_run(struct CPU * cpu) {
-    bool is_break = false;
-    
-    for (int i = 0; i < cpu->debug.break_n; i++) {
-	if (cpu->registers.pc == cpu->debug.breakpoints[i]) is_break = true;
-    }
-    
     if (cpu->debug.next >= 0) cpu->debug.next--;
     
-    if ((cpu->debug.next == 0) || is_break) {
+    if ((cpu->debug.next == 0) ||
+	vector_present(cpu->debug.breakpoints, cpu->registers.pc)) {
 	handle_debug(cpu);
     }
 }

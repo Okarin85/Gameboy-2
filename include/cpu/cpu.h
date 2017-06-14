@@ -3,7 +3,7 @@
  * Filename: cpu.h
  * Author: Jules <archjules>
  * Created: Wed Dec  7 09:03:16 2016 (+0100)
- * Last-Updated: Tue Jun 13 01:58:39 2017 (+0200)
+ * Last-Updated: Thu Jun 15 01:19:31 2017 (+0200)
  *           By: Jules <archjules>
  */
 
@@ -11,6 +11,7 @@
 #define CPU_H
 #include <stdint.h>
 #include <stdbool.h>
+#include "util/vector.h"
 #include "platform/screen.h"
 #include "rom/types.h"
 #include "gpu/structs.h"
@@ -104,8 +105,7 @@ struct CPU {
     // Debug
     struct {
 	int next;
-	int breakpoints[0xff];
-	int break_n;
+	struct Vector breakpoints;
     } debug;
     
     // Timer stuff

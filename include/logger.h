@@ -3,7 +3,7 @@
  * Filename: logger.h
  * Author: Jules <archjules>
  * Created: Fri Dec  2 18:57:11 2016 (+0100)
- * Last-Updated: Fri Dec  2 22:25:06 2016 (+0100)
+ * Last-Updated: Thu Jun 15 01:36:16 2017 (+0200)
  *           By: Jules <archjules>
  */
 #ifndef LOGGER_H

@@ -3,11 +3,12 @@
  * Filename: commands.c
  * Author: Jules <archjules>
  * Created: Sat Jun 10 00:32:19 2017 (+0200)
- * Last-Updated: Tue Jun 13 01:59:41 2017 (+0200)
+ * Last-Updated: Thu Jun 15 01:51:13 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
 #include <string.h>
+#include "util/vector.h"
 #include "memory/memory.h"
 #include "rom/mbc.h"
 #include "debug/debug.h"
@@ -15,7 +16,6 @@
 
 bool command_help(struct CPU * cpu, char ** tokens) {
     int i = 0;
-
     
     while(commands[i].function != NULL) {
 	if (commands[i].short_c && commands[i].long_c) {
@@ -45,15 +45,7 @@ bool command_quit(struct CPU * cpu, char ** tokens) {
 }
 
 bool command_next(struct CPU * cpu, char ** tokens) {
-    char * arg; int addr;
-    arg = strtok_r(NULL, "\n ", tokens);
-    
-    if (arg != NULL) {
-	sscanf(arg, "%d", &addr);
-	cpu->debug.next = addr;
-    } else {
-	cpu->debug.next = 1;
-    }
+    cpu->debug.next = read_arg_int_default(tokens, 1);
     
     return false;
 }
@@ -69,73 +61,55 @@ bool command_flip(struct CPU * cpu, char ** tokens) {
 
 // Breakpoint-related commands
 bool command_set_break(struct CPU * cpu, char ** tokens) {
-    bool is_break; char * arg; int addr;
-    arg = strtok_r(NULL, "\n ", tokens);
-    sscanf(arg, "%x", &addr);
-    printf("Setting breakpoint at %#x\n", addr);
+    int addr = read_arg_int_default(tokens, -1);
 
-    is_break = false;
-    for (int i = 0; i < cpu->debug.break_n; i++) {
-	if (addr == cpu->debug.breakpoints[i]) is_break = true;
-    }
-
-    if ((cpu->debug.break_n < 0xff) && !is_break) {
-	cpu->debug.breakpoints[cpu->debug.break_n] = addr;
-	cpu->debug.break_n++;
-    } else if (is_break) {
-	log_info("Breakpoint already set");
+    if ((addr != -1) && (!vector_present(cpu->debug.breakpoints, addr))) {
+	printf("Setting breakpoint at %#x\n", addr);
+	vector_expand(&cpu->debug.breakpoints, addr);
+    } else if (addr == -1) {
+	log_warn("An argument was expected");
     } else {
-	log_warn("Too many breakpoints set");
+	log_warn("Breakpoint already set!");
     }
-
+    
     return true;
 }
 
 bool command_rem_break(struct CPU * cpu, char ** tokens) {
-    char * arg; int id = -1, addr;
-    arg = strtok_r(NULL, "\n ", tokens);
-    sscanf(arg, "%x", &addr);
-    
-    for (int i = 0; i < cpu->debug.break_n; i++) {
-	if (addr == cpu->debug.breakpoints[i]) id = i;
-    }
-    
-    if (id == -1) {
-	log_warn("Breakpoint not set");
-    } else {
-	printf("Removing breakpoint at %#x\n", addr);
-	for (int i = id; i < (cpu->debug.break_n - 1); i++) {
-	    cpu->debug.breakpoints[i] = cpu->debug.breakpoints[i + 1];
+    int addr = read_arg_int_default(tokens, -1);
+
+    if (addr != -1) {
+	if (vector_remove(&cpu->debug.breakpoints, addr)) {
+	    printf("Removing breakpoint at %#x\n", addr);
+	} else {
+	    log_warn("Breakpoint not set");
 	}
-
-	cpu->debug.break_n--;
     }
-
+    
     return true;
 }
 
 // Memory-related commands
 bool command_read(struct CPU * cpu, char ** tokens) {
-    char * arg; int addr;
-    arg = strtok_r(NULL, "\n ", tokens);
-    sscanf(arg, "%x", &addr);
+    int addr;
+    addr = read_arg_int_default(tokens, -1);
+
+    if (addr != -1) {
+	for (int i = 0; i < 5; i++) {
+	    printf("%04x: ", addr + (i << 4));
+	    for (int j = 0; j < 16; j++) {
+		printf("%02x ", read_byte(cpu, addr + (i << 4) + j));
+	    }
 	    
-    for (int i = 0; i < 5; i++) {
-	printf("%04x: ", addr + (i << 4));
-	for (int j = 0; j < 16; j++) {
-	    printf("%02x ", read_byte(cpu, addr + (i << 4) + j));
+	    printf("\n");
 	}
-
-	printf("\n");
     }
-
+    
     return true;
 }
 
 bool command_dis(struct CPU * cpu, char ** tokens) {
-    char * arg; int addr;
-    arg = strtok_r(NULL, "\n ", tokens);
-    sscanf(arg, "%x", &addr);
+    int addr = read_arg_int_default(tokens, cpu->registers.pc);
     
     char * inst = disasm(cpu, addr);
     printf("0x%04x: %s\n", addr, inst);

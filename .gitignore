@@ -2,8 +2,10 @@ CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
 Makefile
+build
 
 gameboy
 
+tests
 *.gb
 *_dump

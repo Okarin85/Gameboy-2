@@ -3,7 +3,7 @@
  * Filename: cb.c
  * Author: Jules <archjules>
  * Created: Sat Dec 10 22:40:29 2016 (+0100)
- * Last-Updated: Tue Jun 13 00:05:46 2017 (+0200)
+ * Last-Updated: Wed Jun 14 18:20:27 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -510,7 +510,7 @@ void cb_rlc_hl(struct CPU * cpu) {
     store_byte(cpu, cpu->registers.hl, value);
 }
 
-static struct Instruction cb_instructions[] = {
+struct Instruction cb_instructions[] = {
     {"RLC B",      0, cb_rlc_b},  // 0x0X
     {"RLC C",      0, cb_rlc_c},
     {"RLC D",      0, cb_rlc_d},
