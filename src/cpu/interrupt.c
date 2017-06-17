@@ -3,7 +3,7 @@
  * Filename: interrupt.c
  * Author: Jules <archjules>
  * Created: Tue Dec 20 23:09:01 2016 (+0100)
- * Last-Updated: Sat Jun 17 19:57:27 2017 (+0200)
+ * Last-Updated: Sat Jun 17 20:08:37 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include "cpu/timer.h"
@@ -15,8 +15,9 @@ void treat_interruptions(struct CPU * cpu) {
     for (int i = 0; i < 5; i++) {
 	// Check if the interrupt was activated, and the IE flag allows it.
 	if ((cpu->memory.io[0x0F] & (1 << i)) && (cpu->memory.io[0xFF] & (1 << i))) {
+	    cpu->halted = false;
+	    
 	    if (cpu->interrupts) {
-		cpu->halted = false;
 		remove_interruption(cpu, 1 << i);
 		
 		// Calling the interruption vector

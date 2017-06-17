@@ -34,5 +34,5 @@ add_executable(gameboy
 )
 
 add_definitions(-DLOGLEVEL=0)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wno-unused-parameter")
-target_link_libraries(gameboy SDL readline)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -Wall -Wextra -Wno-unused-parameter")
+target_link_libraries(gameboy SDL2 readline)

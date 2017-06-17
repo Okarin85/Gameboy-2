@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Sat Jun 17 10:06:25 2017 (+0200)
+ * Last-Updated: Sun Jun 18 00:34:29 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -136,7 +136,7 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
 	cpu->gpu.lcd_on     = ((value & (1 << 7)) != 0);
 
 	if (!cpu->gpu.lcd_on) {
-	    cpu->gpu.mode = 2;
+	    cpu->gpu.mode = 0;
 	    cpu->gpu.clock = 0;
 	    cpu->gpu.current_line = 0;
 	}

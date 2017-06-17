@@ -3,7 +3,7 @@
  * Filename: mbc1.c
  * Author: Jules <archjules>
  * Created: Tue Jan  3 10:52:18 2017 (+0100)
- * Last-Updated: Sat Jun 17 01:34:56 2017 (+0200)
+ * Last-Updated: Sat Jun 17 23:08:09 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -96,7 +96,7 @@ void mbc1_configure(struct CPU * cpu, char * filename) {
     }
     
     size = snprintf(NULL, 0, "%s.sav", filename);
-    mbc->save_filename = malloc(size);
+    mbc->save_filename = malloc(size + 1);
     if (mbc->save_filename == NULL) {
 	log_fatal("Couldn't allocate memory.");
 	exit(EXIT_FAILURE);

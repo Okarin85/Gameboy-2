@@ -3,20 +3,22 @@
  * Filename: input.c
  * Author: Jules <archjules>
  * Created: Thu Dec 15 14:44:01 2016 (+0100)
- * Last-Updated: Sat Jun 10 17:02:57 2017 (+0200)
+ * Last-Updated: Sun Jun 18 00:30:57 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include "debug/debug.h"
 #include "platform/input.h"
 #include "logger.h"
-#define KEY_A 24
-#define KEY_B 25
-#define KEY_START 36
-#define KEY_SELECT 65
-#define KEY_UP 111
-#define KEY_DOWN 116
-#define KEY_RIGHT 114
-#define KEY_LEFT 113
+#define KEY_A 20
+#define KEY_B 26
+#define KEY_START 40
+#define KEY_SELECT 44
+#define KEY_UP 82
+#define KEY_DOWN 81
+#define KEY_RIGHT 79
+#define KEY_LEFT 80
+#define KEY_F1 58
+#define KEY_F11 68
 
 extern uint8_t oam[0xA0];
 
@@ -55,12 +57,14 @@ void treat_events(struct CPU * cpu) {
 		cpu->keys.direction &= ~(0x08);
 		break;
 		// Debug keys
-	    case 67: // Fast mode
+	    case KEY_F1: // Fast mode
 		log_debug("Fast mode toggled");
 		cpu->fast_mode = !cpu->fast_mode;
 		break;
-	    case 95: // Debugger
-	        handle_debug(cpu);
+	    case KEY_F11: // Debugger
+	        cpu->debug.next = 1;
+		break;
+	    default:
 		break;
 	    }
 	    break;
@@ -89,6 +93,8 @@ void treat_events(struct CPU * cpu) {
 		break;
 	    case KEY_DOWN: // Down
 		cpu->keys.direction |= 0x08;
+		break;
+	    default:
 		break;
 	    }
 	    break;

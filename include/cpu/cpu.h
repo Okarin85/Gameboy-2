@@ -3,7 +3,7 @@
  * Filename: cpu.h
  * Author: Jules <archjules>
  * Created: Wed Dec  7 09:03:16 2016 (+0100)
- * Last-Updated: Thu Jun 15 01:19:31 2017 (+0200)
+ * Last-Updated: Sat Jun 17 21:49:21 2017 (+0200)
  *           By: Jules <archjules>
  */
 
@@ -95,7 +95,7 @@ struct CPU {
 
     // Graphical stuff
     struct GPU gpu;
-    Screen * screen;
+    Screen screen;
 
     // DMA
     bool dma_ongoing;

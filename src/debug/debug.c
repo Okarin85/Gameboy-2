@@ -4,7 +4,7 @@
  * Filename: debug.c
  * Author: Jules <archjules>
  * Created: Wed Jun  7 06:03:04 2017 (+0200)
- * Last-Updated: Thu Jun 15 09:12:59 2017 (+0200)
+ * Last-Updated: Sun Jun 18 00:30:39 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -55,6 +55,8 @@ void handle_debug(struct CPU * cpu) {
     char * buffer;
     char * command;
     bool c = true, f;
+    
+    cpu->debug.next = -1;
     print_registers(cpu);
 
     while(c) {

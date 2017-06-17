@@ -3,7 +3,7 @@
  * Filename: main.c
  * Author: Jules <archjules>
  * Created: Wed Dec  7 08:48:50 2016 (+0100)
- * Last-Updated: Fri Jun 16 17:00:40 2017 (+0200)
+ * Last-Updated: Sat Jun 17 23:32:46 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -54,7 +54,7 @@ int main(int argc, char ** argv) {
 
     rom_load(&cpu, rom_filename);
     cpu.screen = new_screen();
-    
+
     while(!cpu.state) {
 	cpu_next_instruction(&cpu);
     }

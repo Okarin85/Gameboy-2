@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Sat Jun 17 20:03:32 2017 (+0200)
+ * Last-Updated: Sat Jun 17 20:47:22 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -88,7 +88,6 @@ void cpu_next_instruction(struct CPU * cpu) {
     
     if (cpu->halted) {
 	cpu_delay(cpu, 1);
-	treat_interruptions(cpu);
     } else {
 	handle_debug_run(cpu);
 	
@@ -111,8 +110,9 @@ void cpu_next_instruction(struct CPU * cpu) {
 	        ((void (*)(struct CPU *, uint16_t))instruction.function)(cpu, operand);
 		break;
 	    }
-	    
-	    treat_interruptions(cpu);
 	}
     }
+
+    if((cpu->memory.io[0xF] & cpu->memory.io[0xFF]) != 0)
+	treat_interruptions(cpu);
 }
