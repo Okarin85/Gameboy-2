@@ -3,7 +3,7 @@
  * Filename: debug.h
  * Author: Jules <archjules>
  * Created: Wed Jun  7 06:03:48 2017 (+0200)
- * Last-Updated: Sat Jun 10 01:29:10 2017 (+0200)
+ * Last-Updated: Sat Jun 17 20:04:10 2017 (+0200)
  *           By: Jules <archjules>
  */
 #ifndef DEBUG_H
@@ -22,6 +22,8 @@ struct DCommand {
 void handle_debug(struct CPU *);
 void handle_debug_run(struct CPU *);
 char * disasm(struct CPU *, uint16_t);
+
+int read_arg_int_default(char **, int);
 
 extern struct DCommand commands[];
 #endif /* DEBUG_H */

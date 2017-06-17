@@ -3,9 +3,10 @@
  * Filename: disasm.c
  * Author: Jules <archjules>
  * Created: Fri Jun  9 22:14:25 2017 (+0200)
- * Last-Updated: Wed Jun 14 18:26:29 2017 (+0200)
+ * Last-Updated: Sat Jun 17 20:05:07 2017 (+0200)
  *           By: Jules <archjules>
  */
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include "memory/memory.h"

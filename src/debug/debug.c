@@ -4,7 +4,7 @@
  * Filename: debug.c
  * Author: Jules <archjules>
  * Created: Wed Jun  7 06:03:04 2017 (+0200)
- * Last-Updated: Thu Jun 15 01:26:10 2017 (+0200)
+ * Last-Updated: Thu Jun 15 09:12:59 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -40,8 +40,12 @@ void print_registers(struct CPU * cpu) {
 void handle_debug_run(struct CPU * cpu) {
     if (cpu->debug.next >= 0) cpu->debug.next--;
     
-    if ((cpu->debug.next == 0) ||
-	vector_present(cpu->debug.breakpoints, cpu->registers.pc)) {
+    if (cpu->debug.next == 0) {
+	handle_debug(cpu);
+    }
+
+    if (vector_present(cpu->debug.breakpoints, cpu->registers.pc)) {
+	log_debug("Breakpoint triggered at 0x%x", cpu->registers.pc);
 	handle_debug(cpu);
     }
 }

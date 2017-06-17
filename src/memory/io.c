@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Tue Jun 13 03:45:41 2017 (+0200)
+ * Last-Updated: Sat Jun 17 10:06:25 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -20,10 +20,39 @@ uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
 	} else {
 	    return 0xC0 | cpu->memory.io[0x00] | cpu->keys.buttons;
 	}
+    case 0x01:
+	return 0;
+    case 0x02:
+	return 0;
     case 0x04:
 	return (uint8_t)(cpu->timer_track >> 8);
     case 0x05:
 	return cpu->timer_tima;
+    case 0x10:
+    case 0x11:
+    case 0x12:
+    case 0x13:
+    case 0x14:
+    case 0x15:
+    case 0x16:
+    case 0x17:
+    case 0x18:
+    case 0x19:
+    case 0x1a:
+    case 0x1b:
+    case 0x1c:
+    case 0x1d:
+    case 0x1e:
+    case 0x1f:
+    case 0x20:
+    case 0x21:
+    case 0x22:
+    case 0x23:
+    case 0x24:
+    case 0x25:
+    case 0x26:
+	return 0;
+	break;
     case 0x40:
 	return
 	    cpu->gpu.lcd_on     << 7 |

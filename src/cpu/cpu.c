@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Tue Jun 13 01:59:12 2017 (+0200)
+ * Last-Updated: Sat Jun 17 20:03:32 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -82,12 +82,13 @@ void cpu_delay(struct CPU * cpu, int m_cycles) {
 
 void cpu_next_instruction(struct CPU * cpu) {
     uint8_t op;
-    uint16_t operand; int old_t;
+    uint16_t operand;
     
     struct Instruction instruction;
     
     if (cpu->halted) {
 	cpu_delay(cpu, 1);
+	treat_interruptions(cpu);
     } else {
 	handle_debug_run(cpu);
 	

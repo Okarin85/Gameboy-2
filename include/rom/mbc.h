@@ -3,7 +3,7 @@
  * Filename: mbc.h
  * Author: Jules <archjules>
  * Created: Tue Jan  3 10:26:12 2017 (+0100)
- * Last-Updated: Wed Jan 11 22:58:25 2017 (+0100)
+ * Last-Updated: Sat Jun 17 01:15:48 2017 (+0200)
  *           By: Jules <archjules>
  */
 
@@ -22,6 +22,7 @@ struct MBC1 {
     
     uint8_t rom_bank;
     uint8_t ram_bank;
+    int banks;
 
     char * save_filename;
     uint8_t * ram;

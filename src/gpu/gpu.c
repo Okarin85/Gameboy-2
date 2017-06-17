@@ -3,7 +3,7 @@
  * Filename: gpu.c
  * Author: Jules <archjules>
  * Created: Tue Dec 13 00:45:56 2016 (+0100)
- * Last-Updated: Tue Jun 13 01:42:30 2017 (+0200)
+ * Last-Updated: Thu Jun 15 20:43:31 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -65,6 +65,7 @@ void gpu_stat_interrupt(struct CPU * cpu, uint8_t bit) {
  */
 static inline void change_current_line(struct CPU * cpu, int new_line) {
     cpu->gpu.current_line = new_line;
+    
     if (new_line == cpu->gpu.lyc) {
 	cpu->gpu.coincidence = true;
 	gpu_stat_interrupt(cpu, cpu->gpu.coincidence_enabled);

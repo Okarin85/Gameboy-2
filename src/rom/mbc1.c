@@ -3,7 +3,7 @@
  * Filename: mbc1.c
  * Author: Jules <archjules>
  * Created: Tue Jan  3 10:52:18 2017 (+0100)
- * Last-Updated: Thu Jan 12 18:15:35 2017 (+0100)
+ * Last-Updated: Sat Jun 17 01:34:56 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -25,7 +25,7 @@ uint8_t mbc1_read_rom(struct CPU * cpu, uint16_t address) {
     case 0x5000:
     case 0x6000:
     case 0x7000:
-	bank_base = (((struct MBC1 *)cpu->rom.mbc_info)->rom_bank) * 0x4000;
+	bank_base = (((struct MBC1 *)cpu->rom.mbc_info)->rom_bank) << 14;
 	return cpu->rom.rom_data[bank_base + (address & 0x3FFF)];
     }
 
@@ -55,8 +55,9 @@ void mbc1_write_rom(struct CPU * cpu, uint16_t address, uint8_t value) {
 	break;
     case 0x2000:
     case 0x3000:
-	if ((value == 0x00) || (value == 0x20) || (value == 0x40) || (value == 0x60))
-	   value++;
+	if (!(value & 0x1F)) value |= 1;
+
+	value &= ((struct MBC1 *)cpu->rom.mbc_info)->banks - 1;
 	mbc_info->rom_bank &= ~(0x1F);
 	mbc_info->rom_bank |= (value & 0x1f);
 	break;
@@ -116,6 +117,7 @@ void mbc1_configure(struct CPU * cpu, char * filename) {
     
     mbc->rom_bank = 1;
     mbc->ram_bank = 0;
+    mbc->banks = 4 << cpu->rom.rom_data[0x148];
     
     cpu->rom.read_rom = mbc1_read_rom;
     cpu->rom.read_ram = mbc1_read_ram;
