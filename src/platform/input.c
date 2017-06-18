@@ -3,7 +3,7 @@
  * Filename: input.c
  * Author: Jules <archjules>
  * Created: Thu Dec 15 14:44:01 2016 (+0100)
- * Last-Updated: Sun Jun 18 00:30:57 2017 (+0200)
+ * Last-Updated: Sun Jun 18 03:13:03 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include "debug/debug.h"
@@ -58,8 +58,7 @@ void treat_events(struct CPU * cpu) {
 		break;
 		// Debug keys
 	    case KEY_F1: // Fast mode
-		log_debug("Fast mode toggled");
-		cpu->fast_mode = !cpu->fast_mode;
+		cpu->fast_mode = true;
 		break;
 	    case KEY_F11: // Debugger
 	        cpu->debug.next = 1;
@@ -93,6 +92,9 @@ void treat_events(struct CPU * cpu) {
 		break;
 	    case KEY_DOWN: // Down
 		cpu->keys.direction |= 0x08;
+		break;
+	    case KEY_F1:
+		cpu->fast_mode = false;
 		break;
 	    default:
 		break;

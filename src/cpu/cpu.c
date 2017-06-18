@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Sat Jun 17 20:47:22 2017 (+0200)
+ * Last-Updated: Sun Jun 18 23:33:25 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -113,6 +113,6 @@ void cpu_next_instruction(struct CPU * cpu) {
 	}
     }
 
-    if((cpu->memory.io[0xF] & cpu->memory.io[0xFF]) != 0)
+    if((cpu->interrupt_flags & cpu->interrupt_enable) != 0)
 	treat_interruptions(cpu);
 }

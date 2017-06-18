@@ -3,7 +3,7 @@
  * Filename: gpu.c
  * Author: Jules <archjules>
  * Created: Tue Dec 13 00:45:56 2016 (+0100)
- * Last-Updated: Sun Jun 18 00:34:55 2017 (+0200)
+ * Last-Updated: Sun Jun 18 23:08:45 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -55,7 +55,7 @@ void gpu_render_line(struct CPU * cpu, int current_line) {
  */
 void gpu_stat_interrupt(struct CPU * cpu, uint8_t bit) {
     if (bit) {
-	provoke_interruption(cpu, INT_STAT);
+	trigger_interruption(cpu, INT_STAT);
     }
 }
 
@@ -91,7 +91,7 @@ void gpu_next(struct CPU * cpu) {
 	    
 	    if (cpu->gpu.current_line == 144) {
 		gpu_stat_interrupt(cpu, cpu->gpu.mode1_enabled);
-		provoke_interruption(cpu, INT_VBLANK);
+		trigger_interruption(cpu, INT_VBLANK);
 		cpu->gpu.mode = 1;
 	    } else {
 		cpu->gpu.mode = 2;

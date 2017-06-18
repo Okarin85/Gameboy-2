@@ -3,7 +3,7 @@
  * Filename: timer.c
  * Author: Jules <archjules>
  * Created: Tue Jan  3 18:09:59 2017 (+0100)
- * Last-Updated: Wed Jan 11 10:43:53 2017 (+0100)
+ * Last-Updated: Sun Jun 18 23:08:52 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -21,7 +21,7 @@ void timer_step(struct CPU * cpu) {
 	    cpu->timer_tima++;
 
 	    if (cpu->timer_tima == 0) {
-		provoke_interruption(cpu, INT_TIMER);
+		trigger_interruption(cpu, INT_TIMER);
 		cpu->timer_tima = cpu->timer_tma;
 	    }
 	}

@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Sun Jun 18 00:34:29 2017 (+0200)
+ * Last-Updated: Mon Jun 19 00:04:02 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -15,10 +15,10 @@
 uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
     switch(port) {
     case 0x00:
-	if (cpu->memory.io[0x00] & 0x20) {
-	    return 0xC0 | cpu->memory.io[0x00] | cpu->keys.direction;
+	if (cpu->joypad_mode) {
+	    return 0xE0 | cpu->keys.direction;
 	} else {
-	    return 0xC0 | cpu->memory.io[0x00] | cpu->keys.buttons;
+	    return 0xD0 | cpu->keys.buttons;
 	}
     case 0x01:
 	return 0;
@@ -28,6 +28,8 @@ uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
 	return (uint8_t)(cpu->timer_track >> 8);
     case 0x05:
 	return cpu->timer_tima;
+    case 0xF:
+	return cpu->interrupt_flags;
     case 0x10:
     case 0x11:
     case 0x12:
@@ -80,34 +82,48 @@ uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
     case 0x46:
 	return (cpu->dma_source >> 8);
     case 0x47:
-	return cpu->memory.io[0x47];
+	return
+	    cpu->gpu.bg_palette[0] |
+	    cpu->gpu.bg_palette[1] << 2 |
+	    cpu->gpu.bg_palette[2] << 4 |
+	    cpu->gpu.bg_palette[3] << 6;
+    case 0x48:
+	return
+	    cpu->gpu.obp0[1] << 2 |
+	    cpu->gpu.obp0[2] << 4 |
+	    cpu->gpu.obp0[3] << 6;
+    case 0x49:
+	return
+	    cpu->gpu.obp1[1] << 2 |
+	    cpu->gpu.obp1[2] << 4 |
+	    cpu->gpu.obp1[3] << 6;
     case 0x4A:
 	return cpu->gpu.wd_y;
     case 0x4B:
 	return cpu->gpu.wd_x;
+    case 0xFF:
+	return cpu->interrupt_enable;
     default:
-	return cpu->memory.io[port];
+	return 0xFF;
     }
 }
 
 void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
     int old;
-    cpu->memory.io[port] = value;
-    
     switch(port) {
-    case 0x00:
-	cpu->memory.io[port] = value & 0x30;
+    case 0x00: // JOYP
+	cpu->joypad_mode = (value & 0x20) != 0;
 	break;
-    case 0x04:
+    case 0x04: // DIV
 	cpu->timer_track = 0;
 	break;
-    case 0x05:
+    case 0x05: // TIMA
 	cpu->timer_tima= value;
 	break;
-    case 0x06:
+    case 0x06: // TMA
 	cpu->timer_tma = value;
 	break;
-    case 0x07:
+    case 0x07: // TAC
 	cpu->timer_tima_enabled = (value & 0x04);
 	switch(value & 0x03) {
 	case 0x00:
@@ -122,7 +138,49 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
 	case 0x03:
 	    cpu->timer_tima_speed = 8;
 	}
-    case 0x0F:
+	break;
+    case 0x0F: // IF
+	cpu->interrupt_flags = value;
+	break;
+    case 0x10:
+    case 0x11:
+    case 0x12:
+    case 0x13:
+    case 0x14:
+    case 0x15:
+    case 0x16:
+    case 0x17:
+    case 0x18:
+    case 0x19:
+    case 0x1a:
+    case 0x1b:
+    case 0x1c:
+    case 0x1d:
+    case 0x1e:
+    case 0x1f:
+    case 0x20:
+    case 0x21:
+    case 0x22:
+    case 0x23:
+    case 0x24:
+    case 0x25:
+    case 0x26:
+    case 0x30:
+    case 0x31:
+    case 0x32:
+    case 0x33:
+    case 0x34:
+    case 0x35:
+    case 0x36:
+    case 0x37:
+    case 0x38:
+    case 0x39:
+    case 0x3a:
+    case 0x3b:
+    case 0x3c:
+    case 0x3d:
+    case 0x3e:
+    case 0x3f:
 	break;
     case 0x40:
 	old = cpu->gpu.spr_enabled;
@@ -190,6 +248,7 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
 	cpu->memory.bios_inplace = false;
 	break;
     case 0xFF:
+	cpu->interrupt_enable = value;
 	break;
     default:
 	break;

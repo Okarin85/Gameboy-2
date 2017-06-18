@@ -3,7 +3,7 @@
  * Filename: cpu.h
  * Author: Jules <archjules>
  * Created: Wed Dec  7 09:03:16 2016 (+0100)
- * Last-Updated: Sat Jun 17 21:49:21 2017 (+0200)
+ * Last-Updated: Mon Jun 19 00:03:04 2017 (+0200)
  *           By: Jules <archjules>
  */
 
@@ -30,8 +30,13 @@ struct CPU {
     bool state;
     bool halted;
     bool interrupts;
+    bool cgb_mode;
     bool halt_bug;
     bool fast_mode;
+    bool joypad_mode;
+
+    uint8_t interrupt_flags;
+    uint8_t interrupt_enable;
     
     struct {
 	union {
@@ -85,7 +90,6 @@ struct CPU {
 	uint8_t * gram;
 	uint8_t * wram;
 	uint8_t * zram;
-	uint8_t io[0x100];
     } memory;
 
     struct {

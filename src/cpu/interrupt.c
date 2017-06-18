@@ -3,7 +3,7 @@
  * Filename: interrupt.c
  * Author: Jules <archjules>
  * Created: Tue Dec 20 23:09:01 2016 (+0100)
- * Last-Updated: Sat Jun 17 20:08:37 2017 (+0200)
+ * Last-Updated: Sun Jun 18 23:08:22 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include "cpu/timer.h"
@@ -14,7 +14,7 @@
 void treat_interruptions(struct CPU * cpu) {
     for (int i = 0; i < 5; i++) {
 	// Check if the interrupt was activated, and the IE flag allows it.
-	if ((cpu->memory.io[0x0F] & (1 << i)) && (cpu->memory.io[0xFF] & (1 << i))) {
+	if ((cpu->interrupt_flags & (1 << i)) && (cpu->interrupt_enable & (1 << i))) {
 	    cpu->halted = false;
 	    
 	    if (cpu->interrupts) {
@@ -37,13 +37,13 @@ void treat_interruptions(struct CPU * cpu) {
  * Remove an interruption from IF
  */
 void remove_interruption(struct CPU * cpu, uint8_t interruption) {
-    cpu->memory.io[0x0F] &= ~interruption;
+    cpu->interrupt_flags &= ~interruption;
 }
 
 /*
- * provoke_interruption:
+ * trigger_interruption:
  * Sets halted to false, and sets a bit if 
  */
-void provoke_interruption(struct CPU * cpu, uint8_t interruption) {
-    cpu->memory.io[0x0F] |= interruption;
+void trigger_interruption(struct CPU * cpu, uint8_t interruption) {
+    cpu->interrupt_flags |= interruption;
 }

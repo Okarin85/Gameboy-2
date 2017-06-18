@@ -3,7 +3,7 @@
  * Filename: load.c
  * Author: Jules <archjules>
  * Created: Mon Jan  2 18:21:01 2017 (+0100)
- * Last-Updated: Wed Jan 11 23:40:54 2017 (+0100)
+ * Last-Updated: Sun Jun 18 20:25:38 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -15,10 +15,10 @@ void rom_configure(struct CPU * cpu, char * filename) {
     char title[17] = {0};
     int rom_size, ram_size, mbc_type;
 
-    memcpy(title, cpu->rom.rom_data + 0x134, 16);
+    memcpy(title, cpu->rom.rom_data + 0x134, 15);
     mbc_type = cpu->rom.rom_data[0x147];
     rom_size = 32768 << cpu->rom.rom_data[0x148];
-    switch(cpu->rom.rom_data[0x149]) {
+    switch(cpu->rom.rom_data[0x149] & 0x3) {
     case 0:
 	ram_size = 0;
 	break;
@@ -33,18 +33,22 @@ void rom_configure(struct CPU * cpu, char * filename) {
 	break;
     }
 
+    /* Set CPU mode */
+    cpu->cgb_mode = (cpu->rom.rom_data[0x143] & 0x80) != 0;
     
-    log_info("ROM title : %s", title);
-    log_info("ROM size  : %do", rom_size);
-    log_info("RAM size  : %do", ram_size);
-    log_info("MBC type  : %x", mbc_type);
-
     /* Allocate RAM */
     cpu->rom.ram_data = malloc(ram_size);
-    if (cpu->rom.ram_data == NULL) {
+    if ((cpu->rom.ram_data == NULL) && (ram_size != 0)) {
 	log_fatal("Couldn't allocate memory for the RAM");
 	exit(EXIT_FAILURE);
     }
+
+    log_info("ROM title : %s", title);
+    log_info("ROM mode  : %s",
+	     (cpu->cgb_mode) ? "CGB mode" : "Non-CGB mode");
+    log_info("ROM size  : %do", rom_size);
+    log_info("RAM size  : %do", ram_size);
+    log_info("MBC type  : %x", mbc_type);
     
     /* Configure MBC */
     switch(mbc_type) {

@@ -3,7 +3,7 @@
  * Filename: interrupt.h
  * Author: Jules <archjules>
  * Created: Tue Dec 20 23:09:38 2016 (+0100)
- * Last-Updated: Mon Jan  2 07:46:13 2017 (+0100)
+ * Last-Updated: Sun Jun 18 23:14:27 2017 (+0200)
  *           By: Jules <archjules>
  */
 
@@ -18,7 +18,7 @@
 #include "cpu/cpu.h"
 
 void treat_interruptions(struct CPU *);
-void provoke_interruption(struct CPU *, uint8_t);
+void trigger_interruption(struct CPU *, uint8_t);
 void remove_interruption(struct CPU *, uint8_t);
 
 #endif /* INTERRUPT_H */
