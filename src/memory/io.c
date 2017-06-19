@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Mon Jun 19 01:28:07 2017 (+0200)
+ * Last-Updated: Mon Jun 19 13:06:08 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -103,6 +103,32 @@ uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
 	return cpu->gpu.wd_x;
     case 0x4F:
 	return cpu->memory.gram_bank;
+    case 0x68:
+	if (cpu->cgb_mode) {
+	    return (cpu->bgp_increment) ?
+		(0x80 | cpu->bgp_index) : cpu->bgp_index;
+	}
+	
+	break;
+    case 0x69:
+	if (cpu->cgb_mode) {
+	    return cpu->memory.bgp[cpu->bgp_index];
+	}
+
+	break;
+    case 0x6a:
+	if (cpu->cgb_mode) {
+	    return (cpu->obp_increment) ?
+		(0x80 | cpu->obp_index) : cpu->obp_index;
+	}
+	
+	break;
+    case 0x6b:
+	if (cpu->cgb_mode) {
+	    return cpu->memory.obp[cpu->obp_index];
+	}
+
+	break;
     case 0x70:
 	if (cpu->cgb_mode) {
 	    return cpu->memory.wram_bank;
@@ -255,11 +281,47 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
     case 0x4B:
 	cpu->gpu.wd_x = value;
 	break;
+    case 0x4C:
+	break;
     case 0x4F:
 	cpu->memory.gram_bank = (value & 1);
 	break;
     case 0x50:
 	cpu->memory.bios_inplace = false;
+	break;
+    case 0x68:
+	if (cpu->cgb_mode) {
+	    cpu->bgp_index = value & 0x3f;
+	    cpu->bgp_increment = (value & 0x80) != 0;
+	}
+
+	break;
+    case 0x69:
+	if (cpu->cgb_mode) {
+	    cpu->memory.bgp[cpu->bgp_index] = value;
+	    
+	    if (cpu->bgp_increment) {
+		cpu->bgp_index++;
+	    }
+	}
+
+	break;
+    case 0x6a:
+	if (cpu->cgb_mode) {
+	    cpu->obp_index = value & 0x3f;
+	    cpu->obp_increment = (value & 0x80) != 0;
+	}
+
+	break;
+    case 0x6b:
+	if (cpu->cgb_mode) {
+	    cpu->memory.obp[cpu->obp_index] = value;
+	    
+	    if (cpu->obp_increment) {
+		cpu->obp_index++;
+	    }
+	}
+
 	break;
     case 0x70:
 	if(cpu->cgb_mode) {

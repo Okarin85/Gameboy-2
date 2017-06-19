@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Mon Jun 19 01:24:03 2017 (+0200)
+ * Last-Updated: Mon Jun 19 02:42:29 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -37,6 +37,12 @@ static inline uint16_t interpret_opcode(struct CPU * cpu, struct Instruction opc
 
 void cpu_init(struct CPU * cpu) {
     bzero(cpu, sizeof(struct CPU));
+
+    cpu->memory.bios = malloc(0x900);
+    if (cpu->memory.bios == NULL) {
+	log_fatal("Couldn't allocate memory for GRAM.");
+	exit(EXIT_FAILURE);
+    }
     
     cpu->memory.gram = malloc(0x4000);
     if (cpu->memory.gram == NULL) {
@@ -66,6 +72,21 @@ void cpu_init(struct CPU * cpu) {
 
     cpu->registers.pc = 0;
     cpu->debug.next = -1;
+}
+
+void cpu_load_bios(struct CPU * cpu, char * filename) {
+    FILE * file = fopen(filename, "r");
+    if (file == NULL) {
+	log_fatal("Couldn't read the bootrom");
+	exit(EXIT_FAILURE);
+    }
+
+    if (fread(cpu->memory.bios, 1, 0x900, file) == 0x100) {
+	log_info("Bootrom type : Probably DMG");
+    } else {
+	cpu->cgb = true;
+	log_info("Bootrom type : Probably GBC");
+    }
 }
 
 void cpu_destroy(struct CPU * cpu) {

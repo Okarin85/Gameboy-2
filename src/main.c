@@ -3,7 +3,7 @@
  * Filename: main.c
  * Author: Jules <archjules>
  * Created: Wed Dec  7 08:48:50 2016 (+0100)
- * Last-Updated: Mon Jun 19 01:05:45 2017 (+0200)
+ * Last-Updated: Mon Jun 19 13:12:19 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -28,12 +28,15 @@
  */
 int main(int argc, char ** argv) {
     struct CPU cpu;
-    char * rom_filename = NULL, c;
+    char * bios_filename = NULL, c;
 
     cpu_init(&cpu);
     
-    while((c = getopt(argc, argv, "df")) != -1) {
+    while((c = getopt(argc, argv, "b:df")) != -1) {
 	switch (c) {
+	case 'b':
+	    bios_filename = optarg;
+	    break;
 	case 'd':
 	    cpu.debug.next = 1;
 	    break;
@@ -45,14 +48,20 @@ int main(int argc, char ** argv) {
 	}
     }
 
+    if (bios_filename == NULL) {
+	log_fatal("A bootrom must be specified.");
+	return 1;
+    } else {
+	cpu_load_bios(&cpu, bios_filename);
+    }
+    
     if (optind != argc) {
-	rom_filename = argv[optind];
+	rom_load(&cpu, argv[optind]);
     } else {
 	log_fatal("A filename must be specified.");
 	return 1;
     }
 
-    rom_load(&cpu, rom_filename);
     cpu.screen = new_screen();
 
     while(!cpu.state) {

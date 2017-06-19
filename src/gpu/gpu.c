@@ -3,7 +3,7 @@
  * Filename: gpu.c
  * Author: Jules <archjules>
  * Created: Tue Dec 13 00:45:56 2016 (+0100)
- * Last-Updated: Sun Jun 18 23:08:45 2017 (+0200)
+ * Last-Updated: Mon Jun 19 13:12:08 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -11,6 +11,7 @@
 #include "cpu/interrupt.h"
 #include "gpu/gpu.h"
 #include "gpu/oam.h"
+#include "platform/input.h"
 #include "platform/screen.h"
 #include "platform/general.h"
 #include "logger.h"
@@ -78,6 +79,7 @@ static inline void change_current_line(struct CPU * cpu, int new_line) {
  */
 void gpu_next(struct CPU * cpu) {
     if (!cpu->gpu.lcd_on) {
+	treat_events(cpu);
 	return;
     }
     

@@ -3,7 +3,7 @@
  * Filename: logger.h
  * Author: Jules <archjules>
  * Created: Fri Dec  2 18:57:11 2016 (+0100)
- * Last-Updated: Thu Jun 15 01:36:16 2017 (+0200)
+ * Last-Updated: Mon Jun 19 12:44:45 2017 (+0200)
  *           By: Jules <archjules>
  */
 #ifndef LOGGER_H
@@ -17,31 +17,24 @@
 #define LOG_FATAL 4
 #define LOG_SHUT  5
 
-# define log(P, S, ...) fprintf(stderr, P "%s: " S "\n", __FUNCTION__, ##__VA_ARGS__)
-# define logm(S, M, N) g1m_log_mem(S, M, N)
+# define log(P, S, ...) fprintf(stdout, P "%s: " S "\n", __FUNCTION__, ##__VA_ARGS__)
 
 # if LOGLEVEL <= LOG_DEBG
 #  define log_debug(S, ...) log("[debug] ", S, ##__VA_ARGS__)
-#  define logm_debug(M, N) logm("[debug] ", M, N)
 # else
 #  define log_debug(S, ...)
-#  define logm_debug(M, N)
 # endif
 
 # if LOGLEVEL <= LOG_INFO
 #  define log_info(S, ...) log("[info]  ", S, ##__VA_ARGS__)
-#  define logm_info(M, N) logm("[info]  ", M, N)
 # else
 #  define log_info(S, ...)
-#  define logm_info(M, N)
 # endif
 
 # if LOGLEVEL <= LOG_WARN
 #  define log_warn(S, ...) log("[warn]  ", S, ##__VA_ARGS__)
-#  define logm_warn(M, N) logm("[warn]  ", M, N)
 # else
 #  define log_warn(S, ...)
-#  define logm_warn(M, N)
 # endif
 
 # if LOGLEVEL <= LOG_ERR
