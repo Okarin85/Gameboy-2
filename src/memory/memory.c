@@ -3,7 +3,7 @@
  * Filename: memory.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:40:29 2016 (+0100)
- * Last-Updated: Mon Jun 19 13:29:25 2017 (+0200)
+ * Last-Updated: Mon Jun 19 13:35:36 2017 (+0200)
  *           By: Jules <archjules>
  */
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
@@ -15,7 +15,7 @@
 
 uint8_t read_byte(struct CPU * cpu, uint16_t address) {
     switch (address & 0xF000) {
-    case 0x0000: // fallthrough
+    case 0x0000: 
 	if (cpu->memory.bios_inplace && (address < 0x100))
 	    return cpu->memory.bios[address];
 
