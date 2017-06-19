@@ -8,4 +8,5 @@ gameboy
 
 tests
 *.gb
+*.gbc
 *_dump

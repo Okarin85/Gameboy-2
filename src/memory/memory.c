@@ -3,7 +3,7 @@
  * Filename: memory.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:40:29 2016 (+0100)
- * Last-Updated: Wed Jun 14 00:40:34 2017 (+0200)
+ * Last-Updated: Mon Jun 19 01:45:07 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include "cpu/cpu.h"
@@ -45,13 +45,17 @@ uint8_t read_byte(struct CPU * cpu, uint16_t address) {
 	return cpu->rom.read_rom(cpu, address);
     case 0x8000:
     case 0x9000:
-	return cpu->memory.gram[address & 0x1FFF];
+	return cpu->memory.gram
+	    [(cpu->memory.gram_bank << 13) + (address & 0x1FFF)];
     case 0xA000:
     case 0xB000:
 	return cpu->rom.read_ram(cpu, address);
     case 0xC000:
+	return cpu->memory.wram
+	    [address & 0xFFF];
     case 0xD000:
-	return cpu->memory.wram[address & 0x1FFF];
+	return cpu->memory.wram
+	    [(cpu->memory.wram_bank << 12) + (address & 0xFFF)];
     case 0xE000:
     case 0xF000:
 	if (address < 0xFE00) {
@@ -61,7 +65,7 @@ uint8_t read_byte(struct CPU * cpu, uint16_t address) {
 	} else if (((address < 0xFF80) && (address >= 0xFF00)) || (address == 0xFFFF)) {
 	    return io_handle_read(cpu, address & 0xFF);
 	} else if ((address >= 0xFF80)) {
-	    return cpu->memory.zram[address & 0xFF];
+	    return cpu->memory.zram[address & 0x7F];
 	}
     default:
 	return 0xFF;
@@ -95,8 +99,12 @@ void write_byte(struct CPU * cpu, uint16_t address, uint8_t value) {
 	cpu->rom.write_ram(cpu, address, value);
 	return;
     case 0xC000:
+	cpu->memory.wram
+	    [address & 0xFFF] = value;
+	break;
     case 0xD000:
-	cpu->memory.wram[address & 0x1FFF] = value;
+	cpu->memory.wram
+	    [(cpu->memory.wram_bank << 12) + (address & 0xFFF)] = value;
 	return;
     case 0xE000:
     case 0xF000:
@@ -107,7 +115,7 @@ void write_byte(struct CPU * cpu, uint16_t address, uint8_t value) {
 	} else if (((address< 0xFF80) && (address >= 0xFF00)) || (address == 0xFFFF)) {
 	    io_handle_write(cpu, address & 0xFF, value);
 	} else if ((address >= 0xFF80)) {
-	    cpu->memory.zram[address & 0xFF] = value;
+	    cpu->memory.zram[address & 0x7F] = value;
 	} else return;
     }
 }

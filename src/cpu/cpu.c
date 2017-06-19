@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Sun Jun 18 23:33:25 2017 (+0200)
+ * Last-Updated: Mon Jun 19 01:24:03 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -38,24 +38,27 @@ static inline uint16_t interpret_opcode(struct CPU * cpu, struct Instruction opc
 void cpu_init(struct CPU * cpu) {
     bzero(cpu, sizeof(struct CPU));
     
-    cpu->memory.gram = malloc(0x2000);
+    cpu->memory.gram = malloc(0x4000);
     if (cpu->memory.gram == NULL) {
 	log_fatal("Couldn't allocate memory for GRAM.");
 	exit(EXIT_FAILURE);
     }
 
-    cpu->memory.wram = malloc(0x8000);
+    cpu->memory.wram = malloc(0x20000);
     if (cpu->memory.wram == NULL) {
 	log_fatal("Couldn't allocate memory for WRAM.");
 	exit(EXIT_FAILURE);
     }
 
-    cpu->memory.zram = malloc(0xFF);
+    cpu->memory.zram = malloc(0x80);
     if (cpu->memory.zram == NULL) {
 	log_fatal("Couldn't allocate memory for ZRAM.");
 	exit(EXIT_FAILURE);
     }
     cpu->memory.bios_inplace = true;
+    cpu->memory.wram_bank = 1;
+    cpu->memory.gram_bank = 0;
+	
     cpu->timer_tima_speed = 10;
     cpu->keys.buttons   = 0x0F;
     cpu->keys.direction = 0x0F;

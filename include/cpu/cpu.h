@@ -3,7 +3,7 @@
  * Filename: cpu.h
  * Author: Jules <archjules>
  * Created: Wed Dec  7 09:03:16 2016 (+0100)
- * Last-Updated: Mon Jun 19 00:03:04 2017 (+0200)
+ * Last-Updated: Mon Jun 19 01:23:46 2017 (+0200)
  *           By: Jules <archjules>
  */
 
@@ -86,6 +86,8 @@ struct CPU {
     
     struct {
 	bool bios_inplace;
+	int  wram_bank;
+	int  gram_bank;
 	
 	uint8_t * gram;
 	uint8_t * wram;

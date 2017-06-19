@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Mon Jun 19 00:04:02 2017 (+0200)
+ * Last-Updated: Mon Jun 19 01:28:07 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -101,11 +101,22 @@ uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
 	return cpu->gpu.wd_y;
     case 0x4B:
 	return cpu->gpu.wd_x;
+    case 0x4F:
+	return cpu->memory.gram_bank;
+    case 0x70:
+	if (cpu->cgb_mode) {
+	    return cpu->memory.wram_bank;
+	}
+
+	break;
     case 0xFF:
 	return cpu->interrupt_enable;
     default:
-	return 0xFF;
+	log_warn("Reading unmapped register : 0xff%x", port);
+        break;
     }
+
+    return 0xFF;
 }
 
 void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
@@ -244,13 +255,24 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
     case 0x4B:
 	cpu->gpu.wd_x = value;
 	break;
+    case 0x4F:
+	cpu->memory.gram_bank = (value & 1);
+	break;
     case 0x50:
 	cpu->memory.bios_inplace = false;
+	break;
+    case 0x70:
+	if(cpu->cgb_mode) {
+	    if (value == 0) value |= 1;
+	    cpu->memory.wram_bank = value;
+	}
+	
 	break;
     case 0xFF:
 	cpu->interrupt_enable = value;
 	break;
     default:
+	log_warn("Writing unmapped register : 0xff%x (%x)", port, value);
 	break;
     }
 }
