@@ -3,7 +3,7 @@
  * Filename: structs.h
  * Author: Jules <archjules>
  * Created: Mon Jan  2 07:59:19 2017 (+0100)
- * Last-Updated: Mon Jun 12 18:53:36 2017 (+0200)
+ * Last-Updated: Tue Jun 20 02:47:12 2017 (+0200)
  *           By: Jules <archjules>
  */
 
@@ -31,6 +31,7 @@ struct GPU {
     uint_fast8_t current_line;
     uint_fast8_t scroll_x, scroll_y;
     uint_fast16_t clock;
+    uint_fast16_t clock_off;
 
     // LCDC Interrupt
     uint8_t lyc;

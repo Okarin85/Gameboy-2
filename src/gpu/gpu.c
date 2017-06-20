@@ -3,7 +3,7 @@
  * Filename: gpu.c
  * Author: Jules <archjules>
  * Created: Tue Dec 13 00:45:56 2016 (+0100)
- * Last-Updated: Mon Jun 19 13:12:08 2017 (+0200)
+ * Last-Updated: Tue Jun 20 02:51:41 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -79,7 +79,11 @@ static inline void change_current_line(struct CPU * cpu, int new_line) {
  */
 void gpu_next(struct CPU * cpu) {
     if (!cpu->gpu.lcd_on) {
-	treat_events(cpu);
+	// If LCD is off, treat events nevertheless, but only once
+	// every 9120 cycles (what would be 10 frames if the LCD
+	// were on)
+	cpu->gpu.clock_off = (cpu->gpu.clock_off + 1) % 9120;
+	if (cpu->gpu.clock_off == 0) treat_events(cpu);
 	return;
     }
     
