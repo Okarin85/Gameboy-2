@@ -3,7 +3,7 @@
  * Filename: cpu.h
  * Author: Jules <archjules>
  * Created: Wed Dec  7 09:03:16 2016 (+0100)
- * Last-Updated: Mon Jun 19 13:11:42 2017 (+0200)
+ * Last-Updated: Mon Jun 19 17:04:22 2017 (+0200)
  *           By: Jules <archjules>
  */
 
@@ -116,6 +116,12 @@ struct CPU {
     bool dma_ongoing;
     uint16_t dma_source;
     uint16_t dma_dest;
+
+    // HDMA
+    bool hdma_ongoing;
+    uint8_t  hdma_length;
+    uint16_t hdma_source;
+    uint16_t hdma_dest;
 
     // Debug
     struct {

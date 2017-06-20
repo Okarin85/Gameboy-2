@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Mon Jun 19 13:06:08 2017 (+0200)
+ * Last-Updated: Mon Jun 19 21:52:15 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -101,8 +101,20 @@ uint8_t io_handle_read(struct CPU * cpu, uint8_t port) {
 	return cpu->gpu.wd_y;
     case 0x4B:
 	return cpu->gpu.wd_x;
+    case 0x4D:
+	return 0;
     case 0x4F:
 	return cpu->memory.gram_bank;
+    case 0x55:
+	if (cpu->cgb_mode) {
+	    if (cpu->hdma_ongoing) {
+		return 0;
+	    } else {
+		return 0xFF;
+	    }
+	}
+	
+	break;
     case 0x68:
 	if (cpu->cgb_mode) {
 	    return (cpu->bgp_increment) ?
@@ -288,6 +300,45 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
 	break;
     case 0x50:
 	cpu->memory.bios_inplace = false;
+	break;
+    case 0x51:
+	if (cpu->cgb_mode) {
+	    cpu->hdma_source &= 0xFF;
+	    cpu->hdma_source |= (value << 8);
+	}
+
+	break;
+    case 0x52:
+	if (cpu->cgb_mode) {
+	    cpu->hdma_source &= 0xFF00;
+	    cpu->hdma_source |= (value & 0xF0);
+	}
+
+	break;
+    case 0x53:
+	if (cpu->cgb_mode) {
+	    cpu->hdma_dest &= 0xFF;
+	    cpu->hdma_dest |= (value << 8);
+	}
+
+	break;
+    case 0x54:
+	if (cpu->cgb_mode) {
+	    cpu->hdma_dest &= 0xFF00;
+	    cpu->hdma_dest |= (value & 0xF0);
+	}
+
+	break;
+    case 0x55:
+	if (cpu->cgb_mode) {
+	    if (value & 0x80) {
+		log_warn("H-Blank DMA is not yet implemented");
+		cpu->hdma_ongoing = true;
+	    } else {
+		general_dma_handle(cpu, value & 0x7F);
+	    }
+	}
+	
 	break;
     case 0x68:
 	if (cpu->cgb_mode) {

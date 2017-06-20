@@ -3,7 +3,7 @@
  * Filename: dma.c
  * Author: Jules <archjules>
  * Created: Mon Jan  2 08:25:32 2017 (+0100)
- * Last-Updated: Fri Jun 16 22:02:10 2017 (+0200)
+ * Last-Updated: Mon Jun 19 17:01:42 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdbool.h>
@@ -25,5 +25,18 @@ void dma_oam_handle(struct CPU * cpu) {
 	if (cpu->dma_dest > 0xFEA0) {
 	    cpu->dma_ongoing = false;
 	}
+    }
+}
+
+void hblank_dma_handle(struct CPU * cpu) {
+    
+}
+
+void general_dma_handle(struct CPU * cpu, uint8_t value) {
+    uint8_t byte;
+    
+    for (int i = 0; i < ((value + 1) << 4); i++) {
+	byte = read_byte(cpu, cpu->hdma_source + i);
+	write_byte(cpu, cpu->hdma_dest + i, byte);
     }
 }

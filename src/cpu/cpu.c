@@ -3,7 +3,7 @@
  * Filename: cpu.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:04:19 2016 (+0100)
- * Last-Updated: Mon Jun 19 02:42:29 2017 (+0200)
+ * Last-Updated: Tue Jun 20 01:04:20 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -81,11 +81,15 @@ void cpu_load_bios(struct CPU * cpu, char * filename) {
 	exit(EXIT_FAILURE);
     }
 
-    if (fread(cpu->memory.bios, 1, 0x900, file) == 0x100) {
+    int read = fread(cpu->memory.bios, 1, 0x900, file);
+    if (read == 0x100) {
+	cpu->cgb = false;
 	log_info("Bootrom type : Probably DMG");
-    } else {
+    } else if (read == 0x900) {
 	cpu->cgb = true;
 	log_info("Bootrom type : Probably GBC");
+    } else {
+	log_warn("Your bootrom seems strange.");
     }
 }
 

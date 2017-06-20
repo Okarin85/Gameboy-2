@@ -3,7 +3,7 @@
  * Filename: load.c
  * Author: Jules <archjules>
  * Created: Mon Jan  2 18:21:01 2017 (+0100)
- * Last-Updated: Sun Jun 18 20:25:38 2017 (+0200)
+ * Last-Updated: Tue Jun 20 02:26:44 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdio.h>
@@ -34,7 +34,8 @@ void rom_configure(struct CPU * cpu, char * filename) {
     }
 
     /* Set CPU mode */
-    cpu->cgb_mode = (cpu->rom.rom_data[0x143] & 0x80) != 0;
+    if (cpu->cgb)
+	cpu->cgb_mode = (cpu->rom.rom_data[0x143] & 0x80) != 0;
     
     /* Allocate RAM */
     cpu->rom.ram_data = malloc(ram_size);
@@ -44,8 +45,9 @@ void rom_configure(struct CPU * cpu, char * filename) {
     }
 
     log_info("ROM title : %s", title);
-    log_info("ROM mode  : %s",
-	     (cpu->cgb_mode) ? "CGB mode" : "Non-CGB mode");
+    if (cpu->cgb)
+	log_info("ROM mode  : %s",
+		 (cpu->cgb_mode) ? "CGB mode" : "Non-CGB mode");
     log_info("ROM size  : %do", rom_size);
     log_info("RAM size  : %do", ram_size);
     log_info("MBC type  : %x", mbc_type);
