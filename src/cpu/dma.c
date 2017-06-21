@@ -3,7 +3,7 @@
  * Filename: dma.c
  * Author: Jules <archjules>
  * Created: Mon Jan  2 08:25:32 2017 (+0100)
- * Last-Updated: Mon Jun 19 17:01:42 2017 (+0200)
+ * Last-Updated: Wed Jun 21 01:13:16 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdbool.h>
@@ -29,7 +29,16 @@ void dma_oam_handle(struct CPU * cpu) {
 }
 
 void hblank_dma_handle(struct CPU * cpu) {
+    uint8_t byte;
     
+    if (cpu->hdma_length > 0) {
+	for (int i = 0; i < 0x10; i++) {
+	    byte = read_byte(cpu, cpu->hdma_source++);
+	    write_byte(cpu, cpu->hdma_dest++, byte);
+
+	    cpu->hdma_length--;
+	}
+    }
 }
 
 void general_dma_handle(struct CPU * cpu, uint8_t value) {

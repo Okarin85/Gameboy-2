@@ -21,6 +21,7 @@ add_executable(gameboy
   src/memory/io.c
   src/gpu/gpu.c
   src/gpu/tile.c
+  src/gpu/palette.c
   src/gpu/background.c
   src/gpu/oam.c
   src/util/vector.c
@@ -34,5 +35,5 @@ add_executable(gameboy
 )
 
 add_definitions(-DLOGLEVEL=0)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -Wall -Wextra -Wno-unused-parameter")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -Wall -Wextra -Wno-unused-parameter")
 target_link_libraries(gameboy SDL2 readline)

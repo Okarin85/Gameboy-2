@@ -3,7 +3,7 @@
  * Filename: oam.c
  * Author: Jules <archjules>
  * Created: Fri Dec 30 01:01:21 2016 (+0100)
- * Last-Updated: Thu Jan 12 18:16:03 2017 (+0100)
+ * Last-Updated: Wed Jun 21 03:08:20 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdlib.h>
@@ -75,7 +75,9 @@ void oam_write_byte(struct CPU * cpu, uint16_t address, uint8_t value) {
 	cpu->gpu.oam[spr_nb].bg_priority = (value & OAM_BG_PRIORITY) >> 7;
 	cpu->gpu.oam[spr_nb].y_flip      = (value & OAM_Y_FLIP) >> 6;
 	cpu->gpu.oam[spr_nb].x_flip      = (value & OAM_X_FLIP) >> 5;
-	cpu->gpu.oam[spr_nb].palette     = (value & OAM_PALETTE) >> 4;
+	cpu->gpu.oam[spr_nb].palette_dmg = (value & OAM_PALETTE_DMG) >> 4;
+	cpu->gpu.oam[spr_nb].bank_gbc    = (value & OAM_BANK) >> 3;
+	cpu->gpu.oam[spr_nb].palette_gbc = (value & OAM_PALETTE_GBC);
 	break;
     }
 
@@ -96,12 +98,12 @@ uint8_t oam_read_byte(struct CPU * cpu, uint16_t address) {
 	    cpu->gpu.oam[spr_nb].bg_priority << 7 |
 	    cpu->gpu.oam[spr_nb].y_flip      << 6 |
 	    cpu->gpu.oam[spr_nb].x_flip      << 5 |
-	    cpu->gpu.oam[spr_nb].palette     << 4;
+	    cpu->gpu.oam[spr_nb].palette_dmg << 4;
     default: return 0xFF;
     }
 }
 
-uint32_t oam_render_sprite(struct CPU * cpu, int x, int y, int bg_color) {
+uint32_t oam_render_sprite_dmg(struct CPU * cpu, int x, int y, int bg_color) {
     int sprite_x, sprite_y, height, tile_id, color;
     
     for (int i = 0; i < 10; i++) {
@@ -128,9 +130,9 @@ uint32_t oam_render_sprite(struct CPU * cpu, int x, int y, int bg_color) {
 	if (cpu->gpu.line_cache[y][i]->y_flip)
 	    sprite_y = height - sprite_y;
 
-	color = tile_get_pixel(cpu, tile_id, 1, sprite_x, sprite_y);
+	color = tile_get_pixel(cpu, 0, tile_id, 1, sprite_x, sprite_y);
 	if (color != 0) {
-	    if (cpu->gpu.line_cache[y][i]->palette) {
+	    if (cpu->gpu.line_cache[y][i]->palette_dmg) {
 		return cpu->gpu.obp1[color];
 	    } else {
 		return cpu->gpu.obp0[color];
@@ -139,4 +141,43 @@ uint32_t oam_render_sprite(struct CPU * cpu, int x, int y, int bg_color) {
     }
 
     return cpu->gpu.bg_palette[bg_color];
+}
+
+uint32_t oam_render_sprite_gbc(struct CPU * cpu, int x, int y, int bg_color) {
+    int sprite_x, sprite_y, height, tile_id, color;
+    
+    for (int i = 0; i < 10; i++) {
+	if (cpu->gpu.line_cache[y][i] == NULL) break;
+	
+	sprite_x = x - (cpu->gpu.line_cache[y][i]->x_pos - 8);
+	sprite_y = y - (cpu->gpu.line_cache[y][i]->y_pos - 16);
+	if (sprite_x >= 8) continue;
+	if (sprite_x <  0) break;
+	if (cpu->gpu.line_cache[y][i]->bg_priority && (bg_color != 0)) continue;
+	
+	// Now we have the sprite, we get the colour
+	if (cpu->gpu.spr_height) {
+	    height  = 15;
+	    tile_id = cpu->gpu.line_cache[y][i]->tile & 0xfe;
+	} else {
+	    height  = 7;
+	    tile_id = cpu->gpu.line_cache[y][i]->tile;
+	}
+
+	if (cpu->gpu.line_cache[y][i]->x_flip)
+	    sprite_x = 7 - sprite_x;
+
+	if (cpu->gpu.line_cache[y][i]->y_flip)
+	    sprite_y = height - sprite_y;
+
+	color = tile_get_pixel(cpu, cpu->gpu.line_cache[y][i]->bank_gbc,
+			       tile_id, 1, sprite_x, sprite_y);
+	if (color != 0) {
+	    return palette_get_color(cpu->memory.obp,
+				     cpu->gpu.line_cache[y][i]->palette_gbc,
+				     color);
+	}
+    }
+
+    return -1;
 }

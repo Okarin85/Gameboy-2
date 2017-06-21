@@ -3,7 +3,7 @@
  * Filename: memory.c
  * Author: Jules <archjules>
  * Created: Thu Dec  8 13:40:29 2016 (+0100)
- * Last-Updated: Mon Jun 19 14:00:57 2017 (+0200)
+ * Last-Updated: Tue Jun 20 17:45:47 2017 (+0200)
  *           By: Jules <archjules>
  */
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
@@ -79,7 +79,8 @@ void write_byte(struct CPU * cpu, uint16_t address, uint8_t value) {
 	return;
     case 0x8000:
     case 0x9000:
-	cpu->memory.gram[address & 0x1FFF] = value;
+	cpu->memory.gram
+	    [(cpu->memory.gram_bank << 13) + (address & 0x1FFF)] = value;
 	return;
     case 0xA000:
     case 0xB000:

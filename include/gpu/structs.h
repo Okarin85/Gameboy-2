@@ -3,7 +3,7 @@
  * Filename: structs.h
  * Author: Jules <archjules>
  * Created: Mon Jan  2 07:59:19 2017 (+0100)
- * Last-Updated: Tue Jun 20 02:47:12 2017 (+0200)
+ * Last-Updated: Wed Jun 21 00:14:05 2017 (+0200)
  *           By: Jules <archjules>
  */
 
@@ -21,7 +21,9 @@ struct Sprite {
     bool bg_priority;
     bool x_flip;
     bool y_flip;
-    bool palette;
+    bool palette_dmg;
+    bool bank_gbc;
+    int  palette_gbc;
 };
 
 struct GPU {

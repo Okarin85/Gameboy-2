@@ -3,7 +3,7 @@
  * Filename: io.c
  * Author: Jules <archjules>
  * Created: Sun Dec 11 20:49:19 2016 (+0100)
- * Last-Updated: Mon Jun 19 21:52:15 2017 (+0200)
+ * Last-Updated: Wed Jun 21 02:23:45 2017 (+0200)
  *           By: Jules <archjules>
  */
 #include <stdint.h>
@@ -163,6 +163,9 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
     case 0x00: // JOYP
 	cpu->joypad_mode = (value & 0x20) != 0;
 	break;
+    case 0x01:
+    case 0x02:
+	break;
     case 0x04: // DIV
 	cpu->timer_track = 0;
 	break;
@@ -294,6 +297,7 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
 	cpu->gpu.wd_x = value;
 	break;
     case 0x4C:
+	cpu->cgb_mode = value;
 	break;
     case 0x4F:
 	cpu->memory.gram_bank = (value & 1);
@@ -318,7 +322,8 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
     case 0x53:
 	if (cpu->cgb_mode) {
 	    cpu->hdma_dest &= 0xFF;
-	    cpu->hdma_dest |= (value << 8);
+	    cpu->hdma_dest |= ((value & 0x1F) << 8);
+	    cpu->hdma_dest |= 0x8000;
 	}
 
 	break;
@@ -332,8 +337,8 @@ void io_handle_write(struct CPU * cpu, uint8_t port, uint8_t value) {
     case 0x55:
 	if (cpu->cgb_mode) {
 	    if (value & 0x80) {
-		log_warn("H-Blank DMA is not yet implemented");
 		cpu->hdma_ongoing = true;
+		cpu->hdma_length = ((value & 0x7f) + 1) << 4;
 	    } else {
 		general_dma_handle(cpu, value & 0x7F);
 	    }
