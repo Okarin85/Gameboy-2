@@ -32,5 +32,5 @@ On a QWERTY keyboard, the keys are the same, but should be Q for the A button, a
 ## Games I tested this emulator on
  
  * Tetris (playable)
- * Link's Awakening (seems to be playable until you go left of the first map, then south, and then it's really strange)
+ * Link's Awakening (playable)
  * Pokémon Red (playable)
